@@ -15,7 +15,7 @@ export default function PortfolioPage() {
       stage: "PMF",
       desc: "Founded with a vision to redefine menstrual health, Genie Pads is committed to promoting a healthier planet through innovative approach to menstrual hygiene.",
       url: "http://www.geniepads.in/",
-      logo: null,
+      logo: "/logos/geniepads.jpg",
     },
     {
       name: "Melvin Jones",
@@ -23,7 +23,7 @@ export default function PortfolioPage() {
       stage: "PMF",
       desc: "The fashion brand dedicated to making a planet-positive impact. Redefining the fashion industry by exclusively using natural, eco-friendly fabrics and trims.",
       url: "https://melvinjones.in/",
-      logo: null,
+      logo: "/logos/melvinjones.jpg",
     },
     {
       name: "Ingo Electric",
@@ -95,7 +95,7 @@ export default function PortfolioPage() {
       stage: "Idea",
       desc: "Effluent water treatment engineering and hazardous organic solid waste conversion frameworks for sustainable industrial parks.",
       url: "http://abnandanenviro.com/",
-      logo: null,
+      logo: "/logos/abnandanenviro.jpg",
     },
     {
       name: "Zero Touch",
@@ -151,7 +151,7 @@ export default function PortfolioPage() {
       stage: "Scale",
       desc: "India's largest power bank rental sharing network. Instant charging points across cafe networks, multiplexes, and transit terminals.",
       url: "https://spykke.com/",
-      logo: null,
+      logo: "/logos/spykke.jpg",
     },
     {
       name: "Enumerati Solutions LLP",
@@ -176,6 +176,14 @@ export default function PortfolioPage() {
       desc: "International green transition fund investing in early-stage clean-tech, carbon offset assets, and sustainable resource projects.",
       url: "#",
       logo: "/logos/world5fund.jpg",
+    },
+    {
+      name: "DEFA",
+      sector: "Technology",
+      stage: "Growth",
+      desc: "Digital education and future-readiness academy, providing customized skill development curricula and corporate training models.",
+      url: "#",
+      logo: "/logos/defa.jpg",
     },
   ];
 

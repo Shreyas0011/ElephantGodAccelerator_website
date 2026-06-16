@@ -299,6 +299,11 @@ export default function HomePage() {
                   { name: "Discreet Arts", src: "discreetarts.jpg" },
                   { name: "Charze Max", src: "charzemax.jpg" },
                   { name: "World 5 Fund", src: "world5fund.jpg" },
+                  { name: "Genie Pads", src: "geniepads.jpg" },
+                  { name: "Melvin Jones", src: "melvinjones.jpg" },
+                  { name: "Abnandan Enviro", src: "abnandanenviro.jpg" },
+                  { name: "Spykke", src: "spykke.jpg" },
+                  { name: "DEFA", src: "defa.jpg" },
                 ].map((logo, idx) => (
                   <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
                     <img
@@ -321,6 +326,11 @@ export default function HomePage() {
                   { name: "Discreet Arts", src: "discreetarts.jpg" },
                   { name: "Charze Max", src: "charzemax.jpg" },
                   { name: "World 5 Fund", src: "world5fund.jpg" },
+                  { name: "Genie Pads", src: "geniepads.jpg" },
+                  { name: "Melvin Jones", src: "melvinjones.jpg" },
+                  { name: "Abnandan Enviro", src: "abnandanenviro.jpg" },
+                  { name: "Spykke", src: "spykke.jpg" },
+                  { name: "DEFA", src: "defa.jpg" },
                 ].map((logo, idx) => (
                   <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
                     <img

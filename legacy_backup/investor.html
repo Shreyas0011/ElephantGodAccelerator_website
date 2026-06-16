@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join India's Leading Angel Investor Network | Elephant God Accelerator</title>
+  <meta name="description" content="Access high-growth, vetted Indian startups. Partner with family offices, venture capitals, and corporate investors.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- --- Header / Navbar --- -->
+  <header class="header scrolled">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-cubes" style="color: var(--primary);"></i>
+        <span>ELEPHANTGOD</span> ACCELERATOR
+      </a>
+      
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="portfolio.html" class="nav-link">Portfolio</a>
+        <a href="mentors.html" class="nav-link">Mentors</a>
+        <a href="events.html" class="nav-link">Events</a>
+        <a href="blog.html" class="nav-link">Insights</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a href="download.html" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Download Profile</a>
+        <a href="apply.html" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Apply Accelerator</a>
+      </div>
+
+      <button class="menu-btn" aria-label="Toggle Navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- --- Page Header --- -->
+  <section class="scorecard-hero" style="background: radial-gradient(circle at top right, rgba(255, 183, 3, 0.08) 0%, transparent 60%);">
+    <div class="container" style="max-width: 800px;">
+      <span style="color: var(--secondary); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.05em;">Capital Alliance</span>
+      <h1 style="font-size: 3rem; margin-top: 0.5rem; margin-bottom: 1rem;">Investor & Partner Network</h1>
+      <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6;">Access curated investment deal flows, co-invest alongside institutional leads, and partner with early/growth-stage startups validated by our execution framework.</p>
+    </div>
+  </section>
+
+  <!-- --- Investor Form Section --- -->
+  <section style="background: var(--bg-deep); padding: 2rem 0 7rem;">
+    <div class="container" style="max-width: 800px;">
+      <div class="wizard-form-card" style="border-color: rgba(255,183,3,0.15);">
+        <h2 style="margin-bottom: 1.5rem; text-align: center; color: var(--secondary);">Investor Registration</h2>
+        <p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem; margin-bottom: 3rem;">Register your investment thesis parameters to receive matches from our portfolio database.</p>
+        
+        <form id="investor-register-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inv-name">Contact Person Name *</label>
+              <input type="text" id="inv-name" name="investor_name" required placeholder="E.g., Anil Hegde">
+            </div>
+            <div class="form-group">
+              <label for="inv-email">Work Email *</label>
+              <input type="email" id="inv-email" name="investor_email" required placeholder="name@fund.com">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inv-entity">Fund / Network Name *</label>
+              <input type="text" id="inv-entity" name="fund_name" required placeholder="E.g., Vedic Ventures">
+            </div>
+            <div class="form-group">
+              <label for="inv-type">Investor Type *</label>
+              <select id="inv-type" name="investor_type" required>
+                <option value="">Select Category</option>
+                <option value="Angel Network">Angel Network / Syndicate</option>
+                <option value="Family Office">Family Office</option>
+                <option value="Venture Capital">Venture Capital (VC) Fund</option>
+                <option value="Corporate Investor">Corporate Venturing Arm</option>
+                <option value="Individual Angel">Individual Angel Investor</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inv-ticket">Typical Ticket Size *</label>
+              <select id="inv-ticket" name="ticket_size" required>
+                <option value="">Select Range</option>
+                <option value="₹10L - ₹50L">₹10 Lakhs - ₹50 Lakhs</option>
+                <option value="₹50L - ₹2Cr">₹50 Lakhs - ₹2 Crores</option>
+                <option value="₹2Cr - ₹5Cr">₹2 Crores - ₹5 Crores</option>
+                <option value="Above ₹5Cr">Above ₹5 Crores</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="inv-location">Preferred Location HQ</label>
+              <input type="text" id="inv-location" name="location" placeholder="E.g., Bengaluru, Mumbai">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inv-sector">Preferred Sector Focus *</label>
+              <select id="inv-sector" name="preferred_sector" required>
+                <option value="">Select Sector</option>
+                <option value="Healthcare">Healthcare & MedTech</option>
+                <option value="Consumer Brands">Consumer Brands / FMCG</option>
+                <option value="Mobility">Mobility & Automotive</option>
+                <option value="Sustainability">Sustainability / CleanTech</option>
+                <option value="Technology">Technology & SaaS</option>
+                <option value="AI & Data">AI & Big Data</option>
+                <option value="Sector Agnostic">Sector Agnostic</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="inv-stage">Preferred Startup Stage *</label>
+              <select id="inv-stage" name="preferred_stage" required>
+                <option value="">Select Stage</option>
+                <option value="Idea">Idea / Pre-seed</option>
+                <option value="Validation">Validation / Prototype</option>
+                <option value="PMF">Product Market Fit</option>
+                <option value="Growth">Growth / Series A</option>
+                <option value="Scale">Scale / Growth Round</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inv-thesis">Investment Thesis / Notes *</label>
+            <textarea id="inv-thesis" name="thesis" rows="4" required placeholder="Describe what technology architectures or founder alignments you look for in your portfolio..."></textarea>
+          </div>
+
+          <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 1.5rem; background: linear-gradient(135deg, var(--secondary), #e09f00); box-shadow: 0 4px 15px rgba(255, 183, 3, 0.3);"><i class="fas fa-handshake"></i> Register & Request Deal Flows</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- Footer --- -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3><span>ELEPHANTGOD</span> ACCELERATOR</h3>
+          <p>India's leading execution-driven venture growth platform. We build scalable companies from raw innovation.</p>
+          <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/ramani-iyer-03024178/" target="_blank" class="footer-social-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Accelerator</h4>
+          <ul>
+            <li><a href="portfolio.html">EGA Portfolio</a></li>
+            <li><a href="mentors.html">Mentor Council</a></li>
+            <li><a href="events.html">Cohort Events</a></li>
+            <li><a href="apply.html">Startup Scorecard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Venture Capital</h4>
+          <ul>
+            <li><a href="investor.html">VC Network</a></li>
+            <li><a href="investor.html">Family Offices</a></li>
+            <li><a href="download.html">Corporate Profile</a></li>
+            <li><a href="blog.html">Market Insights</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-newsletter">
+          <h4>Ecosystem Insights</h4>
+          <p>Subscribe to our monthly newsletter covering startup valuations, angel syndicates, and corporate frameworks.</p>
+          <form class="newsletter-form" action="#" onsubmit="alert('Thank you for subscribing!'); this.reset(); return false;">
+            <input type="email" placeholder="Your Email Address" required>
+            <button class="btn btn-primary" type="submit" style="padding: 0 1rem;"><i class="fas fa-paper-plane"></i></button>
+          </form>
+          <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+            <i class="fas fa-envelope"></i> Write to us: <a href="mailto:info@elephantgodaccelerator.com" style="color:var(--text-secondary);">info@elephantgodaccelerator.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2026 Elephant God Accelerator (EGA). All Rights Reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Governance</a>
+          <a href="#">Accessibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

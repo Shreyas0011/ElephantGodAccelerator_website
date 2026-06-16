@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insights Hub & Startup Growth Blog | Elephant God Accelerator</title>
+  <meta name="description" content="Read expert columns on Indian startup funding, angel investing, GTM execution, and corporate secretarial governance.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .blog-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 3rem;
+    }
+    .blog-category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      background: var(--bg-surface-glass);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      border-radius: 12px;
+      align-self: start;
+    }
+    .category-item {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: var(--transition-fast);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .category-item:hover, .category-item.active {
+      background: rgba(255, 77, 109, 0.08);
+      color: var(--primary);
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+    .blog-card {
+      background: var(--bg-surface-glass);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition-smooth);
+    }
+    .blog-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-glow);
+    }
+    .blog-image {
+      height: 180px;
+      background: linear-gradient(135deg, rgba(255, 77, 109, 0.1), rgba(255, 183, 3, 0.1));
+      position: relative;
+      overflow: hidden;
+    }
+    .blog-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.8;
+      transition: var(--transition-smooth);
+    }
+    .blog-card:hover .blog-image img {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+    .blog-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-color);
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    .blog-body {
+      padding: 1.5rem;
+    }
+    .blog-body h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+      color: var(--text-primary);
+    }
+    .blog-excerpt {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .blog-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1rem 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .blog-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- --- Header / Navbar --- -->
+  <header class="header scrolled">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-cubes" style="color: var(--primary);"></i>
+        <span>ELEPHANTGOD</span> ACCELERATOR
+      </a>
+      
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="portfolio.html" class="nav-link">Portfolio</a>
+        <a href="mentors.html" class="nav-link">Mentors</a>
+        <a href="events.html" class="nav-link">Events</a>
+        <a href="blog.html" class="nav-link active">Insights</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a href="download.html" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Download Profile</a>
+        <a href="apply.html" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Apply Accelerator</a>
+      </div>
+
+      <button class="menu-btn" aria-label="Toggle Navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- --- Page Header --- -->
+  <section class="scorecard-hero" style="background: radial-gradient(circle at top right, rgba(255, 183, 3, 0.08) 0%, transparent 60%);">
+    <div class="container" style="max-width: 800px;">
+      <span style="color: var(--secondary); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.05em;">Venture Knowledge</span>
+      <h1 style="font-size: 3rem; margin-top: 0.5rem; margin-bottom: 1rem;">Insights Hub</h1>
+      <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6;">Access our database of fundraising strategies, GTM operations playbooks, valuation breakdowns, and regulatory updates in India.</p>
+    </div>
+  </section>
+
+  <!-- --- Blog Component --- -->
+  <section style="background: var(--bg-deep); padding-bottom: 7rem;">
+    <div class="container">
+      <div class="blog-layout">
+        
+        <!-- Left Side: Category filter sidebar -->
+        <div class="blog-category-list" id="blog-category-box">
+          <h4 style="margin-bottom: 1rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; color: var(--text-primary);">Categories</h4>
+          <div class="category-item active" data-category=""><span>All Articles</span> <i class="fas fa-chevron-right" style="font-size:0.75rem;"></i></div>
+          <div class="category-item" data-category="Startup Funding India"><span>Startup Funding India</span> <i class="fas fa-chevron-right" style="font-size:0.75rem;"></i></div>
+          <div class="category-item" data-category="Startup Mentorship India"><span>Startup Mentorship India</span> <i class="fas fa-chevron-right" style="font-size:0.75rem;"></i></div>
+          <div class="category-item" data-category="Angel Investing"><span>Angel Investing</span> <i class="fas fa-chevron-right" style="font-size:0.75rem;"></i></div>
+          <div class="category-item" data-category="Founder Growth"><span>Founder Growth</span> <i class="fas fa-chevron-right" style="font-size:0.75rem;"></i></div>
+          <div class="category-item" data-category="Venture Capital"><span>Venture Capital</span> <i class="fas fa-chevron-right" style="font-size:0.75rem;"></i></div>
+          <div class="category-item" data-category="Startup Strategy"><span>Startup Strategy</span> <i class="fas fa-chevron-right" style="font-size:0.75rem;"></i></div>
+        </div>
+
+        <!-- Right Side: Blog Cards -->
+        <div>
+          <div class="blog-grid" id="blog-grid">
+            <!-- Rendered by Javascript -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- --- Footer --- -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3><span>ELEPHANTGOD</span> ACCELERATOR</h3>
+          <p>India's leading execution-driven venture growth platform. We build scalable companies from raw innovation.</p>
+          <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/ramani-iyer-03024178/" target="_blank" class="footer-social-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Accelerator</h4>
+          <ul>
+            <li><a href="portfolio.html">EGA Portfolio</a></li>
+            <li><a href="mentors.html">Mentor Council</a></li>
+            <li><a href="events.html">Cohort Events</a></li>
+            <li><a href="apply.html">Startup Scorecard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Venture Capital</h4>
+          <ul>
+            <li><a href="investor.html">VC Network</a></li>
+            <li><a href="investor.html">Family Offices</a></li>
+            <li><a href="download.html">Corporate Profile</a></li>
+            <li><a href="blog.html">Market Insights</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-newsletter">
+          <h4>Ecosystem Insights</h4>
+          <p>Subscribe to our monthly newsletter covering startup valuations, angel syndicates, and corporate frameworks.</p>
+          <form class="newsletter-form" action="#" onsubmit="alert('Thank you for subscribing!'); this.reset(); return false;">
+            <input type="email" placeholder="Your Email Address" required>
+            <button class="btn btn-primary" type="submit" style="padding: 0 1rem;"><i class="fas fa-paper-plane"></i></button>
+          </form>
+          <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+            <i class="fas fa-envelope"></i> Write to us: <a href="mailto:info@elephantgodaccelerator.com" style="color:var(--text-secondary);">info@elephantgodaccelerator.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2026 Elephant God Accelerator (EGA). All Rights Reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Governance</a>
+          <a href="#">Accessibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Blog articles data array
+    const blogsData = [
+      { id: 1, title: 'Demystifying Startup Valuations in India: A Founder Guide', category: 'Startup Funding India', excerpt: 'How early stage Indian founders should value their MVP before approaching angel syndicates and seed VCs.', date: 'June 10, 2026', readTime: '5 min read', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400&h=200' },
+      { id: 2, title: 'The Role of Hands-on Mentorship in Post-PMF Scale up', category: 'Startup Mentorship India', excerpt: 'Advice from Chief Mentor Ramani Iyer on avoiding common scaling pitfalls in Operations, GTM, and hiring.', date: 'May 28, 2026', readTime: '7 min read', img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=400&h=200' },
+      { id: 3, title: 'Co-Investments & Syndicates: A Guide to Angel Investing', category: 'Angel Investing', excerpt: 'How Indian family offices and HNIs are pooling Capital to access seed and growth stage portfolios.', date: 'May 15, 2026', readTime: '6 min read', img: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=400&h=200' },
+      { id: 4, title: 'Reducing Operating Overheads: Centralized Shared Services', category: 'Founder Growth', excerpt: 'Analyzing how founders can trim operating expenses by up to 40% using specialized compliance, tax, and IT services.', date: 'April 30, 2026', readTime: '8 min read', img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=400&h=200' },
+      { id: 5, title: 'Cap-Table Cleanliness & Termsheet Negotiations', category: 'Venture Capital', excerpt: 'A comprehensive walkthrough on venture term sheets, liquidation preferences, and anti-dilution triggers.', date: 'April 12, 2026', readTime: '10 min read', img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=400&h=200' },
+      { id: 6, title: 'Building Automated B2B Sales Funnels using CRM systems', category: 'Startup Strategy', excerpt: 'Practical playbooks to align operations, generate outbound database leads, and scale recurring monthly revenue.', date: 'March 25, 2026', readTime: '6 min read', img: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=400&h=200' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('blog-grid');
+      const categoryBox = document.getElementById('blog-category-box');
+
+      function renderBlogs(items) {
+        grid.innerHTML = '';
+        if (items.length === 0) {
+          grid.innerHTML = `<div class="glass-card" style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No articles found in this category.</div>`;
+          return;
+        }
+
+        items.forEach(blog => {
+          const card = document.createElement('div');
+          card.className = 'blog-card';
+          card.innerHTML = `
+            <div>
+              <div class="blog-image">
+                <img src="${blog.img}" alt="${blog.title}">
+                <span class="blog-badge">${blog.category}</span>
+              </div>
+              <div class="blog-body">
+                <h3>${blog.title}</h3>
+                <p class="blog-excerpt">${blog.excerpt}</p>
+              </div>
+            </div>
+            <div class="blog-footer">
+              <span><i class="far fa-calendar"></i> ${blog.date}</span>
+              <span><i class="far fa-clock"></i> ${blog.readTime}</span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      // Category filter click handler
+      if (categoryBox) {
+        const items = categoryBox.querySelectorAll('.category-item');
+        items.forEach(item => {
+          item.addEventListener('click', () => {
+            items.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            const category = item.getAttribute('data-category');
+            if (category === '') {
+              renderBlogs(blogsData);
+            } else {
+              const filtered = blogsData.filter(b => b.category === category);
+              renderBlogs(filtered);
+            }
+          });
+        });
+      }
+
+      // Initial load
+      renderBlogs(blogsData);
+    });
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>

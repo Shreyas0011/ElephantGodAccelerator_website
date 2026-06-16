@@ -1,0 +1,43 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { MessageCircle, FileText, Calendar } from "lucide-react";
+import { useApp } from "@/context/AppContext";
+
+export default function MobileStickyBar() {
+  const { openMeetingModal } = useApp();
+
+  return (
+    <div className="fixed bottom-0 left-0 w-full z-45 bg-bg-surface/90 backdrop-blur-md border-t border-gold/10 grid grid-cols-3 md:hidden">
+      {/* WhatsApp Link */}
+      <a
+        href="https://wa.me/919999999999"
+        target="_blank"
+        rel="noreferrer"
+        className="flex flex-col items-center justify-center py-2 text-gray-400 hover:text-emerald-400 active:text-emerald-400 border-r border-white/5"
+      >
+        <MessageCircle className="w-5 h-5 mb-0.5" />
+        <span className="text-[10px] font-bold uppercase tracking-wider">WhatsApp</span>
+      </a>
+
+      {/* Apply Link */}
+      <Link
+        href="/apply"
+        className="flex flex-col items-center justify-center py-2 text-gold hover:text-white active:text-white border-r border-white/5 bg-gold/5"
+      >
+        <FileText className="w-5 h-5 mb-0.5" />
+        <span className="text-[10px] font-bold uppercase tracking-wider">Apply Now</span>
+      </Link>
+
+      {/* Schedule Link */}
+      <button
+        onClick={openMeetingModal}
+        className="flex flex-col items-center justify-center py-2 text-gray-400 hover:text-primary active:text-primary"
+      >
+        <Calendar className="w-5 h-5 mb-0.5" />
+        <span className="text-[10px] font-bold uppercase tracking-wider">Schedule</span>
+      </button>
+    </div>
+  );
+}

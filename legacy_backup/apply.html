@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Startup Funding & Acceleration Application | Elephant God Accelerator</title>
+  <meta name="description" content="Apply to India's top startup accelerator. Check your startup funding readiness with our interactive assessment tool.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- --- Header / Navbar --- -->
+  <header class="header scrolled">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-cubes" style="color: var(--primary);"></i>
+        <span>ELEPHANTGOD</span> ACCELERATOR
+      </a>
+      
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="portfolio.html" class="nav-link">Portfolio</a>
+        <a href="mentors.html" class="nav-link">Mentors</a>
+        <a href="events.html" class="nav-link">Events</a>
+        <a href="blog.html" class="nav-link">Insights</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a href="download.html" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Download Profile</a>
+        <a href="apply.html" class="btn btn-primary active" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Apply Accelerator</a>
+      </div>
+
+      <button class="menu-btn" aria-label="Toggle Navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- --- Scorecard assessment Intro --- -->
+  <section class="scorecard-hero">
+    <div class="container" style="max-width: 800px;">
+      <span style="color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.05em;">Venture Metric Tool</span>
+      <h1 style="font-size: 3rem; margin-top: 0.5rem; margin-bottom: 1rem;">Startup Funding Readiness Scorecard</h1>
+      <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6;">Assess your venture metrics against typical venture capital thresholds in India. Complete this quick 5-question scorecard to check validation benchmarks and unlock tailored recommendations.</p>
+    </div>
+  </section>
+
+  <!-- --- Scorecard Widget Section --- -->
+  <section style="background: var(--bg-deep); padding-bottom: 5rem;">
+    <div class="container scorecard-wrapper">
+      <div class="scorecard-card">
+        
+        <!-- Welcome Screen -->
+        <div id="scorecard-welcome" style="text-align: center;">
+          <i class="fas fa-clipboard-check" style="font-size: 4rem; color: var(--accent); margin-bottom: 1.5rem;"></i>
+          <h2 style="margin-bottom: 1rem;">Ready to Begin the Assessment?</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">Takes less than 2 minutes. We evaluate revenue metrics, product maturity, unit economics, team structure, and history.</p>
+          <button class="btn btn-primary btn-lg" id="scorecard-start">Start Scorecard Assessment</button>
+        </div>
+
+        <!-- Question Screen (Drawn by JS) -->
+        <div id="scorecard-qbox" style="display: none;">
+          <div class="scorecard-progress">
+            <div class="scorecard-progress-bar" id="scorecard-progress-bar"></div>
+          </div>
+          <!-- Question elements go here -->
+        </div>
+
+        <!-- Result Screen -->
+        <div id="scorecard-result" class="scorecard-result-box">
+          <div class="radial-progress-container">
+            <div class="radial-progress">
+              <svg>
+                <circle class="circle-bg" cx="90" cy="90" r="75"></circle>
+                <circle class="circle-fill" cx="90" cy="90" r="75"></circle>
+              </svg>
+              <div class="radial-progress-text">
+                <span class="score-percent" id="score-percent">0%</span>
+                <span class="score-label">Score</span>
+              </div>
+            </div>
+          </div>
+          <h2 id="result-verdict" class="result-verdict">Evaluating Readiness...</h2>
+          <p id="result-feedback" class="result-feedback"></p>
+          
+          <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem;">
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">To submit these results and obtain structured operational audits from our team, please complete the Accelerator Application form below.</p>
+            <a href="#apply-wizard" class="btn btn-primary">Proceed to Accelerator Application</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- --- Application Wizard Section --- -->
+  <section class="section-padding" style="background: var(--bg-surface); border-top: 1px solid var(--border-color);" id="apply-wizard">
+    <div class="container wizard-container">
+      <div class="section-header">
+        <span style="color: var(--primary); font-weight: 700; text-transform: uppercase;">Accelerator Cohort 2026</span>
+        <h2 style="margin-top: 0.5rem;">EGA Cohort Application</h2>
+        <p>Submit your deck and business parameters. The structured validation program is open to pre-revenue prototypes, growth stages, and scaling ventures.</p>
+      </div>
+
+      <div class="wizard-steps">
+        <div class="wizard-step-line"></div>
+        <div class="wizard-step-node active">
+          <div class="wizard-node-circle">1</div>
+          <span class="wizard-node-label">Founder</span>
+        </div>
+        <div class="wizard-step-node">
+          <div class="wizard-node-circle">2</div>
+          <span class="wizard-node-label">Startup</span>
+        </div>
+        <div class="wizard-step-node">
+          <div class="wizard-node-circle">3</div>
+          <span class="wizard-node-label">Metrics</span>
+        </div>
+        <div class="wizard-step-node">
+          <div class="wizard-node-circle">4</div>
+          <span class="wizard-node-label">Capital</span>
+        </div>
+      </div>
+
+      <div class="wizard-form-card">
+        <form id="apply-wizard-form">
+          <!-- Step 1: Founder Information -->
+          <div class="form-step-pane active">
+            <h3 style="margin-bottom: 1.5rem; color: var(--secondary);"><i class="far fa-user"></i> Founder Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="founder-name">Full Name *</label>
+                <input type="text" id="founder-name" name="founder_name" required placeholder="E.g., Shreyas Kumar">
+              </div>
+              <div class="form-group">
+                <label for="founder-email">Email Address *</label>
+                <input type="email" id="founder-email" name="founder_email" required placeholder="name@company.com">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="founder-phone">Phone Number (WhatsApp preferred) *</label>
+                <input type="text" id="founder-phone" name="founder_phone" required placeholder="+91 XXXXX XXXXX">
+              </div>
+              <div class="form-group">
+                <label for="founder-linkedin">LinkedIn Profile URL</label>
+                <input type="url" id="founder-linkedin" name="founder_linkedin" placeholder="https://linkedin.com/in/username">
+              </div>
+            </div>
+            <div class="wizard-buttons">
+              <span></span> <!-- Spacer -->
+              <button type="button" class="btn btn-primary next-step">Next Step <i class="fas fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- Step 2: Startup Details -->
+          <div class="form-step-pane">
+            <h3 style="margin-bottom: 1.5rem; color: var(--secondary);"><i class="fas fa-cubes"></i> Startup Profile</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startup-name">Startup Name *</label>
+                <input type="text" id="startup-name" name="startup_name" required placeholder="E.g., Genie Pads">
+              </div>
+              <div class="form-group">
+                <label for="startup-website">Website URL / Product Link</label>
+                <input type="url" id="startup-website" name="startup_website" placeholder="https://www.company.com">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startup-sector">Industry / Sector *</label>
+                <select id="startup-sector" name="startup_sector" required>
+                  <option value="">Select Sector</option>
+                  <option value="Healthcare">Healthcare & MedTech</option>
+                  <option value="Consumer Brands">Consumer Brands / FMCG</option>
+                  <option value="Mobility">Mobility & Automotive</option>
+                  <option value="Sustainability">Sustainability / CleanTech</option>
+                  <option value="Technology">Technology & SaaS</option>
+                  <option value="AI & Data">AI & Big Data</option>
+                  <option value="Manufacturing">Manufacturing & Hardware</option>
+                  <option value="Real Estate">Real Estate & Co-Living</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="startup-location">Headquarters Location *</label>
+                <input type="text" id="startup-location" name="startup_location" required placeholder="E.g., Bengaluru">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="startup-elevator">Elevator Pitch (1-2 sentences) *</label>
+              <textarea id="startup-elevator" name="startup_elevator" rows="3" required placeholder="Describe what problem your startup solves and how..."></textarea>
+            </div>
+            <div class="wizard-buttons">
+              <button type="button" class="btn btn-secondary prev-step"><i class="fas fa-arrow-left"></i> Previous</button>
+              <button type="button" class="btn btn-primary next-step">Next Step <i class="fas fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- Step 3: Metrics & Traction -->
+          <div class="form-step-pane">
+            <h3 style="margin-bottom: 1.5rem; color: var(--secondary);"><i class="fas fa-chart-line"></i> Traction & Team</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startup-stage">Current Development Stage *</label>
+                <select id="startup-stage" name="startup_stage" required>
+                  <option value="">Select Stage</option>
+                  <option value="Idea">Idea / Concept</option>
+                  <option value="Validation">Validation / Prototype</option>
+                  <option value="Product Market Fit">Product-Market Fit (PMF)</option>
+                  <option value="Growth">Growth & Early Scaling</option>
+                  <option value="Scale">National Scale-up</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="startup-team">Core Team Size (Co-founders + Employees) *</label>
+                <input type="number" id="startup-team" name="startup_team" required min="1" placeholder="E.g., 4">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startup-revenue">Monthly Recurring Revenue (MRR) *</label>
+                <select id="startup-revenue" name="startup_revenue" required>
+                  <option value="">Select Revenue Status</option>
+                  <option value="Pre-revenue">Pre-revenue</option>
+                  <option value="Less than 2L">Less than ₹2 Lakhs / month</option>
+                  <option value="2L - 5L">₹2 Lakhs - ₹5 Lakhs / month</option>
+                  <option value="More than 5L">More than ₹5 Lakhs / month</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="startup-registered">Registered Legal Entity Type *</label>
+                <select id="startup-registered" name="startup_registered" required>
+                  <option value="">Select Entity Type</option>
+                  <option value="Pvt Ltd">Private Limited (Pvt Ltd)</option>
+                  <option value="LLP">Limited Liability Partnership (LLP)</option>
+                  <option value="Partnership">Partnership Firm</option>
+                  <option value="Proprietorship">Sole Proprietorship</option>
+                  <option value="Not Registered Yet">Not Registered Yet</option>
+                </select>
+              </div>
+            </div>
+            <div class="wizard-buttons">
+              <button type="button" class="btn btn-secondary prev-step"><i class="fas fa-arrow-left"></i> Previous</button>
+              <button type="button" class="btn btn-primary next-step">Next Step <i class="fas fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- Step 4: Capital & Pitch Deck -->
+          <div class="form-step-pane">
+            <h3 style="margin-bottom: 1.5rem; color: var(--secondary);"><i class="fas fa-wallet"></i> Capital & Pitch Deck</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startup-raised">Prior Funding Raised (Grants / Angels) *</label>
+                <select id="startup-raised" name="startup_raised" required>
+                  <option value="">Select Raised Amount</option>
+                  <option value="None">None (Bootstrapped)</option>
+                  <option value="Under 10L">Under ₹10 Lakhs</option>
+                  <option value="10L - 50L">₹10 Lakhs - ₹50 Lakhs</option>
+                  <option value="Over 50L">Over ₹50 Lakhs</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="startup-funding-req">Funding Requirement *</label>
+                <select id="startup-funding-req" name="startup_funding_req" required>
+                  <option value="">Select Requirement</option>
+                  <option value="Under 25L">Under ₹25 Lakhs</option>
+                  <option value="25L - 1Cr">₹25 Lakhs - ₹1 Crore</option>
+                  <option value="1Cr - 5Cr">₹1 Crore - ₹5 Crores</option>
+                  <option value="Strategic Mentorship Only">Strategic Mentorship Only</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Upload Pitch Deck (PDF preferred, Max 10MB) *</label>
+              <div class="file-upload-wrapper">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h4 style="margin-bottom: 0.25rem;">Drag & Drop Pitch Deck File</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">or click to browse local files</p>
+                <input type="file" name="pitch_deck" required accept=".pdf,.ppt,.pptx">
+              </div>
+            </div>
+            <div class="wizard-buttons">
+              <button type="button" class="btn btn-secondary prev-step"><i class="fas fa-arrow-left"></i> Previous</button>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i> Submit Application</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- Footer --- -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3><span>ELEPHANTGOD</span> ACCELERATOR</h3>
+          <p>India's leading execution-driven venture growth platform. We build scalable companies from raw innovation.</p>
+          <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/ramani-iyer-03024178/" target="_blank" class="footer-social-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Accelerator</h4>
+          <ul>
+            <li><a href="portfolio.html">EGA Portfolio</a></li>
+            <li><a href="mentors.html">Mentor Council</a></li>
+            <li><a href="events.html">Cohort Events</a></li>
+            <li><a href="apply.html">Startup Scorecard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Venture Capital</h4>
+          <ul>
+            <li><a href="investor.html">VC Network</a></li>
+            <li><a href="investor.html">Family Offices</a></li>
+            <li><a href="download.html">Corporate Profile</a></li>
+            <li><a href="blog.html">Market Insights</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-newsletter">
+          <h4>Ecosystem Insights</h4>
+          <p>Subscribe to our monthly newsletter covering startup valuations, angel syndicates, and corporate frameworks.</p>
+          <form class="newsletter-form" action="#" onsubmit="alert('Thank you for subscribing!'); this.reset(); return false;">
+            <input type="email" placeholder="Your Email Address" required>
+            <button class="btn btn-primary" type="submit" style="padding: 0 1rem;"><i class="fas fa-paper-plane"></i></button>
+          </form>
+          <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+            <i class="fas fa-envelope"></i> Write to us: <a href="mailto:info@elephantgodaccelerator.com" style="color:var(--text-secondary);">info@elephantgodaccelerator.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2026 Elephant God Accelerator (EGA). All Rights Reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Governance</a>
+          <a href="#">Accessibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

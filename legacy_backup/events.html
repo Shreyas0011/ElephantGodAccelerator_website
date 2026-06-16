@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accelerator Cohort Events & Demo Days | Elephant God Accelerator</title>
+  <meta name="description" content="View upcoming startup demo days, founder meetups, and investor matchmaking sessions at Elephant God Accelerator.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- --- Header / Navbar --- -->
+  <header class="header scrolled">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-cubes" style="color: var(--primary);"></i>
+        <span>ELEPHANTGOD</span> ACCELERATOR
+      </a>
+      
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="portfolio.html" class="nav-link">Portfolio</a>
+        <a href="mentors.html" class="nav-link">Mentors</a>
+        <a href="events.html" class="nav-link active">Events</a>
+        <a href="blog.html" class="nav-link">Insights</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a href="download.html" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Download Profile</a>
+        <a href="apply.html" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Apply Accelerator</a>
+      </div>
+
+      <button class="menu-btn" aria-label="Toggle Navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- --- Page Header --- -->
+  <section class="scorecard-hero" style="background: radial-gradient(circle at top right, rgba(255, 77, 109, 0.08) 0%, transparent 60%);">
+    <div class="container" style="max-width: 800px;">
+      <span style="color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.05em;">EGA Community Hub</span>
+      <h1 style="font-size: 3rem; margin-top: 0.5rem; margin-bottom: 1rem;">Ecosystem Events Calendar</h1>
+      <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6;">Stay connected with upcoming Demo Days, sector pitch sprints, educational masterclasses, and regional VC network meetups.</p>
+    </div>
+  </section>
+
+  <!-- --- Calendar Component --- -->
+  <section style="background: var(--bg-deep); padding-bottom: 7rem;">
+    <div class="container">
+      <div class="calendar-layout">
+        
+        <!-- Left Side: Calendar Grid -->
+        <div>
+          <div class="calendar-header">
+            <h2 id="calendar-month-label" style="font-family: var(--font-headings); color: var(--text-primary);">June 2026</h2>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem;" onclick="alert('Calendar navigation is mocked for June 2026 (Active Cohort Month)')"><i class="fas fa-chevron-left"></i></button>
+              <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem;" onclick="alert('Calendar navigation is mocked for June 2026 (Active Cohort Month)')"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="calendar-grid" id="calendar-grid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Right Side: Details Card -->
+        <div class="calendar-event-details" id="event-details-area">
+          <!-- Populated by JS -->
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- --- Footer --- -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3><span>ELEPHANTGOD</span> ACCELERATOR</h3>
+          <p>India's leading execution-driven venture growth platform. We build scalable companies from raw innovation.</p>
+          <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/ramani-iyer-03024178/" target="_blank" class="footer-social-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="footer-social-btn"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Accelerator</h4>
+          <ul>
+            <li><a href="portfolio.html">EGA Portfolio</a></li>
+            <li><a href="mentors.html">Mentor Council</a></li>
+            <li><a href="events.html">Cohort Events</a></li>
+            <li><a href="apply.html">Startup Scorecard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Venture Capital</h4>
+          <ul>
+            <li><a href="investor.html">VC Network</a></li>
+            <li><a href="investor.html">Family Offices</a></li>
+            <li><a href="download.html">Corporate Profile</a></li>
+            <li><a href="blog.html">Market Insights</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-newsletter">
+          <h4>Ecosystem Insights</h4>
+          <p>Subscribe to our monthly newsletter covering startup valuations, angel syndicates, and corporate frameworks.</p>
+          <form class="newsletter-form" action="#" onsubmit="alert('Thank you for subscribing!'); this.reset(); return false;">
+            <input type="email" placeholder="Your Email Address" required>
+            <button class="btn btn-primary" type="submit" style="padding: 0 1rem;"><i class="fas fa-paper-plane"></i></button>
+          </form>
+          <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+            <i class="fas fa-envelope"></i> Write to us: <a href="mailto:info@elephantgodaccelerator.com" style="color:var(--text-secondary);">info@elephantgodaccelerator.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2026 Elephant God Accelerator (EGA). All Rights Reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Governance</a>
+          <a href="#">Accessibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

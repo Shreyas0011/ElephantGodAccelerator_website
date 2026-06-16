@@ -44,13 +44,13 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+      className={`fixed left-1/2 -translate-x-1/2 w-[92%] max-w-7xl z-50 rounded-2xl transition-all duration-500 ${
         scrolled || isOpen
-          ? "bg-bg-dark/90 backdrop-blur-xl border-b border-gray-200/50 py-4"
-          : "bg-transparent py-6"
+          ? "top-4 bg-bg-dark/95 backdrop-blur-xl border border-gold/10 shadow-[0_10px_35px_rgba(201,169,110,0.1)] py-3.5 px-6"
+          : "top-6 bg-transparent py-4 px-6"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary via-secondary to-gold flex items-center justify-center shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform duration-300">
@@ -65,20 +65,22 @@ export default function Header() {
         <nav className="hidden lg:flex items-center gap-8">
           <Link
             href="/"
-            className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 hover:text-gold ${
+            className={`relative text-xs uppercase tracking-wider font-bold transition-colors duration-300 hover:text-gold py-1.5 group/nav-link ${
               pathname === "/" ? "text-gold" : scrolled ? "text-gray-600" : "text-gray-300"
             }`}
           >
             Home
+            <span className={`absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover/nav-link:w-full ${pathname === "/" ? "w-full" : ""}`} />
           </Link>
 
           <Link
             href="/#programs"
-            className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 hover:text-gold ${
+            className={`relative text-xs uppercase tracking-wider font-bold transition-colors duration-300 hover:text-gold py-1.5 group/nav-link ${
               scrolled ? "text-gray-600" : "text-gray-300"
             }`}
           >
             Programs
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover/nav-link:w-full" />
           </Link>
 
           {/* Network Dropdown */}
@@ -89,7 +91,7 @@ export default function Header() {
             onMouseLeave={() => setActiveDropdown(null)}
           >
             <button
-              className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 flex items-center gap-1 hover:text-gold cursor-pointer ${
+              className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 flex items-center gap-1 hover:text-gold cursor-pointer py-1.5 ${
                 pathname === "/portfolio" || pathname === "/mentors" || pathname === "/investor"
                   ? "text-gold"
                   : scrolled ? "text-gray-600" : "text-gray-300"
@@ -105,14 +107,15 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 bg-bg-surface border border-gray-200 rounded-2xl p-4 shadow-xl z-50"
+                  className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 bg-bg-surface/95 backdrop-blur-xl border border-gold/10 rounded-2xl p-4 shadow-2xl z-50"
                 >
-                  <div className="flex flex-col gap-1">
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-bg-surface border-t border-l border-gold/10 rotate-45" />
+                  <div className="flex flex-col gap-1 relative z-10">
                     {networkLinks.map((link) => (
                       <Link
                         key={link.name}
                         href={link.href}
-                        className="p-3 rounded-xl hover:bg-white/5 transition-all text-left flex flex-col group/item"
+                        className="p-3 rounded-xl hover:bg-gold/10 transition-all text-left flex flex-col group/item"
                       >
                         <span className="text-sm font-bold text-white group-hover/item:text-gold transition-colors flex items-center gap-1">
                           {link.name}
@@ -135,7 +138,7 @@ export default function Header() {
             onMouseLeave={() => setActiveDropdown(null)}
           >
             <button
-              className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 flex items-center gap-1 hover:text-gold cursor-pointer ${
+              className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 flex items-center gap-1 hover:text-gold cursor-pointer py-1.5 ${
                 pathname === "/blog" || pathname === "/events" ? "text-gold" : scrolled ? "text-gray-600" : "text-gray-300"
               }`}
             >
@@ -149,14 +152,15 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 bg-bg-surface border border-gray-200 rounded-2xl p-4 shadow-xl z-50"
+                  className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 bg-bg-surface/95 backdrop-blur-xl border border-gold/10 rounded-2xl p-4 shadow-2xl z-50"
                 >
-                  <div className="flex flex-col gap-1">
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-bg-surface border-t border-l border-gold/10 rotate-45" />
+                  <div className="flex flex-col gap-1 relative z-10">
                     {insightsLinks.map((link) => (
                       <Link
                         key={link.name}
                         href={link.href}
-                        className="p-3 rounded-xl hover:bg-white/5 transition-all text-left flex flex-col group/item"
+                        className="p-3 rounded-xl hover:bg-gold/10 transition-all text-left flex flex-col group/item"
                       >
                         <span className="text-sm font-bold text-white group-hover/item:text-gold transition-colors flex items-center gap-1">
                           {link.name}
@@ -173,20 +177,22 @@ export default function Header() {
 
           <Link
             href="/#about"
-            className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 hover:text-gold ${
+            className={`relative text-xs uppercase tracking-wider font-bold transition-colors duration-300 hover:text-gold py-1.5 group/nav-link ${
               scrolled ? "text-gray-600" : "text-gray-300"
             }`}
           >
             About
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover/nav-link:w-full" />
           </Link>
 
           <button
             onClick={openMeetingModal}
-            className={`text-xs uppercase tracking-wider font-bold transition-colors duration-300 cursor-pointer hover:text-gold ${
+            className={`relative text-xs uppercase tracking-wider font-bold transition-colors duration-300 cursor-pointer hover:text-gold py-1.5 group/nav-link ${
               scrolled ? "text-gray-600" : "text-gray-300"
             }`}
           >
             Contact
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover/nav-link:w-full" />
           </button>
         </nav>
 
@@ -227,25 +233,25 @@ export default function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden bg-bg-dark border-b border-gray-200 px-4 pt-2 pb-8 flex flex-col gap-3 overflow-hidden"
+            className="lg:hidden mt-4 pt-4 border-t border-gray-200/20 flex flex-col gap-3 overflow-hidden"
           >
             <Link
               href="/"
               onClick={() => setIsOpen(false)}
-              className="text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200"
+              className="text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200/20"
             >
               Home
             </Link>
             <Link
               href="/#programs"
               onClick={() => setIsOpen(false)}
-              className="text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200"
+              className="text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200/20"
             >
               Programs
             </Link>
 
             {/* Network section */}
-            <div className="flex flex-col gap-1 border-b border-gray-200 py-2">
+            <div className="flex flex-col gap-1 border-b border-gray-200/20 py-2">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-gold flex items-center gap-1 mb-1">
                 <Sparkles className="w-3 h-3" /> Network
               </span>
@@ -263,7 +269,7 @@ export default function Header() {
             </div>
 
             {/* Insights section */}
-            <div className="flex flex-col gap-1 border-b border-gray-200 py-2">
+            <div className="flex flex-col gap-1 border-b border-gray-200/20 py-2">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-gold flex items-center gap-1 mb-1">
                 <Sparkles className="w-3 h-3" /> Insights
               </span>
@@ -283,7 +289,7 @@ export default function Header() {
             <Link
               href="/#about"
               onClick={() => setIsOpen(false)}
-              className="text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200"
+              className="text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200/20"
             >
               About
             </Link>
@@ -292,7 +298,7 @@ export default function Header() {
                 setIsOpen(false);
                 openMeetingModal();
               }}
-              className="text-left text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200 cursor-pointer"
+              className="text-left text-sm font-bold text-gray-500 hover:text-gold py-2.5 border-b border-gray-200/20 cursor-pointer"
             >
               Contact
             </button>

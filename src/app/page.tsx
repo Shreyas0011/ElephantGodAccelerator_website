@@ -434,11 +434,11 @@ export default function HomePage() {
           <div className="max-w-3xl mx-auto">
             <div className="premium-card p-6 sm:p-8 flex flex-col md:flex-row gap-6 items-center">
               {/* Photo */}
-              <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden shrink-0 border border-gold/30 relative">
+              <div className="w-36 h-48 sm:w-44 sm:h-56 rounded-2xl overflow-hidden shrink-0 border border-gold/30 relative">
                 <img
                   src="/ramani_iyer.png"
                   alt="Ramani Iyer"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-top"
                 />
               </div>
               {/* Profile content */}

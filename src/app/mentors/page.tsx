@@ -36,11 +36,11 @@ export default function MentorsPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="glass-card p-6 sm:p-8 rounded-3xl border border-gray-200 hover:border-gold/30 flex flex-col md:flex-row gap-8 text-left transition-all max-w-2xl mx-auto">
             {/* Photo */}
-            <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden shrink-0 border border-gray-200 self-center">
+            <div className="w-36 h-48 sm:w-44 sm:h-56 rounded-2xl overflow-hidden shrink-0 border border-gray-200 self-center">
               <img
                 src={founder.img}
                 alt={founder.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             </div>
 

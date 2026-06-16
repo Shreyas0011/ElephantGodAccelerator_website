@@ -63,7 +63,7 @@ export default function PortfolioPage() {
       stage: "Scale",
       desc: "Traditional ready-to-cook fresh foods using high-quality grains, offering natural, healthy batters, flatbreads, and traditional Indian sides.",
       url: "http://www.ammammas.com/",
-      logo: null,
+      logo: "/logos/ammammas.jpg",
     },
     {
       name: "Olive Living",
@@ -71,7 +71,7 @@ export default function PortfolioPage() {
       stage: "Scale",
       desc: "Premium co-living and managed student accommodation spaces across tier-1 cities, optimizing modern layouts and community facilities.",
       url: "https://oliveliving.com/",
-      logo: null,
+      logo: "/logos/olive.jpg",
     },
     {
       name: "NES",
@@ -87,7 +87,7 @@ export default function PortfolioPage() {
       stage: "Scale",
       desc: "International animation studio specializing in 2D/3D CGI series, feature films, and game asset development for global networks.",
       url: "https://discreetartsglobal.com/",
-      logo: null,
+      logo: "/logos/discreetarts.jpg",
     },
     {
       name: "Abnandan Enviro",
@@ -160,6 +160,22 @@ export default function PortfolioPage() {
       desc: "Venture analytics, financial reporting architectures, and automated dashboard integrations for investment companies.",
       url: "http://www.enumerati.in/",
       logo: null,
+    },
+    {
+      name: "Charze Max",
+      sector: "Mobility",
+      stage: "Growth",
+      desc: "Smart electric vehicle charging network and infrastructure solutions, powering the future of micro-mobility and passenger EVs.",
+      url: "#",
+      logo: "/logos/charzemax.jpg",
+    },
+    {
+      name: "World 5 Fund",
+      sector: "Sustainability",
+      stage: "Scale",
+      desc: "International green transition fund investing in early-stage clean-tech, carbon offset assets, and sustainable resource projects.",
+      url: "#",
+      logo: "/logos/world5fund.jpg",
     },
   ];
 

@@ -294,11 +294,11 @@ export default function HomePage() {
                   { name: "Tribal Brew Coffee", src: "tribalbrew.jpg" },
                   { name: "Just Connect Electricals", src: "justconnect.jpg" },
                   { name: "Myniwa", src: "myniwa.jpg" },
-                  { name: "Mykhaana", src: "mykhaana.jpg" },
-                  { name: "CosmicEye", src: "cosmiceye.jpg" },
-                  { name: "Tribal Brew Coffee", src: "tribalbrew.jpg" },
-                  { name: "Just Connect Electricals", src: "justconnect.jpg" },
-                  { name: "Myniwa", src: "myniwa.jpg" },
+                  { name: "Ammamma's", src: "ammammas.jpg" },
+                  { name: "Olive Living", src: "olive.jpg" },
+                  { name: "Discreet Arts", src: "discreetarts.jpg" },
+                  { name: "Charze Max", src: "charzemax.jpg" },
+                  { name: "World 5 Fund", src: "world5fund.jpg" },
                 ].map((logo, idx) => (
                   <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
                     <img
@@ -316,11 +316,11 @@ export default function HomePage() {
                   { name: "Tribal Brew Coffee", src: "tribalbrew.jpg" },
                   { name: "Just Connect Electricals", src: "justconnect.jpg" },
                   { name: "Myniwa", src: "myniwa.jpg" },
-                  { name: "Mykhaana", src: "mykhaana.jpg" },
-                  { name: "CosmicEye", src: "cosmiceye.jpg" },
-                  { name: "Tribal Brew Coffee", src: "tribalbrew.jpg" },
-                  { name: "Just Connect Electricals", src: "justconnect.jpg" },
-                  { name: "Myniwa", src: "myniwa.jpg" },
+                  { name: "Ammamma's", src: "ammammas.jpg" },
+                  { name: "Olive Living", src: "olive.jpg" },
+                  { name: "Discreet Arts", src: "discreetarts.jpg" },
+                  { name: "Charze Max", src: "charzemax.jpg" },
+                  { name: "World 5 Fund", src: "world5fund.jpg" },
                 ].map((logo, idx) => (
                   <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
                     <img

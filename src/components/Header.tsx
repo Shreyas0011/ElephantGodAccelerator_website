@@ -7,6 +7,8 @@ import { Menu, X, ArrowUpRight, Award, ChevronDown, Sparkles } from "lucide-reac
 import { useApp } from "@/context/AppContext";
 import { motion, AnimatePresence } from "framer-motion";
 
+import TransparentLogo from "./TransparentLogo";
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -53,13 +55,11 @@ export default function Header() {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center group">
-          <div className="bg-white rounded-xl py-1 px-3.5 flex items-center justify-center shadow-md border border-gold/20 h-10 transition-transform duration-300 group-hover:scale-105">
-            <img
-              src="/logos/ega.png"
-              alt="Elephant God Accelerator Logo"
-              className="h-full w-auto object-contain"
-            />
-          </div>
+          <TransparentLogo
+            src="/logos/ega.png"
+            alt="Elephant God Accelerator Logo"
+            className="h-14 md:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+          />
         </Link>
 
         {/* Desktop Navigation */}

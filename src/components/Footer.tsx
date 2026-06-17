@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Send, Mail } from "lucide-react";
+import TransparentLogo from "./TransparentLogo";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -32,13 +33,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Col */}
           <div className="flex flex-col gap-4">
-            <div className="bg-white rounded-xl py-1 px-3.5 flex items-center justify-center shadow-md border border-gold/20 h-10 w-fit">
-              <img
-                src="/logos/ega.png"
-                alt="Elephant God Accelerator Logo"
-                className="h-full w-auto object-contain"
-              />
-            </div>
+            <TransparentLogo
+              src="/logos/ega.png"
+              alt="Elephant God Accelerator Logo"
+              className="h-16 w-auto object-contain"
+            />
             <p className="text-gray-400 text-sm leading-relaxed">
               India's leading execution-driven startup growth platform. We turn early-stage innovation into VC-fundable market leaders.
             </p>

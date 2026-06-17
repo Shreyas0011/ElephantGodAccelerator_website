@@ -58,7 +58,7 @@ export default function Header() {
           <TransparentLogo
             src="/logos/ega.png"
             alt="Elephant God Accelerator Logo"
-            className="h-12 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            className="h-16 md:h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
 

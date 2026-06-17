@@ -52,13 +52,14 @@ export default function Header() {
     >
       <div className="flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary via-secondary to-gold flex items-center justify-center shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform duration-300">
-            <Award className="w-5 h-5 text-white" />
+        <Link href="/" className="flex items-center group">
+          <div className="bg-white rounded-xl py-1 px-3.5 flex items-center justify-center shadow-md border border-gold/20 h-10 transition-transform duration-300 group-hover:scale-105">
+            <img
+              src="/logos/ega.jpg"
+              alt="Elephant God Accelerator Logo"
+              className="h-full w-auto object-contain"
+            />
           </div>
-          <span className={`font-display font-black tracking-wider text-lg sm:text-xl transition-colors duration-300 ${scrolled || isOpen ? "text-primary" : "text-[#ffffff]"}`}>
-            ELEPHANTGOD <span className="gradient-text-gold font-medium tracking-normal">ACCELERATOR</span>
-          </span>
         </Link>
 
         {/* Desktop Navigation */}

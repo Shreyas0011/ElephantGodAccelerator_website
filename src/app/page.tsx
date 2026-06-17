@@ -309,6 +309,8 @@ export default function HomePage() {
                   { name: "Elephantgod Infra", src: "elephantgodinfra.jpg" },
                   { name: "GRV Academy", src: "grvacademy.jpg" },
                   { name: "R Cube MedTech", src: "rcubemedtech.jpg" },
+                  { name: "NES", src: "nes.jpg" },
+                  { name: "Zero Touch", src: "zerotouch.jpg" },
                 ].map((logo, idx) => (
                   <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
                     <img
@@ -341,6 +343,8 @@ export default function HomePage() {
                   { name: "Elephantgod Infra", src: "elephantgodinfra.jpg" },
                   { name: "GRV Academy", src: "grvacademy.jpg" },
                   { name: "R Cube MedTech", src: "rcubemedtech.jpg" },
+                  { name: "NES", src: "nes.jpg" },
+                  { name: "Zero Touch", src: "zerotouch.jpg" },
                 ].map((logo, idx) => (
                   <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
                     <img

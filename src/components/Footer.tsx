@@ -32,9 +32,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Col */}
           <div className="flex flex-col gap-4">
-            <h3 className="font-display font-black tracking-tight text-white text-lg">
-              ELEPHANTGOD <span className="gradient-text-gold font-normal">ACCELERATOR</span>
-            </h3>
+            <div className="bg-white rounded-xl py-1 px-3.5 flex items-center justify-center shadow-md border border-gold/20 h-10 w-fit">
+              <img
+                src="/logos/ega.jpg"
+                alt="Elephant God Accelerator Logo"
+                className="h-full w-auto object-contain"
+              />
+            </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               India's leading execution-driven startup growth platform. We turn early-stage innovation into VC-fundable market leaders.
             </p>

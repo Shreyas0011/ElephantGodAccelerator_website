@@ -79,7 +79,7 @@ export default function PortfolioPage() {
       stage: "Validation",
       desc: "Custom IT architectures, engineering consulting, and industrial system integrations for automated manufacturing pipelines.",
       url: "https://nesconsultancy.com/",
-      logo: null,
+      logo: "/logos/nes.jpg",
     },
     {
       name: "Discreet Arts",
@@ -103,7 +103,7 @@ export default function PortfolioPage() {
       stage: "Validation",
       desc: "IoT-based contact-free digital systems for retail, automated checkout points, and contactless terminal logs.",
       url: "http://zerotouch.in/",
-      logo: null,
+      logo: "/logos/zerotouch.jpg",
     },
     {
       name: "R Cube MedTech",

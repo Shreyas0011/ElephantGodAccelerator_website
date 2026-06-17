@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import MeetingModal from "@/components/MeetingModal";
 import FloatingWidgets from "@/components/FloatingWidgets";
 import MobileStickyBar from "@/components/MobileStickyBar";
+import TechBackground from "@/components/TechBackground";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -55,6 +56,7 @@ export default function RootLayout({
           <div className="glow-orb glow-orb-green top-[50%] left-[-5%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px]" />
           <div className="glow-orb glow-orb-orange top-[75%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px]" />
         </div>
+        <TechBackground />
         <AppProvider>
           <Header />
           <main className="flex-grow relative z-10">{children}</main>

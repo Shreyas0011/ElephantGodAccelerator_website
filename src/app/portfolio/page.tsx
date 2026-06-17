@@ -39,7 +39,7 @@ export default function PortfolioPage() {
       stage: "Validation",
       desc: "Vetted medical diagnostics and device research. Developing high-precision early screening devices for cardiovascular biomarkers.",
       url: "https://suttonandshaw.com/",
-      logo: null,
+      logo: "/logos/suttonandshaw.jpg",
     },
     {
       name: "Tribal Brew Coffee",
@@ -111,7 +111,7 @@ export default function PortfolioPage() {
       stage: "Validation",
       desc: "Custom orthopedic orthopedic implants, bio-compatible joint models, and pre-surgery 3D layout engineering systems.",
       url: "https://www.rcubemedtech.com/",
-      logo: null,
+      logo: "/logos/rcubemedtech.jpg",
     },
     {
       name: "Just Connect Electricals",
@@ -143,7 +143,7 @@ export default function PortfolioPage() {
       stage: "Scale",
       desc: "Eco-friendly industrial warehousing layouts, logistics hubs, and cold storage constructions in southern Indian states.",
       url: "http://elephantgodinfra.com/",
-      logo: null,
+      logo: "/logos/elephantgodinfra.jpg",
     },
     {
       name: "Spykke",
@@ -184,6 +184,22 @@ export default function PortfolioPage() {
       desc: "Digital education and future-readiness academy, providing customized skill development curricula and corporate training models.",
       url: "#",
       logo: "/logos/defa.jpg",
+    },
+    {
+      name: "DesiLLM",
+      sector: "Technology",
+      stage: "PMF",
+      desc: "Large Language Model pre-training and fine-tuning suite optimized for Indian languages and localized enterprise compliance.",
+      url: "#",
+      logo: "/logos/desillm.jpg",
+    },
+    {
+      name: "GRV Academy",
+      sector: "Education",
+      stage: "Scale",
+      desc: "Premium business management and vocational academy delivering highly specialized industry-ready curricula and training programs.",
+      url: "https://grv.edu.in/",
+      logo: "/logos/grvacademy.jpg",
     },
   ];
 

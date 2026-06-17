@@ -80,7 +80,55 @@ export default function TransparentLogo({ src, alt, className }: TransparentLogo
         }
 
         ctx.putImageData(imgData, 0, 0);
-        setProcessedSrc(canvas.toDataURL());
+
+        // Scan the transparent image to find the bounding box of the actual visible content
+        let minX = width;
+        let minY = height;
+        let maxX = 0;
+        let maxY = 0;
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            const a = data[idx + 3];
+            if (a > 0) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+        }
+
+        // Crop the canvas to the bounding box if valid
+        if (maxX >= minX && maxY >= minY) {
+          const cropWidth = maxX - minX + 1;
+          const cropHeight = maxY - minY + 1;
+
+          const cropCanvas = document.createElement("canvas");
+          cropCanvas.width = cropWidth;
+          cropCanvas.height = cropHeight;
+          const cropCtx = cropCanvas.getContext("2d");
+
+          if (cropCtx) {
+            cropCtx.drawImage(
+              canvas,
+              minX,
+              minY,
+              cropWidth,
+              cropHeight,
+              0,
+              0,
+              cropWidth,
+              cropHeight
+            );
+            setProcessedSrc(cropCanvas.toDataURL());
+          } else {
+            setProcessedSrc(canvas.toDataURL());
+          }
+        } else {
+          setProcessedSrc(canvas.toDataURL());
+        }
       } catch (err) {
         console.error("Failed to process image transparency:", err);
         setProcessedSrc(src);

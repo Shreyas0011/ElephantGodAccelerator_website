@@ -100,14 +100,17 @@ export default function TransparentLogo({ src, alt, className }: TransparentLogo
           }
         }
 
-        // Crop the canvas to the bounding box if valid
+        // Crop the canvas to the bounding box if valid, adding standard padding for breathing room
         if (maxX >= minX && maxY >= minY) {
           const cropWidth = maxX - minX + 1;
           const cropHeight = maxY - minY + 1;
 
+          // Add a balanced 8% padding on all sides to give the logo elements breathing room
+          const padding = Math.max(6, Math.round(cropHeight * 0.08));
+
           const cropCanvas = document.createElement("canvas");
-          cropCanvas.width = cropWidth;
-          cropCanvas.height = cropHeight;
+          cropCanvas.width = cropWidth + padding * 2;
+          cropCanvas.height = cropHeight + padding * 2;
           const cropCtx = cropCanvas.getContext("2d");
 
           if (cropCtx) {
@@ -117,8 +120,8 @@ export default function TransparentLogo({ src, alt, className }: TransparentLogo
               minY,
               cropWidth,
               cropHeight,
-              0,
-              0,
+              padding,
+              padding,
               cropWidth,
               cropHeight
             );

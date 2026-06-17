@@ -55,7 +55,7 @@ export default function Header() {
         <Link href="/" className="flex items-center group">
           <div className="bg-white rounded-xl py-1 px-3.5 flex items-center justify-center shadow-md border border-gold/20 h-10 transition-transform duration-300 group-hover:scale-105">
             <img
-              src="/logos/ega.jpg"
+              src="/logos/ega.png"
               alt="Elephant God Accelerator Logo"
               className="h-full w-auto object-contain"
             />

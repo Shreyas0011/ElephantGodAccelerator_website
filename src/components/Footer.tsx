@@ -34,7 +34,7 @@ export default function Footer() {
           <div className="flex flex-col gap-4">
             <div className="bg-white rounded-xl py-1 px-3.5 flex items-center justify-center shadow-md border border-gold/20 h-10 w-fit">
               <img
-                src="/logos/ega.jpg"
+                src="/logos/ega.png"
                 alt="Elephant God Accelerator Logo"
                 className="h-full w-auto object-contain"
               />

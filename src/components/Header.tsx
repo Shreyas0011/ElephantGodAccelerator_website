@@ -48,8 +48,8 @@ export default function Header() {
     <header
       className={`fixed left-1/2 -translate-x-1/2 w-[92%] max-w-7xl z-50 rounded-2xl transition-all duration-500 ${
         scrolled || isOpen
-          ? "top-4 bg-bg-dark/95 backdrop-blur-xl border border-gold/10 shadow-[0_10px_35px_rgba(201,169,110,0.1)] py-3.5 px-6"
-          : "top-6 bg-transparent py-4 px-6"
+          ? "top-3 bg-bg-dark/95 backdrop-blur-xl border border-gold/10 shadow-[0_10px_35px_rgba(201,169,110,0.1)] py-2 px-6"
+          : "top-4 bg-transparent py-2.5 px-6"
       }`}
     >
       <div className="flex items-center justify-between">
@@ -58,7 +58,7 @@ export default function Header() {
           <TransparentLogo
             src="/logos/ega.png"
             alt="Elephant God Accelerator Logo"
-            className="h-14 md:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
 

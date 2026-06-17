@@ -31,7 +31,7 @@ export default function PortfolioPage() {
       stage: "Growth",
       desc: "Modern micro-mobility solutions to combat traffic congestion, making travel faster, safer, and completely seamless using custom electric vehicles.",
       url: "https://ingoelectric.com/",
-      logo: null,
+      logo: "/logos/ingoelectric.png",
     },
     {
       name: "Sutton and Shaw",

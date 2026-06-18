@@ -82,6 +82,14 @@ export default function Header() {
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover/nav-link:w-full" />
           </Link>
 
+          <Link
+            href="/#services"
+            className="relative text-xs uppercase tracking-wider font-extrabold transition-colors duration-300 hover:text-gold py-1 group/nav-link text-[#121212]"
+          >
+            Services
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover/nav-link:w-full" />
+          </Link>
+
           {/* Network Dropdown */}
           <div
             className="relative"
@@ -243,6 +251,13 @@ export default function Header() {
               className="text-sm font-bold text-gray-700 hover:text-gold py-2.5 border-b border-gray-200/20"
             >
               Programs
+            </Link>
+            <Link
+              href="/#services"
+              onClick={() => setIsOpen(false)}
+              className="text-sm font-bold text-gray-700 hover:text-gold py-2.5 border-b border-gray-200/20"
+            >
+              Services
             </Link>
 
             {/* Network section */}

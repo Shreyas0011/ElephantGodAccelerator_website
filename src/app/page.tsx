@@ -20,8 +20,15 @@ import {
   Users,
   CheckCircle2,
   Briefcase,
+  Globe,
+  BarChart3,
+  Map,
+  Presentation,
+  GraduationCap,
 } from "lucide-react";
 import HeroCanvas from "@/components/HeroCanvas";
+import SectionBackground from "@/components/SectionBackground";
+import PremiumDivider from "@/components/PremiumDivider";
 import { useApp } from "@/context/AppContext";
 
 export default function HomePage() {
@@ -209,19 +216,35 @@ export default function HomePage() {
     <div className="relative min-h-screen bg-bg-dark text-white overflow-hidden">
       
       {/* --- 1. PREMIUM HERO SECTION --- */}
-      <section className="relative min-h-[92vh] flex flex-col justify-center items-center pt-36 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden text-center bg-hero-gradient theme-dark">
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center pt-28 pb-12 px-4 sm:px-6 lg:px-8 overflow-hidden text-center bg-hero-gradient theme-dark">
+        <SectionBackground seed="hero" dark density="high" />
         {/* Dynamic canvas backdrop */}
         <HeroCanvas />
         {/* Technical Grid overlay */}
         <div className="absolute inset-0 cyber-grid pointer-events-none z-0" />
         
         {/* Ambient Gradient Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-primary/5 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gold/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-accent/8 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-20 left-10 w-[300px] h-[300px] bg-growth/6 rounded-full blur-[100px] pointer-events-none" />
+
+        {/* Hero floating stat badges */}
+        <span className="hero-float-badge left-[4%] top-[28%] hidden lg:inline-flex animate-float">
+          <TrendingUp className="w-3 h-3 opacity-60" /> 40% Ops Saved
+        </span>
+        <span className="hero-float-badge right-[5%] top-[32%] hidden lg:inline-flex animate-float-delayed">
+          <Coins className="w-3 h-3 opacity-60" /> ₹2Cr+ Syndicated
+        </span>
+        <span className="hero-float-badge left-[8%] bottom-[22%] hidden md:inline-flex animate-float-delayed">
+          <Users className="w-3 h-3 opacity-60" /> 50+ VC Partners
+        </span>
+        <span className="hero-float-badge right-[6%] bottom-[24%] hidden md:inline-flex animate-float">
+          <Briefcase className="w-3 h-3 opacity-60" /> 18 Portfolio Cos
+        </span>
 
         <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-7">
           {/* Glowing Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 text-[10px] font-extrabold bg-bg-surface border border-gray-200 rounded-full text-gold uppercase tracking-widest shadow-lg">
+          <div className="premium-badge text-gold">
             <Sparkles className="w-3.5 h-3.5 text-gold animate-pulse" />
             Venture Acceleration & Operational Growth Platform
           </div>
@@ -256,24 +279,25 @@ export default function HomePage() {
       </section>
 
       {/* --- 1.5 METRICS & LOGO WALL SECTION --- */}
-      <section className="relative border-y border-gray-200 theme-dark bg-primary py-12 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative border-y border-gray-200 theme-dark bg-primary py-8 z-10 overflow-hidden">
+        <SectionBackground seed="metrics" dark density="medium" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           {/* Centered Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto text-center mb-10">
-            <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gray-200 backdrop-blur-sm flex flex-col gap-1.5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto text-center mb-6">
+            <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/25 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
               <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">{stats.portfolio}</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
                 Vetted Cohort Startups
               </span>
             </div>
-            <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gray-200 backdrop-blur-sm flex flex-col gap-1.5">
+            <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/30 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
               <span className="text-3xl sm:text-4xl font-black text-gold tracking-tight">{stats.savings}%</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
                 Recurring Overhead Saved
               </span>
             </div>
-            <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gray-200 backdrop-blur-sm flex flex-col gap-1.5">
+            <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/25 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
               <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">{stats.partners}+</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
                 Institutional Partners
@@ -282,7 +306,7 @@ export default function HomePage() {
           </div>
 
           {/* Smooth Horizontal Logo Wall */}
-          <div className="w-full flex flex-col gap-4 border-t border-gray-200 pt-8">
+          <div className="w-full flex flex-col gap-3 border-t border-gray-200 pt-5">
             <span className="text-[9px] font-extrabold text-gray-500 uppercase tracking-widest text-center">
               Accelerated Cohorts & Featured Portfolio Spotlights
             </span>
@@ -362,10 +386,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PremiumDivider />
+
       {/* --- 2. THE EGA EXECUTION MODEL (Consolidated Framework) --- */}
-      <section id="programs" className="py-28 bg-bg-surface/50 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section id="programs" className="py-16 bg-bg-surface/50 relative overflow-hidden">
+        <SectionBackground seed="programs" density="high" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Left Narrative Column */}
             <div className="lg:col-span-5 flex flex-col gap-6 text-left">
@@ -385,6 +413,33 @@ export default function HomePage() {
                 >
                   Take Funding Readiness Quiz <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
+              </div>
+
+              {/* Decorative Sprint Roadmap Timeline Graphic to fill blank space */}
+              <div className="mt-4 pt-5 border-t border-gold/15 hidden sm:flex flex-col gap-3">
+                <span className="text-[9px] font-mono text-gold/60 uppercase tracking-widest font-extrabold">
+                  Sprint Execution Path
+                </span>
+                <div className="relative flex items-center justify-between w-full px-2 py-4">
+                  {/* Dashed Connecting Line */}
+                  <div className="absolute left-0 right-0 h-[1.5px] bg-gradient-to-r from-gold/40 via-gold/60 to-gold/20 border-t border-dashed border-gold/30" />
+                  
+                  {/* Step Nodes */}
+                  {[
+                    { id: "01", label: "Audit", desc: "Week 1-2" },
+                    { id: "02", label: "GTM", desc: "Week 3-4" },
+                    { id: "03", label: "Pitch", desc: "Week 5" },
+                    { id: "04", label: "Match", desc: "Week 6" }
+                  ].map((step, idx) => (
+                    <div key={idx} className="relative z-10 flex flex-col items-center">
+                      <div className="w-8 h-8 rounded-full bg-[#ffffff] border-2 border-gold flex items-center justify-center shadow-[0_0_15px_rgba(201,169,110,0.3)] transition-transform hover:scale-110">
+                        <span className="text-[10px] font-mono font-black text-gold">{step.id}</span>
+                      </div>
+                      <span className="text-[10px] font-extrabold text-white mt-2 font-display">{step.label}</span>
+                      <span className="text-[8px] font-mono text-gray-500 mt-0.5">{step.desc}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -444,11 +499,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PremiumDivider />
+
       {/* --- 3. THE MENTORSHIP COUNCIL (Balanced Grid Layout) --- */}
-      <section className="py-28 theme-dark bg-primary border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 theme-dark bg-primary border-y border-gray-200 relative overflow-hidden">
+        <SectionBackground seed="mentor" dark density="medium" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-8">
             <span className="text-[10px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/10 px-3 py-1 rounded-full">
               EGA Leadership
             </span>
@@ -497,10 +555,157 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PremiumDivider />
+
+      {/* --- 3.5 SERVICES WE OFFER --- */}
+      <section id="services" className="py-20 bg-bg-dark relative overflow-hidden">
+        <SectionBackground seed="services" density="high" />
+        <div className="absolute top-1/3 left-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] pointer-events-none z-0" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none z-0" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="text-[10px] font-extrabold text-gold uppercase tracking-widest bg-gold/5 border border-gold/10 px-3 py-1 rounded-full">
+              What We Offer
+            </span>
+            <h2 className="font-display font-black text-3.5xl sm:text-4xl md:text-5xl text-white mt-5 leading-tight">
+              Services Tailored for{" "}
+              <span className="gradient-text-gold">Growth-Stage Leaders</span>
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
+              From founding to scale, ElephantGod Accelerator delivers hands-on execution across the full strategic spectrum — so you can focus on building what matters.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Globe,
+                color: "text-gold",
+                borderColor: "border-gold/20",
+                glowColor: "bg-gold/5",
+                tag: "Digital",
+                title: "End-to-End Website Development",
+                desc: "Design, build, and optimize scalable websites tailored to your business objectives — from architecture and UX to performance and SEO.",
+                highlights: ["Custom UI/UX Design", "Performance Optimization", "SEO Architecture"],
+              },
+              {
+                icon: BarChart3,
+                color: "text-secondary",
+                borderColor: "border-secondary/20",
+                glowColor: "bg-secondary/5",
+                tag: "Advisory",
+                title: "Comprehensive Business & Technology Audits",
+                desc: "Detailed assessments across operations, technology, and processes — identifying inefficiencies and surfacing high-leverage improvement opportunities.",
+                highlights: ["Ops & Tech Review", "Process Gap Analysis", "Improvement Roadmap"],
+              },
+              {
+                icon: CheckCircle2,
+                color: "text-growth",
+                borderColor: "border-growth/20",
+                glowColor: "bg-growth/5",
+                tag: "Governance",
+                title: "Business Hygiene Checks",
+                desc: "Establish governance, compliance frameworks, documentation standards, and operational best practices to ensure organizational readiness.",
+                highlights: ["Compliance Frameworks", "Documentation Standards", "Governance Setup"],
+              },
+              {
+                icon: Map,
+                color: "text-accent",
+                borderColor: "border-accent/20",
+                glowColor: "bg-accent/5",
+                tag: "Strategy",
+                title: "Strategic Roadmap Creation",
+                desc: "Clear execution plans and growth roadmaps aligned with short- and long-term goals — turning vision into structured, actionable milestones.",
+                highlights: ["90-Day Sprints", "OKR Alignment", "Milestone Planning"],
+              },
+              {
+                icon: Presentation,
+                color: "text-primary",
+                borderColor: "border-primary/20",
+                glowColor: "bg-primary/5",
+                tag: "Fundraising",
+                title: "Investor Pitch Deck Preparation",
+                desc: "Compelling pitch decks with refined messaging, financial narratives, and go-to-market strategies that resonate with institutional investors.",
+                highlights: ["Financial Narrative", "GTM Strategy", "Investor Matchmaking"],
+              },
+              {
+                icon: GraduationCap,
+                color: "text-gold",
+                borderColor: "border-gold/20",
+                glowColor: "bg-gold/5",
+                tag: "Leadership",
+                title: "CEO, CXO & CFO Mentorship",
+                desc: "Leadership guidance, strategic advisory, and executive mentoring to support decision-making, team structuring, and organizational growth.",
+                highlights: ["1:1 Executive Mentoring", "Decision Frameworks", "Leadership Coaching"],
+              },
+            ].map((service, idx) => {
+              const IconComp = service.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.45, delay: idx * 0.08 }}
+                  className={`group relative premium-card p-7 flex flex-col gap-5 text-left overflow-hidden border ${service.borderColor} hover:border-opacity-60 transition-all duration-300 hover:-translate-y-1`}
+                >
+                  {/* Subtle glow blob on hover */}
+                  <div className={`absolute -top-10 -right-10 w-40 h-40 ${service.glowColor} rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+
+                  {/* Top row: icon + tag */}
+                  <div className="flex items-start justify-between">
+                    <div className={`p-3 rounded-xl bg-white/5 border border-white/5 ${service.color} shrink-0`}>
+                      <IconComp className="w-5 h-5" />
+                    </div>
+                    <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full border ${service.borderColor} ${service.color} bg-white/5`}>
+                      {service.tag}
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex flex-col gap-2">
+                    <h3 className="font-display font-bold text-white text-base leading-snug">
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
+                      {service.desc}
+                    </p>
+                  </div>
+
+                  {/* Highlights */}
+                  <div className="mt-auto pt-4 border-t border-white/5 flex flex-col gap-1.5">
+                    {service.highlights.map((h, i) => (
+                      <span key={i} className="flex items-center gap-2 text-[11px] text-gray-400">
+                        <span className={`w-1.5 h-1.5 rounded-full ${service.color} bg-current shrink-0`} />
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="text-center mt-12">
+            <button
+              onClick={openMeetingModal}
+              className="px-8 py-4 bg-cta-gradient text-[#ffffff] font-extrabold text-xs uppercase tracking-wider rounded-xl hover:shadow-2xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center gap-2 cursor-pointer"
+            >
+              <Calendar className="w-4 h-4" /> Discuss Your Requirements
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <PremiumDivider />
+
       {/* --- 4. CAPITAL NETWORK MAP --- */}
-      <section className="py-28 bg-bg-surface border-y border-gray-200 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="py-16 bg-bg-surface border-y border-gray-200 relative overflow-hidden">
+        <SectionBackground seed="capital" density="high" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Left Content Column */}
             <div className="lg:col-span-5 flex flex-col gap-6 text-left">
@@ -679,15 +884,16 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PremiumDivider />
+
       {/* --- 4.5 INTERACTIVE GROWTH BLUEPRINT GENERATOR --- */}
-      <section className="py-28 theme-dark bg-primary border-y border-gray-200 relative overflow-hidden">
-        {/* Background Grid & Ambient Glows */}
-        <div className="absolute inset-0 cyber-grid pointer-events-none z-0" />
-        <div className="absolute -top-1/3 left-1/4 w-[450px] h-[450px] bg-gold/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute -bottom-1/3 right-1/4 w-[450px] h-[450px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
+      <section className="py-16 theme-dark bg-primary border-y border-gray-200 relative overflow-hidden">
+        <SectionBackground seed="blueprint" dark density="high" />
+        <div className="absolute -top-1/3 left-1/4 w-[450px] h-[450px] bg-gold/5 rounded-full blur-[120px] pointer-events-none z-0" />
+        <div className="absolute -bottom-1/3 right-1/4 w-[450px] h-[450px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none z-0" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-8">
             <span className="text-[10px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/10 px-3 py-1 rounded-full">
               Interactive Planner
             </span>
@@ -874,14 +1080,160 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PremiumDivider />
+
+      {/* --- 4.8 AREAS OF EXPERTISE --- */}
+      <section id="expertise" className="py-20 theme-dark bg-primary border-y border-gray-200 relative overflow-hidden">
+        <SectionBackground seed="expertise" dark density="high" />
+        <div className="absolute -top-1/4 right-1/4 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] pointer-events-none z-0" />
+        <div className="absolute -bottom-1/4 left-1/4 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none z-0" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="text-[10px] font-extrabold text-gold uppercase tracking-widest bg-gold/5 border border-gold/10 px-3 py-1 rounded-full">
+              Deep Domain Focus
+            </span>
+            <h2 className="font-display font-black text-3.5xl sm:text-4xl md:text-5xl text-white mt-5 leading-tight">
+              Areas of <span className="gradient-text-gold">Expertise</span>
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
+              Seven specialized verticals where ElephantGod Accelerator delivers measurable, hands-on impact — from early-stage acceleration to growth-stage consulting.
+            </p>
+          </div>
+
+          {/* 7-card grid: 3 + 3 + 1 centered */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                number: "01",
+                title: "Startup Accelerator India",
+                badge: "Acceleration",
+                icon: Sparkles,
+                color: "text-gold",
+                accent: "border-gold/25",
+                bg: "bg-gold/5",
+                desc: "A structured program that accelerates early-stage startups through mentorship, resources, and networking over 3–6 months, helping them refine business models and scale rapidly.",
+              },
+              {
+                number: "02",
+                title: "Startup Funding India",
+                badge: "Capital",
+                icon: Coins,
+                color: "text-secondary",
+                accent: "border-secondary/25",
+                bg: "bg-secondary/5",
+                desc: "Provides seed to growth-stage capital — including up to ₹50 lakhs via the Startup India Seed Fund Scheme — for prototype development, product trials, and market entry.",
+              },
+              {
+                number: "03",
+                title: "Angel Investor Network India",
+                badge: "Network",
+                icon: Users,
+                color: "text-accent",
+                accent: "border-accent/25",
+                bg: "bg-accent/5",
+                desc: "India's largest B2B network connecting startups with active angel investors from diverse professional backgrounds for early investment and strategic partnerships.",
+              },
+              {
+                number: "04",
+                title: "Startup Mentorship India",
+                badge: "Mentorship",
+                icon: Award,
+                color: "text-growth",
+                accent: "border-growth/25",
+                bg: "bg-growth/5",
+                desc: "Curated guidance from experienced entrepreneurs and industry experts to refine business strategies, improve product-market fit, and accelerate growth.",
+              },
+              {
+                number: "05",
+                title: "Venture Accelerator Bengaluru",
+                badge: "Bengaluru",
+                icon: Map,
+                color: "text-primary",
+                accent: "border-primary/25",
+                bg: "bg-primary/5",
+                desc: "Bengaluru-focused accelerator programs offering localized mentorship, investor connections, and growth support for tech startups in India's startup hub.",
+              },
+              {
+                number: "06",
+                title: "Venture Accelerator India",
+                badge: "Multi-Stage",
+                icon: TrendingUp,
+                color: "text-gold",
+                accent: "border-gold/25",
+                bg: "bg-gold/5",
+                desc: "Multi-stage, fund-led accelerator supporting 200+ startups across GenAI, fintech, SaaS, and healthtech with funding, mentorship, and global expansion support.",
+              },
+              {
+                number: "07",
+                title: "Startup Growth Consulting India",
+                badge: "Consulting",
+                icon: BarChart3,
+                color: "text-secondary",
+                accent: "border-secondary/25",
+                bg: "bg-secondary/5",
+                desc: "Strategic consulting for scaling startups — covering GTM strategy, sales pipeline creation, user interface design, and organizational capability building.",
+              },
+            ].map((item, idx) => {
+              const IconComp = item.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, delay: idx * 0.07 }}
+                  className={`group relative flex flex-col gap-5 p-7 rounded-2xl border ${item.accent} bg-bg-surface-light/30 backdrop-blur-sm hover:bg-bg-surface-light/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden ${
+                    idx === 6 ? "sm:col-start-1 sm:col-end-2 lg:col-start-2 lg:col-end-3" : ""
+                  }`}
+                >
+                  {/* Corner glow */}
+                  <div className={`absolute -bottom-8 -right-8 w-32 h-32 ${item.bg} rounded-full blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+
+                  {/* Header row */}
+                  <div className="flex items-start justify-between">
+                    <div className={`p-3 rounded-xl bg-white/5 border border-white/5 ${item.color} shrink-0`}>
+                      <IconComp className="w-5 h-5" />
+                    </div>
+                    <div className="text-right flex flex-col items-end gap-1">
+                      <span className={`font-display font-black text-2xl ${item.color} opacity-20 leading-none`}>
+                        {item.number}
+                      </span>
+                      <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full border ${item.accent} ${item.color} bg-white/5`}>
+                        {item.badge}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex flex-col gap-2 flex-1">
+                    <h3 className="font-display font-bold text-white text-base leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  {/* Bottom accent line */}
+                  <div className={`h-0.5 w-0 group-hover:w-full transition-all duration-500 rounded-full ${item.bg} bg-current ${item.color}`} />
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <PremiumDivider />
+
       {/* --- 5. FOUNDER VOICE & MEDIA TICKER --- */}
-      <section className="py-28 bg-bg-dark relative overflow-hidden">
-        {/* Glow effect */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
+      <section className="py-16 bg-bg-dark relative overflow-hidden">
+        <SectionBackground seed="testimonials" density="medium" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none z-0" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-8">
             <span className="text-[10px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/10 px-3 py-1 rounded-full">
               Ecosystem Voice
             </span>
@@ -952,8 +1304,8 @@ export default function HomePage() {
         </div>
 
         {/* Media Coverage Ticker */}
-        <div className="mt-24 border-t border-gray-200 pt-16 overflow-hidden w-full">
-          <div className="text-center mb-8">
+        <div className="mt-12 border-t border-gray-200 pt-8 overflow-hidden w-full relative z-10">
+          <div className="text-center mb-5">
             <span className="text-[10px] font-extrabold text-gray-500 uppercase tracking-widest">
               Featured In & Media Coverage
             </span>
@@ -1000,17 +1352,18 @@ export default function HomePage() {
       </section>
 
       {/* --- 6. FINAL CALL TO ACTION --- */}
-      <section className="py-28 theme-dark bg-primary border-t border-gray-200 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[100px] pointer-events-none" />
+      <section className="py-16 theme-dark bg-primary border-t border-gray-200 relative overflow-hidden">
+        <SectionBackground seed="cta" dark density="medium" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[100px] pointer-events-none z-0" />
         
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10 flex flex-col items-center">
-          <span className="text-[10px] font-extrabold text-gold uppercase tracking-widest bg-gold/5 border border-gold/10 px-3 py-1 rounded-full mb-6">
+          <span className="text-[10px] font-extrabold text-gold uppercase tracking-widest bg-gold/5 border border-gold/10 px-3 py-1 rounded-full mb-4">
             Get Cohort Access
           </span>
           <h2 className="font-display font-black text-3.5xl sm:text-4xl text-white mb-4 leading-tight max-w-2xl">
             Ready to Build Your Startup's Growth Pipeline?
           </h2>
-          <p className="text-gray-400 text-sm sm:text-base max-w-lg mx-auto mb-10 leading-relaxed">
+          <p className="text-gray-400 text-sm sm:text-base max-w-lg mx-auto mb-6 leading-relaxed">
             Apply to join our upcoming cohort or schedule a direct consultation audit regarding GTM CRM pipelines, capital readiness, and compliance setups.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 w-full sm:w-auto">

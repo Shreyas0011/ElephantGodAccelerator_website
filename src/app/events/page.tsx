@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Calendar as CalendarIcon, MapPin, Clock, Users, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { MapPin, Clock, Users, ArrowRight } from "lucide-react";
 
 interface Event {
   title: string;
@@ -11,41 +11,84 @@ interface Event {
   capacity: string;
 }
 
+// Admin-added events from localStorage have this shape
+interface StoredEvent {
+  id: string;
+  date: string;
+  title: string;
+  desc: string;
+  time: string;
+  location: string;
+  capacity: string;
+}
+
+// Default (built-in) events — always shown
+const DEFAULT_EVENTS: Record<string, Event> = {
+  "2026-06-05": {
+    title: "EGA Masterclass: Go-To-Market and Retail Sprints",
+    desc: "An intensive strategy session led by Meera Nair mapping consumer retail networks, distributor incentives, and GTM rollouts in tier-2 cities.",
+    time: "03:00 PM IST",
+    location: "Bengaluru Hub & Zoom",
+    capacity: "Limited to 50 founders",
+  },
+  "2026-06-12": {
+    title: "Seed Valuation & Capital Structuring Audit",
+    desc: "EGA partners sit down with cohort CFOs to structure valuation projections, ESOP pools, and liquidation preferences prior to demo day.",
+    time: "11:00 AM IST",
+    location: "EGA Boardroom",
+    capacity: "Invite Only",
+  },
+  "2026-06-18": {
+    title: "Cohort 12 Demo Day: B2B Scaling Showcase",
+    desc: "12 selected Indian hardware, AI, and logistics startups pitch in front of 40+ active venture capital funds, family offices, and HNI syndicates.",
+    time: "02:00 PM IST",
+    location: "Hotel Grand Sheraton, Bengaluru",
+    capacity: "VCs and Accredited Angels only",
+  },
+  "2026-06-25": {
+    title: "Venture Terms & Cap Tables Masterclass",
+    desc: "An active negotiation drill detailing anti-dilution clauses, liquidation preferences, and MCA compliance requirements.",
+    time: "04:00 PM IST",
+    location: "Online (Zoom)",
+    capacity: "Public registration open",
+  },
+};
+
 export default function EventsPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>("2026-06-18");
   const [rsvpEmail, setRsvpEmail] = useState("");
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
-  const mockEvents: Record<string, Event> = {
-    "2026-06-05": {
-      title: "EGA Masterclass: Go-To-Market and Retail Sprints",
-      desc: "An intensive strategy session led by Meera Nair mapping consumer retail networks, distributor incentives, and GTM rollouts in tier-2 cities.",
-      time: "03:00 PM IST",
-      location: "Bengaluru Hub & Zoom",
-      capacity: "Limited to 50 founders",
-    },
-    "2026-06-12": {
-      title: "Seed Valuation & Capital Structuring Audit",
-      desc: "EGA partners sit down with cohort CFOs to structure valuation projections, ESOP pools, and liquidation preferences prior to demo day.",
-      time: "11:00 AM IST",
-      location: "EGA Boardroom",
-      capacity: "Invite Only",
-    },
-    "2026-06-18": {
-      title: "Cohort 12 Demo Day: B2B Scaling Showcase",
-      desc: "12 selected Indian hardware, AI, and logistics startups pitch in front of 40+ active venture capital funds, family offices, and HNI syndicates.",
-      time: "02:00 PM IST",
-      location: "Hotel Grand Sheraton, Bengaluru",
-      capacity: "VCs and Accredited Angels only",
-    },
-    "2026-06-25": {
-      title: "Venture Terms & Cap Tables Masterclass",
-      desc: "An active negotiation drill detailing anti-dilution clauses, liquidation preferences, and MCA compliance requirements.",
-      time: "04:00 PM IST",
-      location: "Online (Zoom)",
-      capacity: "Public registration open",
-    },
-  };
+  // Merged events: defaults + admin-added from localStorage
+  const [allEvents, setAllEvents] = useState<Record<string, Event>>(DEFAULT_EVENTS);
+
+  useEffect(() => {
+    // Load admin-added events from localStorage and merge
+    try {
+      const stored: StoredEvent[] = JSON.parse(
+        localStorage.getItem("ega_admin_events") || "[]"
+      );
+      if (stored.length > 0) {
+        const adminMap: Record<string, Event> = {};
+        stored.forEach((ev) => {
+          adminMap[ev.date] = {
+            title: ev.title,
+            desc: ev.desc,
+            time: ev.time,
+            location: ev.location,
+            capacity: ev.capacity,
+          };
+        });
+        // Admin events take precedence over defaults for same date
+        setAllEvents({ ...DEFAULT_EVENTS, ...adminMap });
+      }
+    } catch {
+      // silently ignore
+    }
+  }, []);
+
+  // Use allEvents as the active calendar map
+  const mockEvents = allEvents;
 
   const handleDayClick = (dayStr: string) => {
     if (mockEvents[dayStr]) {
@@ -73,10 +116,30 @@ export default function EventsPage() {
     setRsvpEmail("");
   };
 
-  // June 2026 starts on Monday, 30 days
-  const offset = 1; // Mon
-  const daysInMonth = 30;
+  // Dynamic calendar: current view month/year with navigation
+  const [calYear, setCalYear] = useState(2026);
+  const [calMonth, setCalMonth] = useState(5); // 0-indexed: 5 = June
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  // Day of week (Mon=0…Sun=6) for 1st of displayed month
+  const firstDayOfMonth = new Date(calYear, calMonth, 1).getDay();
+  const offset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1; // convert Sun=0 to Mon=0
+
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const goToPrevMonth = () => {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
+    else setCalMonth(m => m - 1);
+  };
+  const goToNextMonth = () => {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
+    else setCalMonth(m => m + 1);
+  };
 
   return (
     <div className="pt-24 pb-16 bg-bg-dark min-h-screen">
@@ -101,12 +164,26 @@ export default function EventsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Calendar Grid Box */}
           <div className="lg:col-span-7 glass-card rounded-3xl p-6 border border-white/5">
-            <h3 className="font-display font-extrabold text-lg text-white mb-6 flex items-center justify-between">
-              <span>June 2026</span>
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                June 1st starts Monday
-              </span>
-            </h3>
+            {/* Month Navigator */}
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={goToPrevMonth}
+                className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-gold/30 transition-all"
+                aria-label="Previous month"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <h3 className="font-display font-extrabold text-lg text-white">
+                {monthNames[calMonth]} {calYear}
+              </h3>
+              <button
+                onClick={goToNextMonth}
+                className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-gold/30 transition-all"
+                aria-label="Next month"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
 
             {/* Days Header */}
             <div className="grid grid-cols-7 text-center font-bold text-xs text-gray-500 uppercase mb-4">
@@ -128,7 +205,9 @@ export default function EventsPage() {
 
               {/* Day Cells */}
               {days.map((day) => {
-                const dateStr = `2026-06-${day < 10 ? "0" + day : day}`;
+                const mm = String(calMonth + 1).padStart(2, "0");
+                const dd = String(day).padStart(2, "0");
+                const dateStr = `${calYear}-${mm}-${dd}`;
                 const hasEvent = !!mockEvents[dateStr];
                 const isSelected = selectedDate === dateStr;
 

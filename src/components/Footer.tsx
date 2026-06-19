@@ -175,12 +175,37 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Admin Portal Button — clearly visible */}
+        <div className="border-t border-white/10 pt-6 mb-6 flex justify-center">
+          <Link
+            href="/admin"
+            id="admin-login-link"
+            className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-white/5 border border-gold/40 text-gold font-bold text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold hover:shadow-lg hover:shadow-gold/10 hover:scale-[1.03] active:scale-[0.98] transition-all"
+            aria-label="Admin portal login"
+          >
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Admin Login
+          </Link>
+        </div>
+
         {/* Footer Bottom */}
-        <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="border-t border-gray-200/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-gray-500 text-xs">
             © {new Date().getFullYear()} Elephant God Accelerator (EGA). All Rights Reserved.
           </span>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center gap-6">
             <a href="#" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
               Privacy Policy
             </a>

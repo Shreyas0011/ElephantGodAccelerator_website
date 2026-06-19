@@ -30,13 +30,24 @@ import HeroCanvas from "@/components/HeroCanvas";
 import SectionBackground from "@/components/SectionBackground";
 import PremiumDivider from "@/components/PremiumDivider";
 import { useApp } from "@/context/AppContext";
+import { loadSiteContent, SiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 
 export default function HomePage() {
   const { openMeetingModal } = useApp();
+  const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_CONTENT);
+
+  // Load content on mount
+  useEffect(() => {
+    setSiteContent(loadSiteContent());
+  }, []);
 
   // Stats Counters
   const [stats, setStats] = useState({ portfolio: 0, savings: 0, partners: 0 });
   useEffect(() => {
+    const targetPortfolio = parseInt(siteContent.hero.stat1Value, 10) || 18;
+    const targetSavings = parseInt(siteContent.hero.stat2Value, 10) || 40;
+    const targetPartners = parseInt(siteContent.hero.stat3Value, 10) || 50;
+
     const duration = 1200;
     const steps = 40;
     const stepTime = duration / steps;
@@ -45,73 +56,35 @@ export default function HomePage() {
     const timer = setInterval(() => {
       currentStep++;
       setStats({
-        portfolio: Math.min(18, Math.round((18 / steps) * currentStep)),
-        savings: Math.min(40, Math.round((40 / steps) * currentStep)),
-        partners: Math.min(50, Math.round((50 / steps) * currentStep)),
+        portfolio: Math.min(targetPortfolio, Math.round((targetPortfolio / steps) * currentStep)),
+        savings: Math.min(targetSavings, Math.round((targetSavings / steps) * currentStep)),
+        partners: Math.min(targetPartners, Math.round((targetPartners / steps) * currentStep)),
       });
 
       if (currentStep >= steps) clearInterval(timer);
     }, stepTime);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [siteContent]);
 
   // Capital Ecosystem Hover State
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const capitalNodes: Record<
     string,
     { title: string; stage: string; ticket: string; desc: string }
-  > = {
-    angels: {
-      title: "Angel Networks",
-      stage: "Pre-Seed / Seed",
-      ticket: "₹10L - ₹50L",
-      desc: "Early syndicates and HNI pools focused on validating initial product concepts and prototype traction.",
-    },
-    family: {
-      title: "Family Offices",
-      stage: "Seed / Series A",
-      ticket: "₹50L - ₹2Cr",
-      desc: "Long-term, patient institutional capital looking for sustainable unit economics and corporate governance.",
-    },
-    vc: {
-      title: "Venture Capitals",
-      stage: "Series A / Series B",
-      ticket: "₹2Cr - ₹10Cr",
-      desc: "Institutional growth-stage funds scaling established PMF models to national and global levels.",
-    },
-    strategic: {
-      title: "Strategic Investors",
-      stage: "Growth Stage",
-      ticket: "Custom Ticket",
-      desc: "Industry experts and joint-venture partners offering proprietary channel distribution and regulatory support.",
-    },
-    corp: {
-      title: "Corporate Venture",
-      stage: "Syndicate / M&A",
-      ticket: "Above ₹5Cr",
-      desc: "Large enterprise conglomerates matching technology architectures with parent systems for acquisition or integration.",
-    },
-  };
+  > = {};
+  siteContent.capitalNodes.forEach(node => {
+    capitalNodes[node.key] = {
+      title: node.title,
+      stage: node.stage,
+      ticket: node.ticket,
+      desc: node.desc
+    };
+  });
 
   // Testimonial State
   const [testimonialIdx, setTestimonialIdx] = useState(0);
-  const testimonialData = [
-    {
-      quote:
-        "ElephantGod Accelerator did not just consult us; they became our operational execution department. We optimized our core unit economics and restructured our CRM pipeline, leading to a 40% save in operating expenses.",
-      author: "Venkata Raman",
-      title: "Co-Founder, Ingo Electric",
-      impact: "40% Ops Savings",
-    },
-    {
-      quote:
-        "Mr. Ramani Iyer's active guidance helped us structure our distribution system. The shared services support for compliance and MCA audits saved us months of overhead.",
-      author: "Radha Krishnan",
-      title: "Founder, Ammamma's",
-      impact: "MCA Compliance Cleared",
-    },
-  ];
+  const testimonialData = siteContent.testimonials;
 
   // Interactive Blueprint Planner State
   const [blueprintSector, setBlueprintSector] = useState("saas");
@@ -230,34 +203,47 @@ export default function HomePage() {
 
         {/* Hero floating stat badges */}
         <span className="hero-float-badge left-[4%] top-[28%] hidden lg:inline-flex animate-float">
-          <TrendingUp className="w-3 h-3 opacity-60" /> 40% Ops Saved
+          <TrendingUp className="w-3 h-3 opacity-60" /> {stats.savings}% Ops Saved
         </span>
         <span className="hero-float-badge right-[5%] top-[32%] hidden lg:inline-flex animate-float-delayed">
           <Coins className="w-3 h-3 opacity-60" /> ₹2Cr+ Syndicated
         </span>
         <span className="hero-float-badge left-[8%] bottom-[22%] hidden md:inline-flex animate-float-delayed">
-          <Users className="w-3 h-3 opacity-60" /> 50+ VC Partners
+          <Users className="w-3 h-3 opacity-60" /> {stats.partners}+ Partners
         </span>
         <span className="hero-float-badge right-[6%] bottom-[24%] hidden md:inline-flex animate-float">
-          <Briefcase className="w-3 h-3 opacity-60" /> 18 Portfolio Cos
+          <Briefcase className="w-3 h-3 opacity-60" /> {stats.portfolio} Portfolio Cos
         </span>
 
         <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-7">
           {/* Glowing Badge */}
           <div className="premium-badge text-gold">
             <Sparkles className="w-3.5 h-3.5 text-gold animate-pulse" />
-            Venture Acceleration & Operational Growth Platform
+            {siteContent.hero.badge}
           </div>
 
           {/* Premium Typographic Title */}
           <h1 className="font-display font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-[1.05] tracking-tight max-w-4xl">
-            We build the operational systems that turn startups into{" "}
-            <span className="gradient-text-gold">Market Leaders</span>
+            {(() => {
+              const h = siteContent.hero.headline;
+              const word = "Market Leaders";
+              if (h.includes(word)) {
+                const parts = h.split(word);
+                return (
+                  <>
+                    {parts[0]}
+                    <span className="gradient-text-gold">{word}</span>
+                    {parts[1]}
+                  </>
+                );
+              }
+              return h;
+            })()}
           </h1>
 
           {/* Clean Subtitle */}
           <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            Elephant God Accelerator works alongside founders as hands-on execution partners, driving Go-To-Market blueprints, compliance systems, B2B sales automation, and institutional fundraising.
+            {siteContent.hero.subheadline}
           </p>
 
           {/* Styled CTAs */}
@@ -288,19 +274,19 @@ export default function HomePage() {
             <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/25 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
               <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">{stats.portfolio}</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
-                Vetted Cohort Startups
+                {siteContent.hero.stat1Label}
               </span>
             </div>
             <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/30 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
               <span className="text-3xl sm:text-4xl font-black text-gold tracking-tight">{stats.savings}%</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
-                Recurring Overhead Saved
+                {siteContent.hero.stat2Label}
               </span>
             </div>
             <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/25 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
               <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">{stats.partners}+</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
-                Institutional Partners
+                {siteContent.hero.stat3Label}
               </span>
             </div>
           </div>
@@ -578,69 +564,19 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Globe,
-                color: "text-gold",
-                borderColor: "border-gold/20",
-                glowColor: "bg-gold/5",
-                tag: "Digital",
-                title: "End-to-End Website Development",
-                desc: "Design, build, and optimize scalable websites tailored to your business objectives — from architecture and UX to performance and SEO.",
-                highlights: ["Custom UI/UX Design", "Performance Optimization", "SEO Architecture"],
-              },
-              {
-                icon: BarChart3,
-                color: "text-secondary",
-                borderColor: "border-secondary/20",
-                glowColor: "bg-secondary/5",
-                tag: "Advisory",
-                title: "Comprehensive Business & Technology Audits",
-                desc: "Detailed assessments across operations, technology, and processes — identifying inefficiencies and surfacing high-leverage improvement opportunities.",
-                highlights: ["Ops & Tech Review", "Process Gap Analysis", "Improvement Roadmap"],
-              },
-              {
-                icon: CheckCircle2,
-                color: "text-growth",
-                borderColor: "border-growth/20",
-                glowColor: "bg-growth/5",
-                tag: "Governance",
-                title: "Business Hygiene Checks",
-                desc: "Establish governance, compliance frameworks, documentation standards, and operational best practices to ensure organizational readiness.",
-                highlights: ["Compliance Frameworks", "Documentation Standards", "Governance Setup"],
-              },
-              {
-                icon: Map,
-                color: "text-accent",
-                borderColor: "border-accent/20",
-                glowColor: "bg-accent/5",
-                tag: "Strategy",
-                title: "Strategic Roadmap Creation",
-                desc: "Clear execution plans and growth roadmaps aligned with short- and long-term goals — turning vision into structured, actionable milestones.",
-                highlights: ["90-Day Sprints", "OKR Alignment", "Milestone Planning"],
-              },
-              {
-                icon: Presentation,
-                color: "text-primary",
-                borderColor: "border-primary/20",
-                glowColor: "bg-primary/5",
-                tag: "Fundraising",
-                title: "Investor Pitch Deck Preparation",
-                desc: "Compelling pitch decks with refined messaging, financial narratives, and go-to-market strategies that resonate with institutional investors.",
-                highlights: ["Financial Narrative", "GTM Strategy", "Investor Matchmaking"],
-              },
-              {
-                icon: GraduationCap,
-                color: "text-gold",
-                borderColor: "border-gold/20",
-                glowColor: "bg-gold/5",
-                tag: "Leadership",
-                title: "CEO, CXO & CFO Mentorship",
-                desc: "Leadership guidance, strategic advisory, and executive mentoring to support decision-making, team structuring, and organizational growth.",
-                highlights: ["1:1 Executive Mentoring", "Decision Frameworks", "Leadership Coaching"],
-              },
-            ].map((service, idx) => {
-              const IconComp = service.icon;
+            {siteContent.services.map((service, idx) => {
+              const config = [
+                { icon: Globe, color: "text-gold", borderColor: "border-gold/20", glowColor: "bg-gold/5" },
+                { icon: BarChart3, color: "text-secondary", borderColor: "border-secondary/20", glowColor: "bg-secondary/5" },
+                { icon: CheckCircle2, color: "text-growth", borderColor: "border-growth/20", glowColor: "bg-growth/5" },
+                { icon: Map, color: "text-accent", borderColor: "border-accent/20", glowColor: "bg-accent/5" },
+                { icon: Presentation, color: "text-primary", borderColor: "border-primary/20", glowColor: "bg-primary/5" },
+                { icon: GraduationCap, color: "text-gold", borderColor: "border-gold/20", glowColor: "bg-gold/5" }
+              ][idx] || { icon: Globe, color: "text-gold", borderColor: "border-gold/20", glowColor: "bg-gold/5" };
+
+              const IconComp = config.icon;
+              const highlights = [service.highlight1, service.highlight2, service.highlight3].filter(Boolean);
+              
               return (
                 <motion.div
                   key={idx}
@@ -648,17 +584,17 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.45, delay: idx * 0.08 }}
-                  className={`group relative premium-card p-7 flex flex-col gap-5 text-left overflow-hidden border ${service.borderColor} hover:border-opacity-60 transition-all duration-300 hover:-translate-y-1`}
+                  className={`group relative premium-card p-7 flex flex-col gap-5 text-left overflow-hidden border ${config.borderColor} hover:border-opacity-60 transition-all duration-300 hover:-translate-y-1`}
                 >
                   {/* Subtle glow blob on hover */}
-                  <div className={`absolute -top-10 -right-10 w-40 h-40 ${service.glowColor} rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+                  <div className={`absolute -top-10 -right-10 w-40 h-40 ${config.glowColor} rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
 
                   {/* Top row: icon + tag */}
                   <div className="flex items-start justify-between">
-                    <div className={`p-3 rounded-xl bg-white/5 border border-white/5 ${service.color} shrink-0`}>
+                    <div className={`p-3 rounded-xl bg-white/5 border border-white/5 ${config.color} shrink-0`}>
                       <IconComp className="w-5 h-5" />
                     </div>
-                    <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full border ${service.borderColor} ${service.color} bg-white/5`}>
+                    <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full border ${config.borderColor} ${config.color} bg-white/5`}>
                       {service.tag}
                     </span>
                   </div>
@@ -675,9 +611,9 @@ export default function HomePage() {
 
                   {/* Highlights */}
                   <div className="mt-auto pt-4 border-t border-white/5 flex flex-col gap-1.5">
-                    {service.highlights.map((h, i) => (
+                    {highlights.map((h, i) => (
                       <span key={i} className="flex items-center gap-2 text-[11px] text-gray-400">
-                        <span className={`w-1.5 h-1.5 rounded-full ${service.color} bg-current shrink-0`} />
+                        <span className={`w-1.5 h-1.5 rounded-full ${config.color} bg-current shrink-0`} />
                         {h}
                       </span>
                     ))}
@@ -1103,79 +1039,18 @@ export default function HomePage() {
 
           {/* 7-card grid: 3 + 3 + 1 centered */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                number: "01",
-                title: "Startup Accelerator India",
-                badge: "Acceleration",
-                icon: Sparkles,
-                color: "text-gold",
-                accent: "border-gold/25",
-                bg: "bg-gold/5",
-                desc: "A structured program that accelerates early-stage startups through mentorship, resources, and networking over 3–6 months, helping them refine business models and scale rapidly.",
-              },
-              {
-                number: "02",
-                title: "Startup Funding India",
-                badge: "Capital",
-                icon: Coins,
-                color: "text-secondary",
-                accent: "border-secondary/25",
-                bg: "bg-secondary/5",
-                desc: "Provides seed to growth-stage capital — including up to ₹50 lakhs via the Startup India Seed Fund Scheme — for prototype development, product trials, and market entry.",
-              },
-              {
-                number: "03",
-                title: "Angel Investor Network India",
-                badge: "Network",
-                icon: Users,
-                color: "text-accent",
-                accent: "border-accent/25",
-                bg: "bg-accent/5",
-                desc: "India's largest B2B network connecting startups with active angel investors from diverse professional backgrounds for early investment and strategic partnerships.",
-              },
-              {
-                number: "04",
-                title: "Startup Mentorship India",
-                badge: "Mentorship",
-                icon: Award,
-                color: "text-growth",
-                accent: "border-growth/25",
-                bg: "bg-growth/5",
-                desc: "Curated guidance from experienced entrepreneurs and industry experts to refine business strategies, improve product-market fit, and accelerate growth.",
-              },
-              {
-                number: "05",
-                title: "Venture Accelerator Bengaluru",
-                badge: "Bengaluru",
-                icon: Map,
-                color: "text-primary",
-                accent: "border-primary/25",
-                bg: "bg-primary/5",
-                desc: "Bengaluru-focused accelerator programs offering localized mentorship, investor connections, and growth support for tech startups in India's startup hub.",
-              },
-              {
-                number: "06",
-                title: "Venture Accelerator India",
-                badge: "Multi-Stage",
-                icon: TrendingUp,
-                color: "text-gold",
-                accent: "border-gold/25",
-                bg: "bg-gold/5",
-                desc: "Multi-stage, fund-led accelerator supporting 200+ startups across GenAI, fintech, SaaS, and healthtech with funding, mentorship, and global expansion support.",
-              },
-              {
-                number: "07",
-                title: "Startup Growth Consulting India",
-                badge: "Consulting",
-                icon: BarChart3,
-                color: "text-secondary",
-                accent: "border-secondary/25",
-                bg: "bg-secondary/5",
-                desc: "Strategic consulting for scaling startups — covering GTM strategy, sales pipeline creation, user interface design, and organizational capability building.",
-              },
-            ].map((item, idx) => {
-              const IconComp = item.icon;
+            {siteContent.expertise.map((item, idx) => {
+              const config = [
+                { icon: Sparkles, color: "text-gold", accent: "border-gold/25", bg: "bg-gold/5" },
+                { icon: Coins, color: "text-secondary", accent: "border-secondary/25", bg: "bg-secondary/5" },
+                { icon: Users, color: "text-accent", accent: "border-accent/25", bg: "bg-accent/5" },
+                { icon: Award, color: "text-growth", accent: "border-growth/25", bg: "bg-growth/5" },
+                { icon: Map, color: "text-primary", accent: "border-primary/25", bg: "bg-primary/5" },
+                { icon: TrendingUp, color: "text-gold", accent: "border-gold/25", bg: "bg-gold/5" },
+                { icon: BarChart3, color: "text-secondary", accent: "border-secondary/25", bg: "bg-secondary/5" }
+              ][idx] || { icon: Sparkles, color: "text-gold", accent: "border-gold/25", bg: "bg-gold/5" };
+
+              const IconComp = config.icon;
               return (
                 <motion.div
                   key={idx}
@@ -1183,23 +1058,23 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.45, delay: idx * 0.07 }}
-                  className={`group relative flex flex-col gap-5 p-7 rounded-2xl border ${item.accent} bg-bg-surface-light/30 backdrop-blur-sm hover:bg-bg-surface-light/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden ${
+                  className={`group relative flex flex-col gap-5 p-7 rounded-2xl border ${config.accent} bg-bg-surface-light/30 backdrop-blur-sm hover:bg-bg-surface-light/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden ${
                     idx === 6 ? "sm:col-start-1 sm:col-end-2 lg:col-start-2 lg:col-end-3" : ""
                   }`}
                 >
                   {/* Corner glow */}
-                  <div className={`absolute -bottom-8 -right-8 w-32 h-32 ${item.bg} rounded-full blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+                  <div className={`absolute -bottom-8 -right-8 w-32 h-32 ${config.bg} rounded-full blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
 
                   {/* Header row */}
                   <div className="flex items-start justify-between">
-                    <div className={`p-3 rounded-xl bg-white/5 border border-white/5 ${item.color} shrink-0`}>
+                    <div className={`p-3 rounded-xl bg-white/5 border border-white/5 ${config.color} shrink-0`}>
                       <IconComp className="w-5 h-5" />
                     </div>
                     <div className="text-right flex flex-col items-end gap-1">
-                      <span className={`font-display font-black text-2xl ${item.color} opacity-20 leading-none`}>
+                      <span className={`font-display font-black text-2xl ${config.color} opacity-20 leading-none`}>
                         {item.number}
                       </span>
-                      <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full border ${item.accent} ${item.color} bg-white/5`}>
+                      <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full border ${config.accent} ${config.color} bg-white/5`}>
                         {item.badge}
                       </span>
                     </div>
@@ -1216,10 +1091,113 @@ export default function HomePage() {
                   </div>
 
                   {/* Bottom accent line */}
-                  <div className={`h-0.5 w-0 group-hover:w-full transition-all duration-500 rounded-full ${item.bg} bg-current ${item.color}`} />
+                  <div className={`h-0.5 w-0 group-hover:w-full transition-all duration-500 rounded-full ${config.bg} bg-current ${config.color}`} />
                 </motion.div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <PremiumDivider />
+
+      {/* --- PRICING SECTION --- */}
+      <section id="pricing" className="py-20 bg-bg-dark relative overflow-hidden">
+        <SectionBackground seed="pricing" density="medium" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] pointer-events-none z-0" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-[10px] font-extrabold text-gold uppercase tracking-widest bg-gold/5 border border-gold/10 px-3 py-1 rounded-full">
+              Structured Engagement
+            </span>
+            <h2 className="font-display font-black text-3.5xl sm:text-4xl md:text-5xl text-white mt-5 leading-tight">
+              Flexible <span className="gradient-text-gold">Program Tracks</span>
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
+              Choose the level of engagement that fits your startup's stage. From strategic advisory to hands-on co-building sprints.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
+            {siteContent.pricing.map((tier, idx) => (
+              <motion.div
+                key={tier.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                className={`relative rounded-3xl p-8 flex flex-col justify-between border transition-all duration-300 ${
+                  tier.highlighted
+                    ? "bg-bg-surface-light/40 border-gold shadow-[0_0_40px_rgba(201,169,110,0.15)] scale-[1.03] lg:-translate-y-1 z-10"
+                    : "bg-bg-surface-light/20 border-white/5 hover:border-gold/30 hover:bg-bg-surface-light/30"
+                }`}
+              >
+                {tier.highlighted && (
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gold to-yellow-600 text-bg-dark text-[9px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                    {tier.badge || "Most Popular"}
+                  </span>
+                )}
+                
+                <div>
+                  <div className="flex justify-between items-start gap-4 mb-4">
+                    <div>
+                      <h3 className="font-display font-black text-white text-xl">{tier.name}</h3>
+                      <p className="text-gray-500 text-xs mt-1">{tier.description}</p>
+                    </div>
+                    {!tier.highlighted && tier.badge && (
+                      <span className="bg-white/5 border border-white/10 text-gray-400 text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full">
+                        {tier.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-baseline gap-1 my-6 border-b border-white/5 pb-6">
+                    <span className="text-4xl font-black text-white tracking-tight">{tier.price}</span>
+                    {tier.period && (
+                      <span className="text-gray-500 text-xs font-medium uppercase tracking-wide">
+                        {tier.period}
+                      </span>
+                    )}
+                  </div>
+
+                  <ul className="flex flex-col gap-3.5 mb-8">
+                    {tier.features.filter(Boolean).map((feat, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-xs text-gray-300">
+                        <CheckCircle2 className={`w-4 h-4 shrink-0 mt-0.5 ${tier.highlighted ? "text-gold" : "text-gray-500"}`} />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="pt-4 mt-auto">
+                  {tier.id === "accelerator" || tier.id === "advisory" ? (
+                    <Link
+                      href="/apply"
+                      className={`w-full py-3.5 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 ${
+                        tier.highlighted
+                          ? "bg-cta-gradient text-[#ffffff] hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]"
+                          : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-gold/50"
+                      }`}
+                    >
+                      {tier.cta || "Apply Now"} <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={openMeetingModal}
+                      className={`w-full py-3.5 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+                        tier.highlighted
+                          ? "bg-cta-gradient text-[#ffffff] hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]"
+                          : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-gold/50"
+                      }`}
+                    >
+                      {tier.cta || "Book Strategy Audit"} <ArrowRight className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

@@ -33,11 +33,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Col */}
           <div className="flex flex-col gap-4">
-            <TransparentLogo
-              src="/logos/ega.png"
-              alt="Elephant God Accelerator Logo"
-              className="h-16 w-auto object-contain"
-            />
+            <div className="bg-white rounded-xl p-2.5 shadow-md flex items-center justify-center self-start h-16 w-40 overflow-hidden">
+              <img
+                src="/logos/rashio.png"
+                alt="Rashio Logo"
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               India's leading execution-driven startup growth platform. We turn early-stage innovation into VC-fundable market leaders.
             </p>

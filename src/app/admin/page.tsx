@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings } from "lucide-react";
+import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText } from "lucide-react";
 import { loadSiteContent, saveSiteContent, resetSiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 import type { SiteContent } from "@/lib/siteContent";
 
@@ -22,7 +22,7 @@ export default function AdminPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [loginAttempts, setLoginAttempts] = useState(0);
-  const [activeTab, setActiveTab] = useState<"events"|"hero"|"services"|"testimonials"|"pricing">("events");
+  const [activeTab, setActiveTab] = useState<"events"|"hero"|"services"|"testimonials"|"pricing"|"applications">("events");
   const [events, setEvents] = useState<CohortEvent[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string|null>(null);
@@ -30,12 +30,77 @@ export default function AdminPage() {
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  
+  // Applications States
+  const [applications, setApplications] = useState<any[]>([]);
+  const [selectedApp, setSelectedApp] = useState<any|null>(null);
+  const [appFilter, setAppFilter] = useState<"all"|"acceleration"|"membership">("all");
 
   useEffect(() => {
     if (sessionStorage.getItem("ega_admin_session") === "active") setIsLoggedIn(true);
     setEvents(loadEvents());
     setSiteContent(loadSiteContent());
+    fetchApplications();
   }, []);
+
+  const fetchApplications = async () => {
+    try {
+      const res = await fetch("/api/applications");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setApplications(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch applications", err);
+    }
+  };
+
+  const handleDeleteApp = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this submission?")) return;
+    try {
+      const res = await fetch("/api/applications", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        setApplications(prev => prev.filter(app => app.id !== id));
+        showSuccess("Submission deleted successfully.");
+        if (selectedApp?.id === id) setSelectedApp(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete application", err);
+    }
+  };
+
+  const exportToCSV = () => {
+    if (applications.length === 0) {
+      alert("No applications to export.");
+      return;
+    }
+    
+    const allKeys = Array.from(new Set(applications.flatMap(app => Object.keys(app))));
+    const csvContent = [
+      allKeys.join(","),
+      ...applications.map(app => 
+        allKeys.map(key => {
+          const val = app[key];
+          if (val === undefined || val === null) return '""';
+          return `"${String(val).replace(/"/g, '""')}"`;
+        }).join(",")
+      )
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ega_submissions_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +170,7 @@ export default function AdminPage() {
 
   const tabs = [
     {id:"events",label:"Events",icon:<Calendar className="w-4 h-4"/>},
+    {id:"applications",label:"Applications",icon:<FileText className="w-4 h-4"/>},
     {id:"hero",label:"Hero & Stats",icon:<Settings className="w-4 h-4"/>},
     {id:"services",label:"Services",icon:<Settings className="w-4 h-4"/>},
     {id:"testimonials",label:"Testimonials",icon:<Settings className="w-4 h-4"/>},
@@ -277,6 +343,257 @@ export default function AdminPage() {
             </div>
           ))}
         </div></section>
+      )}
+
+      {activeTab==="applications" && (
+        <section className="py-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="font-display font-black text-2xl text-white">Form Submissions</h2>
+                <p className="text-gray-400 text-xs mt-1">Review accelerator cohort and club membership applications.</p>
+              </div>
+              <div className="flex gap-3 w-full sm:w-auto">
+                <select 
+                  value={appFilter} 
+                  onChange={e => setAppFilter(e.target.value as any)} 
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider focus:outline-none focus:border-gold/60 cursor-pointer"
+                >
+                  <option value="all">All Forms</option>
+                  <option value="acceleration">Acceleration</option>
+                  <option value="membership">Club Membership</option>
+                </select>
+                <button 
+                  onClick={exportToCSV} 
+                  className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                >
+                  Export CSV
+                </button>
+              </div>
+            </div>
+
+            {applications.length === 0 ? (
+              <div className="glass-card rounded-3xl p-16 border border-white/5 text-center flex flex-col items-center gap-4">
+                <FileText className="w-12 h-12 text-gray-600" />
+                <p className="text-gray-400 font-bold">No submissions received yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {applications
+                  .filter(app => appFilter === "all" || app.type === appFilter)
+                  .map(app => (
+                    <div 
+                      key={app.id} 
+                      className="glass-card rounded-2xl p-5 border border-white/5 hover:border-gold/15 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex justify-between items-start gap-2 mb-3">
+                          <span className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                            app.type === "acceleration" 
+                              ? "bg-primary/20 text-accent border border-accent/20" 
+                              : "bg-gold/20 text-gold border border-gold/20"
+                          }`}>
+                            {app.type === "acceleration" ? "Acceleration" : "Membership"}
+                          </span>
+                          <span className="text-[10px] text-gray-500 font-semibold">
+                            {new Date(app.createdAt || app.id).toLocaleDateString("en-IN", {
+                              day: "numeric", month: "short", year: "numeric"
+                            })}
+                          </span>
+                        </div>
+                        <h3 className="font-display font-bold text-white text-base truncate">
+                          {app.startupName || app.name || "Unnamed Startup"}
+                        </h3>
+                        <p className="text-gray-400 text-xs mt-1">
+                          Founder: <span className="text-white font-medium">{app.founderName || "—"}</span>
+                        </p>
+                        <p className="text-gray-400 text-xs mt-1">
+                          Sector: <span className="text-white font-medium">{app.sector || app.startupSector || "—"}</span>
+                        </p>
+                        {app.type === "membership" && app.scorecardPercentage !== undefined && (
+                          <div className="mt-3 flex items-center gap-2">
+                            <span className="text-[10px] text-gray-500 uppercase font-extrabold">Readiness:</span>
+                            <span className="text-xs font-black text-gold">{app.scorecardPercentage}%</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mt-5 pt-4 border-t border-white/5">
+                        <button 
+                          onClick={() => setSelectedApp(app)} 
+                          className="flex-1 py-2 bg-white/5 border border-white/10 text-gray-300 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" /> View Details
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteApp(app.id)} 
+                          className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:border-red-500/30 hover:text-red-400 transition-all cursor-pointer"
+                          title="Delete Submission"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {selectedApp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl glass-card rounded-3xl p-6 sm:p-8 border border-gold/15 shadow-2xl max-h-[85vh] overflow-y-auto">
+            <button 
+              onClick={() => setSelectedApp(null)} 
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            
+            <div className="mb-6">
+              <span className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                selectedApp.type === "acceleration" 
+                  ? "bg-primary/20 text-accent border border-accent/20" 
+                  : "bg-gold/20 text-gold border border-gold/20"
+              }`}>
+                {selectedApp.type === "acceleration" ? "Accelerator Application" : "Club Membership Application"}
+              </span>
+              <h2 className="font-display font-black text-2xl text-white mt-2 mb-1">
+                {selectedApp.startupName || selectedApp.name || "Unnamed Startup"}
+              </h2>
+              <p className="text-gray-500 text-xs font-semibold">
+                Submitted on {new Date(selectedApp.createdAt || selectedApp.id).toLocaleString("en-IN")}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-5">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Founder Name</span>
+                <span className="text-sm font-semibold text-white">{selectedApp.founderName || "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Startup Name</span>
+                <span className="text-sm font-semibold text-white">{selectedApp.startupName || "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Sector</span>
+                <span className="text-sm font-semibold text-white">{selectedApp.sector || selectedApp.startupSector || "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Revenue Level</span>
+                <span className="text-sm font-semibold text-white">{selectedApp.revenue || selectedApp.startupRevenue || "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Funding Requirement</span>
+                <span className="text-sm font-semibold text-white">{selectedApp.fundingReq || selectedApp.startupFundingReq || "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Website Address</span>
+                {selectedApp.website || selectedApp.startupWebsite ? (
+                  <a 
+                    href={selectedApp.website || selectedApp.startupWebsite} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="text-sm font-semibold text-gold hover:underline flex items-center gap-1"
+                  >
+                    {selectedApp.website || selectedApp.startupWebsite}
+                  </a>
+                ) : (
+                  <span className="text-sm font-semibold text-white">—</span>
+                )}
+              </div>
+
+              {selectedApp.type === "membership" && (
+                <>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Founder Email</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.founderEmail || "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Founder Phone</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.founderPhone || "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">LinkedIn URL</span>
+                    {selectedApp.founderLinkedin ? (
+                      <a 
+                        href={selectedApp.founderLinkedin} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-sm font-semibold text-gold hover:underline"
+                      >
+                        {selectedApp.founderLinkedin}
+                      </a>
+                    ) : (
+                      <span className="text-sm font-semibold text-white">—</span>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Headquarters Location</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.startupLocation || "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Team Size</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.startupTeam || "—"} co-founders/employees</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Entity Registration</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.startupRegistered || "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Prior Funding Raised</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.startupRaised || "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Scorecard Readiness Percentage</span>
+                    <span className="text-sm font-black text-gold">{selectedApp.scorecardPercentage !== undefined ? `${selectedApp.scorecardPercentage}%` : "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 sm:col-span-2">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck File Name</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.pitchDeck || "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 sm:col-span-2">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Elevator Pitch</span>
+                    <p className="text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl p-3 leading-relaxed">{selectedApp.startupElevator || "—"}</p>
+                  </div>
+                </>
+              )}
+
+              {selectedApp.type === "acceleration" && (
+                <>
+                  <div className="flex flex-col gap-1 sm:col-span-2">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Assistant Required For</span>
+                    <p className="text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl p-3 leading-relaxed">{selectedApp.assistantReq || "—"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1 sm:col-span-2">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Company Profile</span>
+                    <p className="text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl p-3 leading-relaxed">{selectedApp.companyProfile || "—"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1 sm:col-span-2">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Product Details</span>
+                    <p className="text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl p-3 leading-relaxed">{selectedApp.productDetails || "—"}</p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-5 border-t border-white/5">
+              <button 
+                onClick={() => setSelectedApp(null)} 
+                className="flex-1 py-3 bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-white/10 transition-all cursor-pointer"
+              >
+                Close Details
+              </button>
+              <button 
+                onClick={() => handleDeleteApp(selectedApp.id)} 
+                className="py-3 px-6 bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/30 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+              >
+                Delete Submission
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {showForm && (

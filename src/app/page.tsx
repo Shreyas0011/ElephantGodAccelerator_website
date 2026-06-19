@@ -32,6 +32,32 @@ import PremiumDivider from "@/components/PremiumDivider";
 import { useApp } from "@/context/AppContext";
 import { loadSiteContent, SiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 
+const PORTFOLIO_LOGOS = [
+  { name: "Mykhaana", src: "mykhaana.jpg", scale: "scale-[1.3]" },
+  { name: "CosmicEye", src: "cosmiceye.jpg", scale: "scale-[1.35]" },
+  { name: "Tribal Brew Coffee", src: "tribalbrew.jpg", scale: "scale-[1.1]" },
+  { name: "Just Connect Electricals", src: "justconnect.jpg", scale: "scale-[1.1]" },
+  { name: "Myniwa", src: "myniwa.jpg", scale: "scale-[1.0]" },
+  { name: "Ammamma's", src: "ammammas.jpg", scale: "scale-[1.4]" },
+  { name: "Olive Living", src: "olive.jpg", scale: "scale-[1.0]" },
+  { name: "Discreet Arts", src: "discreetarts.jpg", scale: "scale-[1.5]" },
+  { name: "Charze Max", src: "charzemax.jpg", scale: "scale-[1.45]" },
+  { name: "World 5 Fund", src: "world5fund.jpg", scale: "scale-[1.8]" },
+  { name: "Genie Pads", src: "geniepads.jpg", scale: "scale-[1.3]" },
+  { name: "Melvin Jones", src: "melvinjones.jpg", scale: "scale-[1.1]" },
+  { name: "Abnandan Enviro", src: "abnandanenviro.jpg", scale: "scale-[1.3]" },
+  { name: "Spykke", src: "spykke.jpg", scale: "scale-[1.1]" },
+  { name: "DEFA", src: "defa.jpg", scale: "scale-[1.1]" },
+  { name: "Sutton & Shaw", src: "suttonandshaw.jpg", scale: "scale-[1.1]" },
+  { name: "DesiLLM", src: "desillm.jpg", scale: "scale-[1.15]" },
+  { name: "Elephantgod Infra", src: "elephantgodinfra.jpg", scale: "scale-[1.8]" },
+  { name: "GRV Academy", src: "grvacademy.jpg", scale: "scale-[2.4]" },
+  { name: "R Cube MedTech", src: "rcubemedtech.jpg", scale: "scale-[1.25]" },
+  { name: "NES", src: "nes.jpg", scale: "scale-[1.15]" },
+  { name: "Zero Touch", src: "zerotouch.jpg", scale: "scale-[1.1]" },
+  { name: "inGO Electric", src: "ingoelectric.png", scale: "scale-[1.15]" },
+];
+
 export default function HomePage() {
   const { openMeetingModal } = useApp();
   const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_CONTENT);
@@ -298,71 +324,23 @@ export default function HomePage() {
             </span>
             <div className="relative flex overflow-x-hidden py-4 w-full opacity-85 hover:opacity-100 transition-opacity duration-300">
               <div className="animate-infinite-scroll flex whitespace-nowrap gap-12 items-center">
-                {[
-                  { name: "Mykhaana", src: "mykhaana.jpg" },
-                  { name: "CosmicEye", src: "cosmiceye.jpg" },
-                  { name: "Tribal Brew Coffee", src: "tribalbrew.jpg" },
-                  { name: "Just Connect Electricals", src: "justconnect.jpg" },
-                  { name: "Myniwa", src: "myniwa.jpg" },
-                  { name: "Ammamma's", src: "ammammas.jpg" },
-                  { name: "Olive Living", src: "olive.jpg" },
-                  { name: "Discreet Arts", src: "discreetarts.jpg" },
-                  { name: "Charze Max", src: "charzemax.jpg" },
-                  { name: "World 5 Fund", src: "world5fund.jpg" },
-                  { name: "Genie Pads", src: "geniepads.jpg" },
-                  { name: "Melvin Jones", src: "melvinjones.jpg" },
-                  { name: "Abnandan Enviro", src: "abnandanenviro.jpg" },
-                  { name: "Spykke", src: "spykke.jpg" },
-                  { name: "DEFA", src: "defa.jpg" },
-                  { name: "Sutton & Shaw", src: "suttonandshaw.jpg" },
-                  { name: "DesiLLM", src: "desillm.jpg" },
-                  { name: "Elephantgod Infra", src: "elephantgodinfra.jpg" },
-                  { name: "GRV Academy", src: "grvacademy.jpg" },
-                  { name: "R Cube MedTech", src: "rcubemedtech.jpg" },
-                  { name: "NES", src: "nes.jpg" },
-                  { name: "Zero Touch", src: "zerotouch.jpg" },
-                  { name: "inGO Electric", src: "ingoelectric.png" },
-                ].map((logo, idx) => (
-                  <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
+                {PORTFOLIO_LOGOS.map((logo, idx) => (
+                  <div key={idx} className="bg-white p-2 rounded-2xl flex items-center justify-center shadow-md h-20 w-48 shrink-0 select-none overflow-hidden transition-transform hover:scale-105">
                     <img
                       src={`/logos/${logo.src}`}
                       alt={logo.name}
-                      className="max-h-full max-w-full object-contain filter grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
+                      className={`max-h-[85%] max-w-[90%] object-contain transition-all duration-300 ${logo.scale}`}
                     />
                   </div>
                 ))}
               </div>
               <div className="animate-infinite-scroll flex whitespace-nowrap gap-12 items-center" aria-hidden="true">
-                {[
-                  { name: "Mykhaana", src: "mykhaana.jpg" },
-                  { name: "CosmicEye", src: "cosmiceye.jpg" },
-                  { name: "Tribal Brew Coffee", src: "tribalbrew.jpg" },
-                  { name: "Just Connect Electricals", src: "justconnect.jpg" },
-                  { name: "Myniwa", src: "myniwa.jpg" },
-                  { name: "Ammamma's", src: "ammammas.jpg" },
-                  { name: "Olive Living", src: "olive.jpg" },
-                  { name: "Discreet Arts", src: "discreetarts.jpg" },
-                  { name: "Charze Max", src: "charzemax.jpg" },
-                  { name: "World 5 Fund", src: "world5fund.jpg" },
-                  { name: "Genie Pads", src: "geniepads.jpg" },
-                  { name: "Melvin Jones", src: "melvinjones.jpg" },
-                  { name: "Abnandan Enviro", src: "abnandanenviro.jpg" },
-                  { name: "Spykke", src: "spykke.jpg" },
-                  { name: "DEFA", src: "defa.jpg" },
-                  { name: "Sutton & Shaw", src: "suttonandshaw.jpg" },
-                  { name: "DesiLLM", src: "desillm.jpg" },
-                  { name: "Elephantgod Infra", src: "elephantgodinfra.jpg" },
-                  { name: "GRV Academy", src: "grvacademy.jpg" },
-                  { name: "R Cube MedTech", src: "rcubemedtech.jpg" },
-                  { name: "NES", src: "nes.jpg" },
-                  { name: "Zero Touch", src: "zerotouch.jpg" },
-                  { name: "inGO Electric", src: "ingoelectric.png" },
-                ].map((logo, idx) => (
-                  <div key={idx} className="bg-[#ffffff] px-6 py-3.5 rounded-2xl flex items-center justify-center shadow-lg h-16 w-48 shrink-0 select-none transition-transform hover:scale-105">
+                {PORTFOLIO_LOGOS.map((logo, idx) => (
+                  <div key={idx} className="bg-white p-2 rounded-2xl flex items-center justify-center shadow-md h-20 w-48 shrink-0 select-none overflow-hidden transition-transform hover:scale-105">
                     <img
                       src={`/logos/${logo.src}`}
                       alt={logo.name}
-                      className="max-h-full max-w-full object-contain filter grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
+                      className={`max-h-[85%] max-w-[90%] object-contain transition-all duration-300 ${logo.scale}`}
                     />
                   </div>
                 ))}
@@ -394,7 +372,7 @@ export default function HomePage() {
               </p>
               <div className="mt-2">
                 <Link
-                  href="/apply"
+                  href="/apply?mode=membership"
                   className="text-xs font-extrabold text-gold hover:text-white transition-colors flex items-center gap-1.5 group"
                 >
                   Take Funding Readiness Quiz <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -1174,7 +1152,7 @@ export default function HomePage() {
                 <div className="pt-4 mt-auto">
                   {tier.id === "accelerator" || tier.id === "advisory" ? (
                     <Link
-                      href="/apply"
+                      href={tier.id === "advisory" ? "/apply?mode=membership" : "/apply"}
                       className={`w-full py-3.5 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 ${
                         tier.highlighted
                           ? "bg-cta-gradient text-[#ffffff] hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]"

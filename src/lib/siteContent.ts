@@ -243,7 +243,7 @@ export const DEFAULT_CONTENT: SiteContent = {
         "Email Support (48h Response)",
         "Access to EGA Resource Library",
       ],
-      cta: "Apply Now",
+      cta: "For Club Membership",
       highlighted: false,
     },
     {

@@ -15,9 +15,10 @@ export default function SectionBackground({
 }: SectionBackgroundProps) {
   // Color tokens
   // Muted gold-bronze for light mode, soft champagne for dark mode
-  const strokeColor = dark ? "rgba(201, 169, 110, 0.14)" : "rgba(162, 128, 69, 0.18)";
-  const dotColor    = dark ? "rgba(201, 169, 110, 0.12)" : "rgba(162, 128, 69, 0.14)";
-  const glowColor   = dark ? "rgba(201, 169, 110, 0.03)" : "rgba(201, 169, 110, 0.04)";
+  const strokeColor = dark ? "rgba(240, 201, 128, 0.28)" : "rgba(162, 128, 69, 0.24)";
+  const dotColor    = dark ? "rgba(240, 201, 128, 0.2)" : "rgba(162, 128, 69, 0.18)";
+  const glowColor   = dark ? "rgba(240, 201, 128, 0.06)" : "rgba(240, 201, 128, 0.06)";
+  const textColor   = dark ? "rgba(240, 201, 128, 0.75)" : "rgba(162, 128, 69, 0.75)";
 
   // We define exactly 3 elegant, curated floating elements per section instead of chaotic random shapes.
   // Each has a clean, neat technical blueprint structure.
@@ -53,7 +54,7 @@ export default function SectionBackground({
           <line x1="2" y1="50" x2="10" y2="50" stroke="currentColor" strokeWidth="0.6" />
           <line x1="90" y1="50" x2="98" y2="50" stroke="currentColor" strokeWidth="0.6" />
           {/* Small label inside */}
-          <text x="50" y="53" textAnchor="middle" fontSize="3.5" fontFamily="monospace" fill="currentColor" letterSpacing="1">
+          <text x="50" y="53" textAnchor="middle" fontSize="3.5" fontFamily="monospace" fill={textColor} letterSpacing="1">
             EGA.REF-01
           </text>
         </svg>
@@ -74,7 +75,7 @@ export default function SectionBackground({
           <line x1="15" y1="85" x2="85" y2="15" stroke="currentColor" strokeWidth="0.4" strokeDasharray="2 3" />
           {/* Center point */}
           <circle cx="50" cy="50" r="2" fill="currentColor" />
-          <text x="50" y="63" textAnchor="middle" fontSize="3.5" fontFamily="monospace" fill="currentColor" letterSpacing="1">
+          <text x="50" y="63" textAnchor="middle" fontSize="3.5" fontFamily="monospace" fill={textColor} letterSpacing="1">
             SYS.GTM_V4
           </text>
         </svg>
@@ -96,7 +97,7 @@ export default function SectionBackground({
           <path d="M 80,35 L 80,20 L 65,20" fill="none" stroke="currentColor" strokeWidth="0.8" />
           <path d="M 20,65 L 20,80 L 35,80" fill="none" stroke="currentColor" strokeWidth="0.8" />
           <path d="M 80,65 L 80,80 L 65,80" fill="none" stroke="currentColor" strokeWidth="0.8" />
-          <text x="50" y="52" textAnchor="middle" fontSize="3.5" fontFamily="monospace" fill="currentColor" letterSpacing="0.8">
+          <text x="50" y="52" textAnchor="middle" fontSize="3.5" fontFamily="monospace" fill={textColor} letterSpacing="0.8">
             FLOW.MATRIX
           </text>
         </svg>

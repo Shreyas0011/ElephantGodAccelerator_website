@@ -23,11 +23,11 @@ export default function MobileStickyBar() {
 
       {/* Apply Link */}
       <Link
-        href="/apply"
+        href="/apply?mode=membership"
         className="flex flex-col items-center justify-center py-2 text-gold hover:text-white active:text-white border-r border-white/5 bg-gold/5"
       >
         <FileText className="w-5 h-5 mb-0.5" />
-        <span className="text-[10px] font-bold uppercase tracking-wider">Apply Now</span>
+        <span className="text-[8px] font-bold uppercase tracking-wider text-center px-1">For Club Membership</span>
       </Link>
 
       {/* Schedule Link */}

@@ -12,16 +12,31 @@ export default function MeetingModal() {
   const [timeSlot, setTimeSlot] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !date || !timeSlot) return;
 
-    const meetings = JSON.parse(localStorage.getItem("ega_meetings") || "[]");
-    meetings.push({
-      id: Date.now(),
+    const auditData = {
       email,
       date,
       timeSlot,
+    };
+
+    try {
+      await fetch("/api/audits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(auditData),
+      });
+    } catch (err) {
+      console.error("Failed to submit strategy audit request", err);
+    }
+
+    // Keep localStorage backup
+    const meetings = JSON.parse(localStorage.getItem("ega_meetings") || "[]");
+    meetings.push({
+      id: Date.now(),
+      ...auditData,
       createdAt: new Date().toISOString(),
     });
     localStorage.setItem("ega_meetings", JSON.stringify(meetings));

@@ -9,6 +9,7 @@ interface Event {
   time: string;
   location: string;
   capacity: string;
+  formFields?: string[];
 }
 
 // Admin-added events from localStorage have this shape
@@ -20,6 +21,7 @@ interface StoredEvent {
   time: string;
   location: string;
   capacity: string;
+  formFields?: string[];
 }
 
 // Default (built-in) events — always shown
@@ -56,7 +58,7 @@ const DEFAULT_EVENTS: Record<string, Event> = {
 
 export default function EventsPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>("2026-06-18");
-  const [rsvpEmail, setRsvpEmail] = useState("");
+  const [rsvpForm, setRsvpForm] = useState<Record<string, string>>({});
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
   // Merged events: defaults + admin-added from localStorage
@@ -77,6 +79,7 @@ export default function EventsPage() {
             time: ev.time,
             location: ev.location,
             capacity: ev.capacity,
+            formFields: ev.formFields,
           };
         });
         // Admin events take precedence over defaults for same date
@@ -94,26 +97,37 @@ export default function EventsPage() {
     if (mockEvents[dayStr]) {
       setSelectedDate(dayStr);
       setRsvpSuccess(false);
-      setRsvpEmail("");
+      setRsvpForm({});
     }
   };
 
   const handleRsvp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rsvpEmail || !selectedDate) return;
+    if (!selectedDate) return;
 
     const rsvps = JSON.parse(localStorage.getItem("ega_rsvps") || "[]");
     rsvps.push({
       id: Date.now(),
-      email: rsvpEmail,
       eventDate: selectedDate,
       eventTitle: mockEvents[selectedDate].title,
       createdAt: new Date().toISOString(),
+      ...rsvpForm,
     });
     localStorage.setItem("ega_rsvps", JSON.stringify(rsvps));
 
     setRsvpSuccess(true);
-    setRsvpEmail("");
+    setRsvpForm({
+      founderName: "",
+      email: "",
+      startupName: "",
+      sector: "",
+      revenue: "",
+      assistantReq: "",
+      fundingReq: "",
+      companyProfile: "",
+      productDetails: "",
+      website: "",
+    });
   };
 
   // Dynamic calendar: current view month/year with navigation
@@ -271,20 +285,44 @@ export default function EventsPage() {
                     RSVP Confirmed! Calendar Invite sent to your email.
                   </div>
                 ) : (
-                  <form onSubmit={handleRsvp} className="flex gap-2">
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@company.com"
-                      value={rsvpEmail}
-                      onChange={(e) => setRsvpEmail(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold"
-                    />
+                  <form onSubmit={handleRsvp} className="flex flex-col gap-3.5 max-h-[420px] overflow-y-auto pr-1">
+                    {(mockEvents[selectedDate].formFields || [
+                      "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
+                      "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
+                    ]).map((field, idx) => {
+                      const isTextArea = field.toLowerCase().includes("profile") || field.toLowerCase().includes("details");
+                      const type = field.toLowerCase().includes("email") ? "email" : field.toLowerCase().includes("website") || field.toLowerCase().includes("url") ? "url" : "text";
+                      
+                      return (
+                        <div key={idx} className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{field}</label>
+                          {isTextArea ? (
+                            <textarea
+                              required
+                              placeholder={`Enter ${field}...`}
+                              rows={2}
+                              value={rsvpForm[field] || ""}
+                              onChange={(e) => setRsvpForm({ ...rsvpForm, [field]: e.target.value })}
+                              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold resize-none"
+                            />
+                          ) : (
+                            <input
+                              type={type}
+                              required
+                              placeholder={`Enter ${field}...`}
+                              value={rsvpForm[field] || ""}
+                              onChange={(e) => setRsvpForm({ ...rsvpForm, [field]: e.target.value })}
+                              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-gradient-to-tr from-primary to-secondary text-bg-dark font-bold text-xs uppercase tracking-wider rounded-lg hover:shadow-lg flex items-center justify-center shrink-0"
+                      className="w-full py-3 bg-gradient-to-tr from-primary to-secondary text-bg-dark font-bold text-xs uppercase tracking-wider rounded-lg hover:shadow-lg flex items-center justify-center shrink-0 mt-2 cursor-pointer"
                     >
-                      RSVP Spot <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                      Register for Event <ArrowRight className="w-3.5 h-3.5 ml-1" />
                     </button>
                   </form>
                 )}

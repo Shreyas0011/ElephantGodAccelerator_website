@@ -47,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable} ${inter.variable} h-full`}>
+    <html lang="en" className={`${outfit.variable} ${inter.variable} h-full`} suppressHydrationWarning>
       <body className="bg-bg-dark text-gray-200 min-h-full flex flex-col antialiased relative overflow-x-hidden fancy-mesh-gradient">
         {/* Fancy background glowing orbs */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
@@ -59,7 +59,7 @@ export default function RootLayout({
         <TechBackground />
         <AppProvider>
           <Header />
-          <main className="flex-grow relative z-10">{children}</main>
+          <main className="flex-grow relative">{children}</main>
           <Footer />
           <MeetingModal />
           <FloatingWidgets />

@@ -33,6 +33,10 @@ import { useApp } from "@/context/AppContext";
 import { loadSiteContent, SiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 
 const PORTFOLIO_LOGOS = [
+  { name: "Bluprnt Workspaces", src: "bluprnt.png", scale: "scale-[1.0]" },
+  { name: "The Business Ascent", src: "businessascent.png", scale: "scale-[1.1]" },
+  { name: "Global Triumph Foundation", src: "globaltriumph.png", scale: "scale-[1.0]" },
+  { name: "ProloanZ", src: "proloanz.png", scale: "scale-[1.1]" },
   { name: "Mykhaana", src: "mykhaana.jpg", scale: "scale-[1.3]" },
   { name: "CosmicEye", src: "cosmiceye.jpg", scale: "scale-[1.35]" },
   { name: "Tribal Brew Coffee", src: "tribalbrew.jpg", scale: "scale-[1.1]" },
@@ -323,7 +327,7 @@ export default function HomePage() {
               Accelerated Cohorts & Featured Portfolio Spotlights
             </span>
             <div className="relative flex overflow-x-hidden py-4 w-full opacity-85 hover:opacity-100 transition-opacity duration-300">
-              <div className="animate-infinite-scroll flex whitespace-nowrap gap-12 items-center">
+              <div className="animate-infinite-scroll flex whitespace-nowrap gap-12 items-center pr-12">
                 {PORTFOLIO_LOGOS.map((logo, idx) => (
                   <div key={idx} className="bg-white p-2 rounded-2xl flex items-center justify-center shadow-md h-20 w-48 shrink-0 select-none overflow-hidden transition-transform hover:scale-105">
                     <img
@@ -334,7 +338,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <div className="animate-infinite-scroll flex whitespace-nowrap gap-12 items-center" aria-hidden="true">
+              <div className="animate-infinite-scroll flex whitespace-nowrap gap-12 items-center pr-12" aria-hidden="true">
                 {PORTFOLIO_LOGOS.map((logo, idx) => (
                   <div key={idx} className="bg-white p-2 rounded-2xl flex items-center justify-center shadow-md h-20 w-48 shrink-0 select-none overflow-hidden transition-transform hover:scale-105">
                     <img

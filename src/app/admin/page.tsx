@@ -6,10 +6,15 @@ import type { SiteContent } from "@/lib/siteContent";
 
 interface CohortEvent {
   id: string; date: string; title: string; desc: string; time: string; location: string; capacity: string;
+  formFields?: string[];
 }
 const ADMIN_PASSWORD = "ega@admin2026";
 const STORAGE_KEY = "ega_admin_events";
-const defaultForm = { date: "", title: "", desc: "", time: "", location: "", capacity: "" };
+const defaultFormFields: string[] = [
+  "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
+  "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
+];
+const defaultForm = { date: "", title: "", desc: "", time: "", location: "", capacity: "", formFields: defaultFormFields };
 function loadEvents(): CohortEvent[] {
   if (typeof window === "undefined") return [];
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
@@ -22,7 +27,7 @@ export default function AdminPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [loginAttempts, setLoginAttempts] = useState(0);
-  const [activeTab, setActiveTab] = useState<"events"|"hero"|"services"|"testimonials"|"pricing"|"applications">("events");
+  const [activeTab, setActiveTab] = useState<"events"|"hero"|"services"|"testimonials"|"pricing"|"applications"|"event-applications"|"audits">("events");
   const [events, setEvents] = useState<CohortEvent[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string|null>(null);
@@ -30,18 +35,60 @@ export default function AdminPage() {
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  const [newFieldInput, setNewFieldInput] = useState("");
   
   // Applications States
   const [applications, setApplications] = useState<any[]>([]);
   const [selectedApp, setSelectedApp] = useState<any|null>(null);
   const [appFilter, setAppFilter] = useState<"all"|"acceleration"|"membership">("all");
 
+  // Event Registrations States
+  const [eventRsvps, setEventRsvps] = useState<any[]>([]);
+  const [selectedEventRsvp, setSelectedEventRsvp] = useState<any|null>(null);
+  const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({});
+
+  // Audits State
+  const [audits, setAudits] = useState<any[]>([]);
+
   useEffect(() => {
     if (sessionStorage.getItem("ega_admin_session") === "active") setIsLoggedIn(true);
     setEvents(loadEvents());
     setSiteContent(loadSiteContent());
     fetchApplications();
+    loadEventRsvps();
+    fetchAudits();
   }, []);
+
+  const loadEventRsvps = () => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = JSON.parse(localStorage.getItem("ega_rsvps") || "[]");
+      setEventRsvps(stored);
+    } catch (err) {
+      console.error("Failed to load event RSVPs", err);
+    }
+  };
+
+  const fetchAudits = async () => {
+    try {
+      const res = await fetch("/api/audits");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setAudits(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch strategy audits", err);
+    }
+  };
+
+  const handleDeleteEventRsvp = (id: number) => {
+    if (!confirm("Are you sure you want to delete this event registration?")) return;
+    const updated = eventRsvps.filter(r => r.id !== id);
+    localStorage.setItem("ega_rsvps", JSON.stringify(updated));
+    setEventRsvps(updated);
+    showSuccess("Event registration deleted successfully.");
+    if (selectedEventRsvp?.id === id) setSelectedEventRsvp(null);
+  };
 
   const fetchApplications = async () => {
     try {
@@ -114,10 +161,29 @@ export default function AdminPage() {
   };
   const handleLogout = () => { setIsLoggedIn(false); sessionStorage.removeItem("ega_admin_session"); };
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(()=>setSuccessMsg(""),3000); };
-  const openAddForm = () => { setForm(defaultForm); setEditingId(null); setFormError(""); setShowForm(true); };
-  const openEditForm = (ev: CohortEvent) => { setForm({date:ev.date,title:ev.title,desc:ev.desc,time:ev.time,location:ev.location,capacity:ev.capacity}); setEditingId(ev.id); setFormError(""); setShowForm(true); };
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(defaultForm); setFormError(""); };
+  const openAddForm = () => { setForm(defaultForm); setEditingId(null); setFormError(""); setNewFieldInput(""); setShowForm(true); };
+  const openEditForm = (ev: CohortEvent) => { setForm({date:ev.date,title:ev.title,desc:ev.desc,time:ev.time,location:ev.location,capacity:ev.capacity, formFields: ev.formFields || defaultFormFields}); setEditingId(ev.id); setFormError(""); setNewFieldInput(""); setShowForm(true); };
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(defaultForm); setFormError(""); setNewFieldInput(""); };
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => setForm(p=>({...p,[e.target.name]:e.target.value}));
+  const handleAddField = () => {
+    if (!newFieldInput.trim()) return;
+    setForm(p => ({ ...p, formFields: [...(p.formFields || defaultFormFields), newFieldInput.trim()] }));
+    setNewFieldInput("");
+  };
+  const handleRemoveField = (idx: number) => {
+    setForm(p => {
+      const arr = [...(p.formFields || defaultFormFields)];
+      arr.splice(idx, 1);
+      return { ...p, formFields: arr };
+    });
+  };
+  const handleEditField = (idx: number, val: string) => {
+    setForm(p => {
+      const arr = [...(p.formFields || defaultFormFields)];
+      arr[idx] = val;
+      return { ...p, formFields: arr };
+    });
+  };
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.date||!form.title||!form.time||!form.location){setFormError("Date, Title, Time, Location required.");return;}
@@ -170,7 +236,9 @@ export default function AdminPage() {
 
   const tabs = [
     {id:"events",label:"Events",icon:<Calendar className="w-4 h-4"/>},
+    {id:"event-applications",label:"Event Applications",icon:<Users className="w-4 h-4"/>},
     {id:"applications",label:"Applications",icon:<FileText className="w-4 h-4"/>},
+    {id:"audits",label:"Strategy Audits",icon:<Clock className="w-4 h-4"/>},
     {id:"hero",label:"Hero & Stats",icon:<Settings className="w-4 h-4"/>},
     {id:"services",label:"Services",icon:<Settings className="w-4 h-4"/>},
     {id:"testimonials",label:"Testimonials",icon:<Settings className="w-4 h-4"/>},
@@ -229,10 +297,51 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
+                        {eventRsvps.filter(r => r.eventDate === event.date).length > 0 && (
+                          <button 
+                            onClick={() => setExpandedEvents(prev => ({ ...prev, [event.id]: !prev[event.id] }))} 
+                            className="px-3 py-2 rounded-lg bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Users className="w-3.5 h-3.5" />
+                            {!!expandedEvents[event.id] ? "Hide Registrations" : `View Registrations (${eventRsvps.filter(r => r.eventDate === event.date).length})`}
+                          </button>
+                        )}
                         <button onClick={()=>openEditForm(event)} className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:border-gold/30 hover:text-gold transition-all"><Edit3 className="w-4 h-4"/></button>
                         <button onClick={()=>handleDelete(event.id)} className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:border-red-500/30 hover:text-red-400 transition-all"><Trash2 className="w-4 h-4"/></button>
                       </div>
                     </div>
+
+                    {/* Collapsible list of registrations for this specific event */}
+                    {!!expandedEvents[event.id] && eventRsvps.filter(r => r.eventDate === event.date).length > 0 && (
+                      <div className="mt-5 pt-5 border-t border-white/5 flex flex-col gap-4">
+                        <h4 className="text-xs font-extrabold text-gold uppercase tracking-wider">Event Registrations</h4>
+                        <div className="flex flex-col gap-3">
+                          {eventRsvps.filter(r => r.eventDate === event.date).map((rsvp) => (
+                            <div key={rsvp.id} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col gap-3">
+                              <div className="flex justify-between items-start gap-2">
+                                <div>
+                                  <span className="text-sm font-bold text-white">{rsvp.founderName}</span>
+                                  <span className="text-xs text-gray-400 block">{rsvp.email}</span>
+                                </div>
+                                <span className="text-[10px] text-gray-500 font-semibold">
+                                  {new Date(rsvp.createdAt).toLocaleString("en-IN")}
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs border-t border-white/5 pt-3">
+                                <div><span className="text-gray-500 block text-[9px] uppercase font-bold">Startup Name</span><span className="text-gray-200">{rsvp.startupName}</span></div>
+                                <div><span className="text-gray-500 block text-[9px] uppercase font-bold">Sector</span><span className="text-gray-200">{rsvp.sector}</span></div>
+                                <div><span className="text-gray-500 block text-[9px] uppercase font-bold">Revenue</span><span className="text-gray-200">{rsvp.revenue}</span></div>
+                                <div><span className="text-gray-500 block text-[9px] uppercase font-bold">Funding Requirement</span><span className="text-gray-200">{rsvp.fundingReq}</span></div>
+                                <div className="sm:col-span-2"><span className="text-gray-500 block text-[9px] uppercase font-bold">Website Address</span><a href={rsvp.website} target="_blank" rel="noreferrer" className="text-gold hover:underline">{rsvp.website}</a></div>
+                                <div className="sm:col-span-3"><span className="text-gray-500 block text-[9px] uppercase font-bold">Assistant Required For</span><p className="text-gray-300 bg-white/5 rounded p-2 mt-1 leading-relaxed">{rsvp.assistantReq}</p></div>
+                                <div className="sm:col-span-3"><span className="text-gray-500 block text-[9px] uppercase font-bold">Company Profile</span><p className="text-gray-300 bg-white/5 rounded p-2 mt-1 leading-relaxed">{rsvp.companyProfile}</p></div>
+                                <div className="sm:col-span-3"><span className="text-gray-500 block text-[9px] uppercase font-bold">Product Details</span><p className="text-gray-300 bg-white/5 rounded p-2 mt-1 leading-relaxed">{rsvp.productDetails}</p></div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -441,8 +550,185 @@ export default function AdminPage() {
         </section>
       )}
 
+      {activeTab==="event-applications" && (
+        <section className="py-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="font-display font-black text-2xl text-white">Event Applications</h2>
+                <p className="text-gray-400 text-xs mt-1">Review registrations for cohort events and masterclasses.</p>
+              </div>
+            </div>
+
+            {eventRsvps.length === 0 ? (
+              <div className="glass-card rounded-3xl p-16 border border-white/5 text-center flex flex-col items-center gap-4">
+                <FileText className="w-12 h-12 text-gray-600" />
+                <p className="text-gray-400 font-bold">No event registrations received yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...eventRsvps].reverse().map(rsvp => (
+                  <div 
+                    key={rsvp.id} 
+                    className="glass-card rounded-2xl p-5 border border-white/5 hover:border-gold/15 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex justify-between items-start gap-2 mb-3">
+                        <span className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold/20 text-gold border border-gold/20">
+                          {rsvp.eventTitle}
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-semibold">
+                          {new Date(rsvp.createdAt || rsvp.id).toLocaleDateString("en-IN", {
+                            day: "numeric", month: "short", year: "numeric"
+                          })}
+                        </span>
+                      </div>
+                      <h3 className="font-display font-bold text-white text-base truncate">
+                        {rsvp["Startup Name"] || rsvp.startupName || "Unnamed Startup"}
+                      </h3>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Founder: <span className="text-white font-medium">{rsvp["Founder Name"] || rsvp.founderName || "—"}</span>
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Email: <span className="text-white font-medium">{rsvp["Email Address"] || rsvp.email || "—"}</span>
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Sector: <span className="text-white font-medium">{rsvp["Sector"] || rsvp.sector || "—"}</span>
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-5 pt-4 border-t border-white/5">
+                      <button 
+                        onClick={() => setSelectedEventRsvp(rsvp)} 
+                        className="flex-1 py-2 bg-white/5 border border-white/10 text-gray-300 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" /> View Details
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteEventRsvp(rsvp.id)} 
+                        className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:border-red-500/30 hover:text-red-400 transition-all cursor-pointer"
+                        title="Delete Registration"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {activeTab==="audits" && (
+        <section className="py-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="font-display font-black text-2xl text-white">Strategy Audits</h2>
+                <p className="text-gray-400 text-xs mt-1">Review requests for 1:1 strategy audits and partner consultations.</p>
+              </div>
+              <button 
+                onClick={() => {
+                  if (audits.length === 0) {
+                    alert("No audits to export.");
+                    return;
+                  }
+                  const allKeys = ["id", "createdAt", "email", "date", "timeSlot"];
+                  const csvContent = [
+                    allKeys.join(","),
+                    ...audits.map(audit => 
+                      allKeys.map(key => `"${String(audit[key] || "").replace(/"/g, '""')}"`).join(",")
+                    )
+                  ].join("\n");
+                  
+                  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.setAttribute("href", url);
+                  link.setAttribute("download", `ega_audits_${new Date().toISOString().split('T')[0]}.csv`);
+                  link.style.visibility = "hidden";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }} 
+                className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+              >
+                Export CSV
+              </button>
+            </div>
+
+            {audits.length === 0 ? (
+              <div className="glass-card rounded-3xl p-16 border border-white/5 text-center flex flex-col items-center gap-4">
+                <Clock className="w-12 h-12 text-gray-600" />
+                <p className="text-gray-400 font-bold">No strategy audits booked yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...audits].reverse().map(audit => (
+                  <div 
+                    key={audit.id} 
+                    className="glass-card rounded-2xl p-5 border border-white/5 hover:border-gold/15 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex justify-between items-start gap-2 mb-3">
+                        <span className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold/20 text-gold border border-gold/20 flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> Audit Booking
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-semibold">
+                          {new Date(audit.createdAt || audit.id).toLocaleDateString("en-IN", {
+                            day: "numeric", month: "short", year: "numeric"
+                          })}
+                        </span>
+                      </div>
+                      <h3 className="font-display font-bold text-white text-base truncate">
+                        {audit.email}
+                      </h3>
+                      <div className="flex flex-col gap-1.5 mt-4 pt-3 border-t border-white/5">
+                        <p className="text-gray-400 text-xs flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-gold" />
+                          Preferred Date: <span className="text-white font-medium">{audit.date}</span>
+                        </p>
+                        <p className="text-gray-400 text-xs flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-gold" />
+                          Time Slot: <span className="text-white font-medium">{audit.timeSlot}</span>
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-5 pt-4 border-t border-white/5">
+                      <button 
+                        onClick={async () => {
+                          if (!confirm("Are you sure you want to delete this booking?")) return;
+                          try {
+                            const res = await fetch("/api/audits", {
+                              method: "DELETE",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ id: audit.id }),
+                            });
+                            if (res.ok) {
+                              setAudits(prev => prev.filter(a => a.id !== audit.id));
+                              showSuccess("Audit booking deleted successfully.");
+                            }
+                          } catch (err) {
+                            console.error("Failed to delete audit booking", err);
+                          }
+                        }} 
+                        className="w-full py-2 bg-white/5 border border-white/10 text-gray-400 hover:border-red-500/30 hover:text-red-400 transition-all font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Delete Booking
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {selectedApp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
           <div className="relative w-full max-w-2xl glass-card rounded-3xl p-6 sm:p-8 border border-gold/15 shadow-2xl max-h-[85vh] overflow-y-auto">
             <button 
               onClick={() => setSelectedApp(null)} 
@@ -596,13 +882,73 @@ export default function AdminPage() {
         </div>
       )}
 
+      {selectedEventRsvp && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl glass-card rounded-3xl p-6 sm:p-8 border border-gold/15 shadow-2xl max-h-[85vh] overflow-y-auto">
+            <button 
+              onClick={() => setSelectedEventRsvp(null)} 
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            
+            <div className="mb-6">
+              <span className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold/20 text-gold border border-gold/20">
+                Event Registration
+              </span>
+              <h2 className="font-display font-black text-2xl text-white mt-2 mb-1">
+                {selectedEventRsvp["Startup Name"] || selectedEventRsvp.startupName || "Unnamed Startup"}
+              </h2>
+              <p className="text-gray-500 text-xs font-semibold">
+                Registered for: <span className="text-white">{selectedEventRsvp.eventTitle} ({selectedEventRsvp.eventDate})</span>
+              </p>
+              <p className="text-gray-500 text-[10px] mt-0.5">
+                Submitted on {new Date(selectedEventRsvp.createdAt || selectedEventRsvp.id).toLocaleString("en-IN")}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-5">
+              {Object.entries(selectedEventRsvp)
+                .filter(([key]) => !['id', 'createdAt', 'eventTitle', 'eventDate'].includes(key))
+                .map(([key, value]) => (
+                  <div key={key} className={`flex flex-col gap-1 ${String(value).length > 60 ? 'sm:col-span-2' : ''}`}>
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">{key}</span>
+                    {String(value).startsWith('http') ? (
+                      <a href={String(value)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-gold hover:underline flex items-center gap-1">{String(value)}</a>
+                    ) : String(value).length > 60 ? (
+                      <p className="text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl p-3 leading-relaxed">{String(value) || "—"}</p>
+                    ) : (
+                      <span className="text-sm font-semibold text-white">{String(value) || "—"}</span>
+                    )}
+                  </div>
+              ))}
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-5 border-t border-white/5">
+              <button 
+                onClick={() => setSelectedEventRsvp(null)} 
+                className="flex-1 py-3 bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-white/10 transition-all cursor-pointer"
+              >
+                Close Details
+              </button>
+              <button 
+                onClick={() => handleDeleteEventRsvp(selectedEventRsvp.id)} 
+                className="py-3 px-6 bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/30 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+              >
+                Delete Registration
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
           <div className="relative w-full max-w-lg glass-card rounded-3xl p-6 sm:p-8 border border-gold/15 shadow-2xl">
             <button onClick={closeForm} className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-colors"><X className="w-4 h-4"/></button>
             <h2 className="font-display font-black text-xl text-white mb-1">{editingId?"Edit Event":"Add New Event"}</h2>
             <p className="text-gray-500 text-xs mb-6">This event will appear on the public cohort calendar.</p>
-            <form onSubmit={handleSave} className="flex flex-col gap-4">
+            <form onSubmit={handleSave} className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-2">
               <div className="flex flex-col gap-1.5"><label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-gold"/>Date <span className="text-red-400">*</span></label><input type="date" name="date" value={form.date} onChange={handleFormChange} required className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 [color-scheme:dark]"/></div>
               <div className="flex flex-col gap-1.5"><label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Event Title <span className="text-red-400">*</span></label><input type="text" name="title" value={form.title} onChange={handleFormChange} placeholder="e.g. Cohort 13 Demo Day" required className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"/></div>
               <div className="flex flex-col gap-1.5"><label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Description</label><textarea name="desc" value={form.desc} onChange={handleFormChange} placeholder="Short description..." rows={3} className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600 resize-none"/></div>
@@ -611,6 +957,38 @@ export default function AdminPage() {
                 <div className="flex flex-col gap-1.5"><label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-gold"/>Location <span className="text-red-400">*</span></label><input type="text" name="location" value={form.location} onChange={handleFormChange} placeholder="e.g. Bengaluru" required className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"/></div>
               </div>
               <div className="flex flex-col gap-1.5"><label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-gold"/>Capacity / Access</label><input type="text" name="capacity" value={form.capacity} onChange={handleFormChange} placeholder="e.g. Public / Invite Only" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"/></div>
+              
+              <div className="flex flex-col gap-2 mt-2">
+                <label className="text-xs font-bold text-gold uppercase tracking-wider">Required Registration Fields</label>
+                <div className="flex flex-col gap-2 bg-white/5 border border-white/10 p-3 rounded-xl">
+                  <div className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
+                    {(form.formFields || defaultFormFields).map((field, idx) => (
+                      <div key={idx} className="flex justify-between items-center bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg group">
+                        <input 
+                          type="text" 
+                          value={field}
+                          onChange={(e) => handleEditField(idx, e.target.value)}
+                          className="bg-transparent text-xs text-white focus:outline-none w-full"
+                          title="Click to edit field name"
+                        />
+                        <button type="button" onClick={() => handleRemoveField(idx)} className="text-gray-500 hover:text-red-400 opacity-50 group-hover:opacity-100 transition-all ml-2" title="Remove field"><X className="w-3.5 h-3.5" /></button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 mt-1 pt-2 border-t border-white/10">
+                    <input 
+                      type="text" 
+                      value={newFieldInput} 
+                      onChange={e => setNewFieldInput(e.target.value)} 
+                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddField())}
+                      placeholder="Type a new detail to ask..." 
+                      className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold placeholder:text-gray-600"
+                    />
+                    <button type="button" onClick={handleAddField} className="px-3 py-2 bg-white/10 hover:bg-gold/20 text-gold text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"><Plus className="w-3.5 h-3.5" /></button>
+                  </div>
+                </div>
+              </div>
+
               {formError && <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-semibold"><AlertCircle className="w-3.5 h-3.5 shrink-0"/>{formError}</div>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={closeForm} className="flex-1 py-3 bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-white/10 transition-all">Cancel</button>

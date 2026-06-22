@@ -10,6 +10,38 @@ export default function PortfolioPage() {
 
   const companies = [
     {
+      name: "Bluprnt Workspaces",
+      sector: "Real Estate",
+      stage: "Validation",
+      desc: "A collaborative, purpose-built co-working ecosystem and physical hub designed specifically for the Architecture, Engineering, and Construction (AEC) industry.",
+      url: "https://bluprnt.in/",
+      logo: "/logos/bluprnt.png",
+    },
+    {
+      name: "The Business Ascent",
+      sector: "Technology",
+      stage: "Growth",
+      desc: "A premium business publication and leadership recognition platform highlighting emerging entrepreneurs and corporate excellence.",
+      url: "https://thebusinessascent.com/",
+      logo: "/logos/businessascent.png",
+    },
+    {
+      name: "Global Triumph Foundation",
+      sector: "Technology",
+      stage: "Scale",
+      desc: "A leading global market research and business consulting organization dedicated to promoting entrepreneurship, education, and social development through leadership networking summits.",
+      url: "https://globaltriumphfoundation.com/",
+      logo: "/logos/globaltriumph.png",
+    },
+    {
+      name: "ProloanZ",
+      sector: "Technology",
+      stage: "PMF",
+      desc: "A specialized financial services and digital lending advisory platform providing tailored loan solutions and consulting to entrepreneurs and individual clients.",
+      url: "https://proloanz.com/",
+      logo: "/logos/proloanz.png",
+    },
+    {
       name: "Genie Pads",
       sector: "Healthcare",
       stage: "PMF",

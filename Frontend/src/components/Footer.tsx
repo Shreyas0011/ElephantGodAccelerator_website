@@ -177,29 +177,20 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Admin Portal Button — clearly visible */}
+        {/* Admin Portal subtle text link */}
         <div className="border-t border-white/10 pt-6 mb-6 flex justify-center">
-          <Link
-            href="/admin"
-            id="admin-login-link"
-            className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-white/5 border border-gold/40 text-gold font-bold text-xs uppercase tracking-wider hover:bg-gold/10 hover:border-gold hover:shadow-lg hover:shadow-gold/10 hover:scale-[1.03] active:scale-[0.98] transition-all"
-            aria-label="Admin portal login"
-          >
-            <svg
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          <p className="text-gray-500 text-xs">
+            If you are the admin of the website then{" "}
+            <Link
+              href="/admin"
+              id="admin-login-link"
+              className="text-gold hover:underline font-semibold"
+              aria-label="Admin login"
             >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            Admin Login
-          </Link>
+              click here to login
+            </Link>
+            .
+          </p>
         </div>
 
         {/* Footer Bottom */}

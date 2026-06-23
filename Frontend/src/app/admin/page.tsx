@@ -9,7 +9,6 @@ interface CohortEvent {
   id: string; date: string; title: string; desc: string; time: string; location: string; capacity: string;
   formFields?: string[];
 }
-const ADMIN_PASSWORD = "ega@admin2026";
 const STORAGE_KEY = "ega_admin_events";
 const defaultFormFields: string[] = [
   "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",

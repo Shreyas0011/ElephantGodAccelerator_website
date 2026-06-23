@@ -10,13 +10,14 @@ connectDB().then(async () => {
     // Seed Admin
     const adminExists = await User.findOne({ role: "admin" });
     if (!adminExists) {
+      const adminPassword = process.env.ADMIN_PASSWORD || "ega@admin2026";
       await User.create({
         name: "EGA Admin",
         email: "admin@elephantgod.com",
-        password: "ega@admin2026",
+        password: adminPassword,
         role: "admin"
       });
-      console.log("Default admin user seeded (admin@elephantgod.com / ega@admin2026)");
+      console.log(`Default admin user seeded (admin@elephantgod.com / ${adminPassword})`);
     }
 
     // Seed Default Events

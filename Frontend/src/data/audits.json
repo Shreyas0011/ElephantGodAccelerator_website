@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1782127132213,
+    "createdAt": "2026-06-22T11:18:52.213Z",
+    "email": "audit-test@example.com",
+    "date": "2026-06-25",
+    "timeSlot": "11:30 AM"
+  },
+  {
+    "id": 1782127359600,
+    "createdAt": "2026-06-22T11:22:39.600Z",
+    "email": "test@gmail.com",
+    "date": "2026-06-23",
+    "timeSlot": "10:00 AM"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1781874602208,
+    "createdAt": "2026-06-19T13:10:02.208Z",
+    "type": "acceleration",
+    "founderName": "Test Founder",
+    "startupName": "Test Accelerator Startup",
+    "sector": "Technology",
+    "revenue": "Pre-revenue",
+    "assistantReq": "GTM Strategy",
+    "fundingReq": "25L - 1Cr",
+    "companyProfile": "A high-growth SaaS platform.",
+    "productDetails": "AI co-pilot for developers.",
+    "website": "http://testsaas.com"
+  },
+  {
+    "id": 1781874839918,
+    "createdAt": "2026-06-19T13:13:59.918Z",
+    "type": "acceleration",
+    "founderName": "test",
+    "startupName": "test",
+    "sector": "Consumer Brands",
+    "revenue": "Pre-revenue",
+    "assistantReq": "test",
+    "fundingReq": "25L - 1Cr",
+    "companyProfile": "test",
+    "productDetails": "test",
+    "website": "https://google.com"
+  }
+]

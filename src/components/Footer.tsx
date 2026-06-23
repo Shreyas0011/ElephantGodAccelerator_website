@@ -35,8 +35,8 @@ export default function Footer() {
           <div className="flex flex-col gap-4">
             <div className="bg-white rounded-xl p-2.5 shadow-md flex items-center justify-center self-start h-16 w-40 overflow-hidden">
               <img
-                src="/logos/ega.png"
-                alt="Elephant God Accelerator Logo"
+                src="/logos/rashio.png"
+                alt="Rashio Logo"
                 className="max-h-full max-w-full object-contain"
               />
             </div>

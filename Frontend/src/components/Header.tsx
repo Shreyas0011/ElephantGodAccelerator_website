@@ -202,7 +202,7 @@ export default function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden mt-3 p-6 bg-[#ffffff]/95 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-xl flex flex-col gap-3 overflow-hidden pointer-events-auto"
+            className="lg:hidden mt-3 p-6 bg-[#ffffff] rounded-2xl border border-gray-200 shadow-2xl flex flex-col gap-3 overflow-hidden pointer-events-auto relative z-50"
           >
             <Link
               href="/"

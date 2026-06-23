@@ -302,19 +302,19 @@ export default function HomePage() {
           {/* Centered Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto text-center mb-6">
             <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/25 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
-              <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">{stats.portfolio}</span>
+              <span className="text-3xl sm:text-4xl font-black text-white tracking-tight whitespace-nowrap">{stats.portfolio}</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
                 {siteContent.hero.stat1Label}
               </span>
             </div>
             <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/30 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
-              <span className="text-3xl sm:text-4xl font-black text-gold tracking-tight">{stats.savings}%</span>
+              <span className="text-3xl sm:text-4xl font-black text-gold tracking-tight whitespace-nowrap">{stats.savings}%</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
                 {siteContent.hero.stat2Label}
               </span>
             </div>
             <div className="p-6 rounded-2xl bg-bg-surface-light/60 border border-gold/25 backdrop-blur-sm flex flex-col gap-1.5 premium-stat-card">
-              <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">{stats.partners}+</span>
+              <span className="text-3xl sm:text-4xl font-black text-white tracking-tight whitespace-nowrap">{stats.partners}+</span>
               <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest">
                 {siteContent.hero.stat3Label}
               </span>
@@ -357,7 +357,7 @@ export default function HomePage() {
       <PremiumDivider />
 
       {/* --- 2. THE EGA EXECUTION MODEL (Consolidated Framework) --- */}
-      <section id="programs" className="py-16 bg-bg-surface/50 relative overflow-hidden">
+      <section id="programs" className="py-16 bg-bg-surface/50 relative overflow-hidden scroll-mt-24">
         <SectionBackground seed="programs" density="high" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -526,7 +526,7 @@ export default function HomePage() {
       <PremiumDivider />
 
       {/* --- 3.5 SERVICES WE OFFER --- */}
-      <section id="services" className="py-20 bg-bg-dark relative overflow-hidden">
+      <section id="services" className="py-20 bg-bg-dark relative overflow-hidden scroll-mt-24">
         <SectionBackground seed="services" density="high" />
         <div className="absolute top-1/3 left-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] pointer-events-none z-0" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none z-0" />
@@ -677,8 +677,48 @@ export default function HomePage() {
             </div>
 
             {/* Right Map Visual Column */}
-            <div className="lg:col-span-7 flex items-center justify-center">
-              <div className="relative w-80 h-80 sm:w-[420px] sm:h-[420px] select-none">
+            <div className="lg:col-span-7 flex items-center justify-center w-full">
+              {/* Mobile/Tablet Simple Interactive List (hidden on medium screens and above) */}
+              <div className="flex md:hidden flex-col gap-3 w-full max-w-md mx-auto px-2">
+                <div className="flex items-center gap-3 justify-center mb-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gold-dark via-gold to-gold-light flex flex-col items-center justify-center text-bg-dark font-display font-black text-center text-[9px] tracking-wider uppercase shadow-md border border-gray-200">
+                    <span>EGA</span>
+                  </div>
+                  <span className="text-[10px] font-extrabold text-white uppercase tracking-widest">Capital Ecosystem</span>
+                </div>
+                {[
+                  { key: "angels", label: "Angel Networks", icon: Coins },
+                  { key: "family", label: "Family Offices", icon: Layers },
+                  { key: "vc", label: "Venture Capital", icon: TrendingUp },
+                  { key: "strategic", label: "Strategic Pools", icon: Sparkles },
+                  { key: "corp", label: "Corporate VCs", icon: Cpu }
+                ].map((node) => {
+                  const NodeIcon = node.icon;
+                  const isSelected = hoveredNode === node.key;
+                  return (
+                    <button
+                      key={node.key}
+                      onClick={() => setHoveredNode(isSelected ? null : node.key)}
+                      className={`w-full p-4 rounded-xl border text-left flex items-center gap-3 transition-all ${
+                        isSelected
+                          ? "bg-gold/10 border-gold text-gold shadow-lg"
+                          : "bg-bg-surface-light/40 border-gray-200/50 text-white hover:border-gold/30"
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg bg-white/5 border border-white/5 ${isSelected ? "text-gold" : "text-gray-400"}`}>
+                        <NodeIcon className="w-4 h-4" />
+                      </div>
+                      <span className="text-sm font-bold flex-1">{node.label}</span>
+                      <span className="text-[10px] text-gray-500 font-mono font-bold uppercase">
+                        {isSelected ? "Active" : "Tap to inspect"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Desktop Interactive Diagram (hidden on mobile/tablet) */}
+              <div className="hidden md:block relative w-80 h-80 sm:w-[420px] sm:h-[420px] select-none">
                 
                 {/* SVG Connecting Lines with live glowing effects */}
                 <svg className="absolute inset-0 w-full h-full pointer-events-none">
@@ -1001,7 +1041,7 @@ export default function HomePage() {
       <PremiumDivider />
 
       {/* --- 4.8 AREAS OF EXPERTISE --- */}
-      <section id="expertise" className="py-20 theme-dark bg-primary border-y border-gray-200 relative overflow-hidden">
+      <section id="expertise" className="py-20 theme-dark bg-primary border-y border-gray-200 relative overflow-hidden scroll-mt-24">
         <SectionBackground seed="expertise" dark density="high" />
         <div className="absolute -top-1/4 right-1/4 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] pointer-events-none z-0" />
         <div className="absolute -bottom-1/4 left-1/4 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none z-0" />
@@ -1084,7 +1124,7 @@ export default function HomePage() {
       <PremiumDivider />
 
       {/* --- PRICING SECTION --- */}
-      <section id="pricing" className="py-20 bg-bg-dark relative overflow-hidden">
+      <section id="pricing" className="py-20 bg-bg-dark relative overflow-hidden scroll-mt-24">
         <SectionBackground seed="pricing" density="medium" />
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] pointer-events-none z-0" />
         

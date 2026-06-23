@@ -333,7 +333,7 @@ export default function ApplyPage() {
                       Startup Acceleration Application
                     </h2>
                     <p className="text-gray-500 text-xs mt-1">
-                      Complete this profile to apply for the Rashio accelerator program.
+                      Complete this profile to apply for the Elephant God Accelerator program.
                     </p>
                   </div>
 

@@ -9,7 +9,7 @@ export default function MobileStickyBar() {
   const { openMeetingModal } = useApp();
 
   return (
-    <div className="fixed bottom-0 left-0 w-full z-45 bg-bg-surface/90 backdrop-blur-md border-t border-gold/10 grid grid-cols-3 md:hidden">
+    <div className="fixed bottom-0 left-0 w-full z-45 bg-[#1a1b1d]/95 backdrop-blur-md border-t border-gold/20 grid grid-cols-3 md:hidden text-white shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
       {/* WhatsApp Link */}
       <a
         href="https://wa.me/919999999999"

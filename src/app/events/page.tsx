@@ -285,7 +285,7 @@ export default function EventsPage() {
                     RSVP Confirmed! Calendar Invite sent to your email.
                   </div>
                 ) : (
-                  <form onSubmit={handleRsvp} className="flex flex-col gap-3.5 max-h-[420px] overflow-y-auto pr-1">
+                  <form onSubmit={handleRsvp} className="flex flex-col gap-3.5 md:max-h-[420px] md:overflow-y-auto pr-1">
                     {(mockEvents[selectedDate].formFields || [
                       "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
                       "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"

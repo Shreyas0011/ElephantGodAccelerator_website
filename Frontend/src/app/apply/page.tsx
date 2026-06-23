@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Coins,
 } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
 export default function ApplyPage() {
   // --- Scorecard State ---
@@ -143,7 +144,7 @@ export default function ApplyPage() {
     localStorage.setItem("ega_applications", JSON.stringify(apps));
 
     try {
-      await fetch("/api/applications", {
+      await fetch(`${API_URL}/applications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -238,7 +239,7 @@ export default function ApplyPage() {
     localStorage.setItem("ega_applications", JSON.stringify(apps));
 
     try {
-      await fetch("/api/applications", {
+      await fetch(`${API_URL}/applications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

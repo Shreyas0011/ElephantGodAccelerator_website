@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText } from "lucide-react";
 import { loadSiteContent, saveSiteContent, resetSiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 import type { SiteContent } from "@/lib/siteContent";
+import { API_URL } from "@/lib/api";
 
 interface CohortEvent {
   id: string; date: string; title: string; desc: string; time: string; location: string; capacity: string;
@@ -52,18 +53,32 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (sessionStorage.getItem("ega_admin_session") === "active") setIsLoggedIn(true);
-    setEvents(loadEvents());
+    fetchEvents();
     setSiteContent(loadSiteContent());
     fetchApplications();
     loadEventRsvps();
     fetchAudits();
   }, []);
 
-  const loadEventRsvps = () => {
-    if (typeof window === "undefined") return;
+  const fetchEvents = async () => {
     try {
-      const stored = JSON.parse(localStorage.getItem("ega_rsvps") || "[]");
-      setEventRsvps(stored);
+      const res = await fetch(`${API_URL}/events`);
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch events", err);
+    }
+  };
+
+  const loadEventRsvps = async () => {
+    try {
+      const res = await fetch(`${API_URL}/registrations`);
+      if (res.ok) {
+        const data = await res.json();
+        setEventRsvps(data);
+      }
     } catch (err) {
       console.error("Failed to load event RSVPs", err);
     }
@@ -71,7 +86,7 @@ export default function AdminPage() {
 
   const fetchAudits = async () => {
     try {
-      const res = await fetch("/api/audits");
+      const res = await fetch(`${API_URL}/audits`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setAudits(data);
@@ -81,18 +96,27 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteEventRsvp = (id: number) => {
+  const handleDeleteEventRsvp = async (id: any) => {
     if (!confirm("Are you sure you want to delete this event registration?")) return;
-    const updated = eventRsvps.filter(r => r.id !== id);
-    localStorage.setItem("ega_rsvps", JSON.stringify(updated));
-    setEventRsvps(updated);
-    showSuccess("Event registration deleted successfully.");
-    if (selectedEventRsvp?.id === id) setSelectedEventRsvp(null);
+    try {
+      const res = await fetch(`${API_URL}/registrations`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        setEventRsvps(prev => prev.filter(r => r.id !== id));
+        showSuccess("Event registration deleted successfully.");
+        if (selectedEventRsvp?.id === id) setSelectedEventRsvp(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete event registration", err);
+    }
   };
 
   const fetchApplications = async () => {
     try {
-      const res = await fetch("/api/applications");
+      const res = await fetch(`${API_URL}/applications`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setApplications(data);
@@ -102,10 +126,10 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteApp = async (id: number) => {
+  const handleDeleteApp = async (id: any) => {
     if (!confirm("Are you sure you want to delete this submission?")) return;
     try {
-      const res = await fetch("/api/applications", {
+      const res = await fetch(`${API_URL}/applications`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -149,17 +173,37 @@ export default function AdminPage() {
     document.body.removeChild(link);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === ADMIN_PASSWORD) {
-      setIsLoggedIn(true); sessionStorage.setItem("ega_admin_session","active"); setLoginError("");
-    } else {
-      const a = loginAttempts+1; setLoginAttempts(a);
-      setLoginError(a>=3?"Too many attempts.":"Incorrect password.");
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: "admin@elephantgod.com",
+          password: passwordInput,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setIsLoggedIn(true);
+        sessionStorage.setItem("ega_admin_session", "active");
+        sessionStorage.setItem("ega_admin_token", data.token);
+        setLoginError("");
+      } else {
+        const errData = await res.json();
+        const a = loginAttempts + 1;
+        setLoginAttempts(a);
+        setLoginError(a >= 3 ? "Too many attempts." : errData.error || "Incorrect password.");
+      }
+    } catch (err) {
+      console.error("Login failed", err);
+      setLoginError("Failed to connect to backend auth server.");
     }
     setPasswordInput("");
   };
-  const handleLogout = () => { setIsLoggedIn(false); sessionStorage.removeItem("ega_admin_session"); };
+  const handleLogout = () => { setIsLoggedIn(false); sessionStorage.removeItem("ega_admin_session"); sessionStorage.removeItem("ega_admin_token"); };
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(()=>setSuccessMsg(""),3000); };
   const openAddForm = () => { setForm(defaultForm); setEditingId(null); setFormError(""); setNewFieldInput(""); setShowForm(true); };
   const openEditForm = (ev: CohortEvent) => { setForm({date:ev.date,title:ev.title,desc:ev.desc,time:ev.time,location:ev.location,capacity:ev.capacity, formFields: ev.formFields || defaultFormFields}); setEditingId(ev.id); setFormError(""); setNewFieldInput(""); setShowForm(true); };
@@ -184,15 +228,52 @@ export default function AdminPage() {
       return { ...p, formFields: arr };
     });
   };
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.date||!form.title||!form.time||!form.location){setFormError("Date, Title, Time, Location required.");return;}
-    const updated = editingId ? events.map(ev=>ev.id===editingId?{...form,id:editingId}:ev) : [...events,{...form,id:Date.now().toString()}];
-    saveEvents(updated); setEvents(updated); showSuccess(editingId?"Event updated!":"Event added!"); closeForm();
+    
+    try {
+      let res;
+      if (editingId) {
+        res = await fetch(`${API_URL}/events/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+      } else {
+        res = await fetch(`${API_URL}/events`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+      }
+
+      if (res.ok) {
+        showSuccess(editingId ? "Event updated!" : "Event added!");
+        closeForm();
+        fetchEvents();
+      } else {
+        const err = await res.json();
+        setFormError(err.error || "Failed to save event");
+      }
+    } catch (err) {
+      console.error("Failed to save event", err);
+      setFormError("Connection to backend server failed.");
+    }
   };
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Delete this event?")) return;
-    const updated = events.filter(ev=>ev.id!==id); saveEvents(updated); setEvents(updated); showSuccess("Event deleted.");
+    try {
+      const res = await fetch(`${API_URL}/events/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        showSuccess("Event deleted.");
+        fetchEvents();
+      }
+    } catch (err) {
+      console.error("Failed to delete event", err);
+    }
   };
   const handleContentChange = (section: keyof SiteContent, field: string, value: string) => {
     setSiteContent(prev => ({ ...prev, [section]: { ...(prev[section] as any), [field]: value } }));
@@ -701,7 +782,7 @@ export default function AdminPage() {
                         onClick={async () => {
                           if (!confirm("Are you sure you want to delete this booking?")) return;
                           try {
-                            const res = await fetch("/api/audits", {
+                            const res = await fetch(`${API_URL}/audits`, {
                               method: "DELETE",
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({ id: audit.id }),

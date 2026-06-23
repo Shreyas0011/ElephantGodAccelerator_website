@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { MapPin, Clock, Users, ArrowRight } from "lucide-react";
 
+import { API_URL } from "@/lib/api";
+
 interface Event {
   title: string;
   desc: string;
@@ -24,70 +26,40 @@ interface StoredEvent {
   formFields?: string[];
 }
 
-// Default (built-in) events — always shown
-const DEFAULT_EVENTS: Record<string, Event> = {
-  "2026-06-05": {
-    title: "EGA Masterclass: Go-To-Market and Retail Sprints",
-    desc: "An intensive strategy session led by Meera Nair mapping consumer retail networks, distributor incentives, and GTM rollouts in tier-2 cities.",
-    time: "03:00 PM IST",
-    location: "Bengaluru Hub & Zoom",
-    capacity: "Limited to 50 founders",
-  },
-  "2026-06-12": {
-    title: "Seed Valuation & Capital Structuring Audit",
-    desc: "EGA partners sit down with cohort CFOs to structure valuation projections, ESOP pools, and liquidation preferences prior to demo day.",
-    time: "11:00 AM IST",
-    location: "EGA Boardroom",
-    capacity: "Invite Only",
-  },
-  "2026-06-18": {
-    title: "Cohort 12 Demo Day: B2B Scaling Showcase",
-    desc: "12 selected Indian hardware, AI, and logistics startups pitch in front of 40+ active venture capital funds, family offices, and HNI syndicates.",
-    time: "02:00 PM IST",
-    location: "Hotel Grand Sheraton, Bengaluru",
-    capacity: "VCs and Accredited Angels only",
-  },
-  "2026-06-25": {
-    title: "Venture Terms & Cap Tables Masterclass",
-    desc: "An active negotiation drill detailing anti-dilution clauses, liquidation preferences, and MCA compliance requirements.",
-    time: "04:00 PM IST",
-    location: "Online (Zoom)",
-    capacity: "Public registration open",
-  },
-};
-
 export default function EventsPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>("2026-06-18");
   const [rsvpForm, setRsvpForm] = useState<Record<string, string>>({});
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
-  // Merged events: defaults + admin-added from localStorage
-  const [allEvents, setAllEvents] = useState<Record<string, Event>>(DEFAULT_EVENTS);
+  // Loaded events from backend
+  const [allEvents, setAllEvents] = useState<Record<string, Event>>({});
 
   useEffect(() => {
-    // Load admin-added events from localStorage and merge
-    try {
-      const stored: StoredEvent[] = JSON.parse(
-        localStorage.getItem("ega_admin_events") || "[]"
-      );
-      if (stored.length > 0) {
-        const adminMap: Record<string, Event> = {};
-        stored.forEach((ev) => {
-          adminMap[ev.date] = {
-            title: ev.title,
-            desc: ev.desc,
-            time: ev.time,
-            location: ev.location,
-            capacity: ev.capacity,
-            formFields: ev.formFields,
-          };
-        });
-        // Admin events take precedence over defaults for same date
-        setAllEvents({ ...DEFAULT_EVENTS, ...adminMap });
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch(`${API_URL}/events`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const eventMap: Record<string, Event> = {};
+            data.forEach((ev) => {
+              eventMap[ev.date] = {
+                title: ev.title,
+                desc: ev.desc,
+                time: ev.time,
+                location: ev.location,
+                capacity: ev.capacity,
+                formFields: ev.formFields,
+              };
+            });
+            setAllEvents(eventMap);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch events from backend", err);
       }
-    } catch {
-      // silently ignore
-    }
+    };
+    fetchEvents();
   }, []);
 
   // Use allEvents as the active calendar map
@@ -101,33 +73,30 @@ export default function EventsPage() {
     }
   };
 
-  const handleRsvp = (e: React.FormEvent) => {
+  const handleRsvp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDate) return;
 
-    const rsvps = JSON.parse(localStorage.getItem("ega_rsvps") || "[]");
-    rsvps.push({
-      id: Date.now(),
+    const payload = {
       eventDate: selectedDate,
       eventTitle: mockEvents[selectedDate].title,
-      createdAt: new Date().toISOString(),
       ...rsvpForm,
-    });
-    localStorage.setItem("ega_rsvps", JSON.stringify(rsvps));
+    };
 
-    setRsvpSuccess(true);
-    setRsvpForm({
-      founderName: "",
-      email: "",
-      startupName: "",
-      sector: "",
-      revenue: "",
-      assistantReq: "",
-      fundingReq: "",
-      companyProfile: "",
-      productDetails: "",
-      website: "",
-    });
+    try {
+      const res = await fetch(`${API_URL}/registrations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        setRsvpSuccess(true);
+        setRsvpForm({});
+      }
+    } catch (err) {
+      console.error("Failed to submit RSVP to backend", err);
+    }
   };
 
   // Dynamic calendar: current view month/year with navigation

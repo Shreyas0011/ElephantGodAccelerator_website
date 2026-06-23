@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Calendar, Clock, Sparkles } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 
+import { API_URL } from "@/lib/api";
+
 export default function MeetingModal() {
   const { isMeetingModalOpen, closeMeetingModal } = useApp();
   const [email, setEmail] = useState("");
@@ -23,7 +25,7 @@ export default function MeetingModal() {
     };
 
     try {
-      await fetch("/api/audits", {
+      await fetch(`${API_URL}/audits`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(auditData),

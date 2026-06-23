@@ -8,6 +8,7 @@ import MeetingModal from "@/components/MeetingModal";
 import FloatingWidgets from "@/components/FloatingWidgets";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import TechBackground from "@/components/TechBackground";
+import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -65,6 +66,7 @@ export default function RootLayout({
           <FloatingWidgets />
           <MobileStickyBar />
         </AppProvider>
+        <Analytics />
       </body>
     </html>
   );

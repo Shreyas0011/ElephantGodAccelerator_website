@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Download, FileText, Send, Sparkles, Calendar } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import RoleSelector from "@/components/RoleSelector";
 
 export default function DownloadPage() {
   const { openMeetingModal } = useApp();
@@ -13,6 +14,7 @@ export default function DownloadPage() {
     org: "",
     designation: "",
     phone: "",
+    role: "Startup",
   });
   const [submitted, setSubmitted] = useState(false);
 
@@ -42,6 +44,7 @@ export default function DownloadPage() {
       `Headquarters: Bengaluru, India\n\n` +
       `Download requested by: ${formData.name}\n` +
       `Organization: ${formData.org}\n` +
+      `Category: ${formData.role}\n` +
       `Date: ${new Date().toLocaleDateString()}\n`;
     
     const blob = new Blob([mockPdfContent], { type: "text/plain" });
@@ -107,6 +110,11 @@ export default function DownloadPage() {
                   Lead Capture Form
                 </h3>
 
+                <RoleSelector
+                  selectedRole={formData.role}
+                  onChange={(role) => setFormData({ ...formData, role })}
+                />
+
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                     Full Name *
@@ -117,7 +125,7 @@ export default function DownloadPage() {
                     required
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="E.g., Shreyas Kumar"
+                    placeholder="E.g., Aarav Sharma"
                     className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
                   />
                 </div>

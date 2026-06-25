@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { MapPin, Clock, Users, ArrowRight } from "lucide-react";
-
 import { API_URL } from "@/lib/api";
+import RoleSelector from "@/components/RoleSelector";
 
 interface Event {
   title: string;
@@ -80,6 +80,7 @@ export default function EventsPage() {
     const payload = {
       eventDate: selectedDate,
       eventTitle: mockEvents[selectedDate].title,
+      Role: rsvpForm["Role"] || "Startup",
       ...rsvpForm,
     };
 
@@ -255,6 +256,10 @@ export default function EventsPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleRsvp} className="flex flex-col gap-3.5 md:max-h-[420px] md:overflow-y-auto pr-1">
+                    <RoleSelector
+                      selectedRole={rsvpForm["Role"] || "Startup"}
+                      onChange={(role) => setRsvpForm({ ...rsvpForm, "Role": role })}
+                    />
                     {(mockEvents[selectedDate].formFields || [
                       "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
                       "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"

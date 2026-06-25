@@ -16,6 +16,7 @@ import {
   Coins,
 } from "lucide-react";
 import { API_URL } from "@/lib/api";
+import RoleSelector from "@/components/RoleSelector";
 
 export default function ApplyPage() {
   // --- Scorecard State ---
@@ -119,6 +120,7 @@ export default function ApplyPage() {
     companyProfile: "",
     productDetails: "",
     website: "",
+    role: "Startup",
   });
   const [accSubmitted, setAccSubmitted] = useState(false);
 
@@ -174,6 +176,7 @@ export default function ApplyPage() {
     startupRegistered: "",
     startupRaised: "",
     startupFundingReq: "",
+    role: "Startup",
   });
   const [fileUploaded, setFileUploaded] = useState<string | null>(null);
   const [appSubmitted, setAppSubmitted] = useState(false);
@@ -338,11 +341,16 @@ export default function ApplyPage() {
                     </p>
                   </div>
 
+                  <RoleSelector
+                    selectedRole={accFormData.role}
+                    onChange={(role) => setAccFormData({ ...accFormData, role })}
+                  />
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Founder name */}
+                    {/* Founder name / Full Name */}
                     <div className="flex flex-col gap-1.5 text-left">
                       <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Founder Name *
+                        {accFormData.role === "Startup" ? "Founder Name *" : "Full Name *"}
                       </label>
                       <input
                         type="text"
@@ -350,15 +358,21 @@ export default function ApplyPage() {
                         required
                         value={accFormData.founderName}
                         onChange={handleAccInputChange}
-                        placeholder="Full name of founder"
+                        placeholder={accFormData.role === "Startup" ? "Full name of founder" : "Enter your full name"}
                         className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
                       />
                     </div>
 
-                    {/* Startup name */}
+                    {/* Startup name / Company Name */}
                     <div className="flex flex-col gap-1.5 text-left">
                       <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Startup Name *
+                        {accFormData.role === "Investor"
+                          ? "Fund / Firm Name *"
+                          : accFormData.role === "Exhibitor"
+                          ? "Company / Brand Name *"
+                          : accFormData.role === "Delegate"
+                          ? "Company / Org Name *"
+                          : "Startup Name *"}
                       </label>
                       <input
                         type="text"
@@ -366,81 +380,165 @@ export default function ApplyPage() {
                         required
                         value={accFormData.startupName}
                         onChange={handleAccInputChange}
-                        placeholder="Name of your startup"
+                        placeholder={
+                          accFormData.role === "Investor"
+                            ? "Name of your fund or firm"
+                            : accFormData.role === "Exhibitor"
+                            ? "Name of your company / brand"
+                            : accFormData.role === "Delegate"
+                            ? "Name of your company or organization"
+                            : "Name of your startup"
+                        }
                         className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Sector */}
+                  <div className={`grid grid-cols-1 ${accFormData.role === "Startup" || accFormData.role === "Investor" ? "sm:grid-cols-2" : ""} gap-4`}>
+                    {/* Sector / Designation */}
                     <div className="flex flex-col gap-1.5 text-left">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Sector *
-                      </label>
-                      <select
-                        name="sector"
-                        required
-                        value={accFormData.sector}
-                        onChange={handleAccInputChange}
-                        className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
-                      >
-                        <option value="" className="text-gray-500">Select Sector</option>
-                        <option value="Healthcare" className="text-gray-700">Healthcare</option>
-                        <option value="Consumer Brands" className="text-gray-700">Consumer Brands</option>
-                        <option value="Mobility" className="text-gray-700">Mobility</option>
-                        <option value="Sustainability" className="text-gray-700">Sustainability</option>
-                        <option value="Technology" className="text-gray-700">Technology & SaaS</option>
-                        <option value="Other" className="text-gray-700">Other</option>
-                      </select>
+                      {accFormData.role === "Delegate" ? (
+                        <>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Designation / Job Title *
+                          </label>
+                          <input
+                            type="text"
+                            name="sector"
+                            required
+                            value={accFormData.sector}
+                            onChange={handleAccInputChange}
+                            placeholder="E.g., Director, Software Engineer, Consultant"
+                            className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            {accFormData.role === "Investor"
+                              ? "Investment Sector Interests *"
+                              : accFormData.role === "Exhibitor"
+                              ? "Product Category / Sector *"
+                              : "Sector *"}
+                          </label>
+                          <select
+                            name="sector"
+                            required
+                            value={accFormData.sector}
+                            onChange={handleAccInputChange}
+                            className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
+                          >
+                            <option value="" className="text-gray-500">Select Sector</option>
+                            <option value="Healthcare" className="text-gray-700">Healthcare</option>
+                            <option value="Consumer Brands" className="text-gray-700">Consumer Brands</option>
+                            <option value="Mobility" className="text-gray-700">Mobility</option>
+                            <option value="Sustainability" className="text-gray-700">Sustainability</option>
+                            <option value="Technology" className="text-gray-700">Technology & SaaS</option>
+                            <option value="Other" className="text-gray-700">Other</option>
+                          </select>
+                        </>
+                      )}
                     </div>
 
-                    {/* Revenue */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Revenue *
-                      </label>
-                      <select
-                        name="revenue"
-                        required
-                        value={accFormData.revenue}
-                        onChange={handleAccInputChange}
-                        className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
-                      >
-                        <option value="" className="text-gray-500">Select Level</option>
-                        <option value="Pre-revenue" className="text-gray-700">Pre-revenue</option>
-                        <option value="Under 2L" className="text-gray-700">Under ₹2 Lakhs / month</option>
-                        <option value="2L - 5L" className="text-gray-700">₹2 Lakhs - ₹5 Lakhs / month</option>
-                        <option value="Above 5L" className="text-gray-700">Above ₹5 Lakhs / month</option>
-                      </select>
-                    </div>
+                    {/* Revenue / Ticket Size */}
+                    {(accFormData.role === "Startup" || accFormData.role === "Investor") && (
+                      <div className="flex flex-col gap-1.5 text-left">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                          {accFormData.role === "Investor" ? "Typical Ticket Size *" : "Revenue *"}
+                        </label>
+                        {accFormData.role === "Investor" ? (
+                          <select
+                            name="revenue"
+                            required
+                            value={accFormData.revenue}
+                            onChange={handleAccInputChange}
+                            className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
+                          >
+                            <option value="" className="text-gray-500">Select Ticket Size</option>
+                            <option value="Under 10L" className="text-gray-700">Under ₹10 Lakhs</option>
+                            <option value="10L - 50L" className="text-gray-700">₹10 Lakhs - ₹50 Lakhs</option>
+                            <option value="50L - 1Cr" className="text-gray-700">₹50 Lakhs - ₹1 Crore</option>
+                            <option value="Above 1Cr" className="text-gray-700">Above ₹1 Crore</option>
+                          </select>
+                        ) : (
+                          <select
+                            name="revenue"
+                            required
+                            value={accFormData.revenue}
+                            onChange={handleAccInputChange}
+                            className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
+                          >
+                            <option value="" className="text-gray-500">Select Level</option>
+                            <option value="Pre-revenue" className="text-gray-700">Pre-revenue</option>
+                            <option value="Under 2L" className="text-gray-700">Under ₹2 Lakhs / month</option>
+                            <option value="2L - 5L" className="text-gray-700">₹2 Lakhs - ₹5 Lakhs / month</option>
+                            <option value="Above 5L" className="text-gray-700">Above ₹5 Lakhs / month</option>
+                          </select>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Funding requirement */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Funding Requirement *
-                      </label>
-                      <select
-                        name="fundingReq"
-                        required
-                        value={accFormData.fundingReq}
-                        onChange={handleAccInputChange}
-                        className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
-                      >
-                        <option value="" className="text-gray-500">Select Requirement</option>
-                        <option value="Under 25L" className="text-gray-700">Under ₹25 Lakhs</option>
-                        <option value="25L - 1Cr" className="text-gray-700">₹25 Lakhs - ₹1 Crore</option>
-                        <option value="1Cr - 5Cr" className="text-gray-700">₹1 Crore - ₹5 Crores</option>
-                        <option value="Mentorship only" className="text-gray-700">Strategic Mentorship Only</option>
-                      </select>
-                    </div>
+                  <div className={`grid grid-cols-1 ${accFormData.role !== "Delegate" ? "sm:grid-cols-2" : ""} gap-4`}>
+                    {/* Funding / Stage / Booth Requirement */}
+                    {accFormData.role !== "Delegate" && (
+                      <div className="flex flex-col gap-1.5 text-left">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                          {accFormData.role === "Investor"
+                            ? "Preferred Investment Stage *"
+                            : accFormData.role === "Exhibitor"
+                            ? "Booth Type / Size *"
+                            : "Funding Requirement *"}
+                        </label>
+                        {accFormData.role === "Investor" ? (
+                          <select
+                            name="fundingReq"
+                            required
+                            value={accFormData.fundingReq}
+                            onChange={handleAccInputChange}
+                            className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
+                          >
+                            <option value="" className="text-gray-500">Select Preferred Stage</option>
+                            <option value="Idea Stage" className="text-gray-700">Idea / Concept</option>
+                            <option value="Seed Stage" className="text-gray-700">Seed Stage (Prototype/Validation)</option>
+                            <option value="Growth Stage" className="text-gray-700">Growth Stage (PMF/Early Scale)</option>
+                            <option value="Any Stage" className="text-gray-700">Any Stage</option>
+                          </select>
+                        ) : accFormData.role === "Exhibitor" ? (
+                          <select
+                            name="fundingReq"
+                            required
+                            value={accFormData.fundingReq}
+                            onChange={handleAccInputChange}
+                            className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
+                          >
+                            <option value="" className="text-gray-500">Select Booth Type</option>
+                            <option value="Standard Booth" className="text-gray-700">Standard Space (2x2m)</option>
+                            <option value="Premium Pavilion" className="text-gray-700">Premium Pavilion (3x3m)</option>
+                            <option value="Raw Space" className="text-gray-700">Raw Custom Space Only</option>
+                          </select>
+                        ) : (
+                          <select
+                            name="fundingReq"
+                            required
+                            value={accFormData.fundingReq}
+                            onChange={handleAccInputChange}
+                            className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
+                          >
+                            <option value="" className="text-gray-500">Select Requirement</option>
+                            <option value="Under 25L" className="text-gray-700">Under ₹25 Lakhs</option>
+                            <option value="25L - 1Cr" className="text-gray-700">₹25 Lakhs - ₹1 Crore</option>
+                            <option value="1Cr - 5Cr" className="text-gray-700">₹1 Crore - ₹5 Crores</option>
+                            <option value="Mentorship only" className="text-gray-700">Strategic Mentorship Only</option>
+                          </select>
+                        )}
+                      </div>
+                    )}
 
-                    {/* Website address */}
+                    {/* Website Address / LinkedIn */}
                     <div className="flex flex-col gap-1.5 text-left">
                       <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Website Address *
+                        {accFormData.role === "Delegate" ? "Website / LinkedIn URL *" : "Website Address *"}
                       </label>
                       <input
                         type="url"
@@ -448,16 +546,22 @@ export default function ApplyPage() {
                         required
                         value={accFormData.website}
                         onChange={handleAccInputChange}
-                        placeholder="https://www.yourstartup.com"
+                        placeholder={accFormData.role === "Delegate" ? "https://linkedin.com/in/username" : "https://www.yourcompany.com"}
                         className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
                       />
                     </div>
                   </div>
 
-                  {/* Assistant required for */}
+                  {/* Textarea 1: Custom label/placeholder based on category */}
                   <div className="flex flex-col gap-1.5 text-left">
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Assistant required for *
+                      {accFormData.role === "Investor"
+                        ? "Investment Thesis *"
+                        : accFormData.role === "Exhibitor"
+                        ? "Exhibits & Display Details *"
+                        : accFormData.role === "Delegate"
+                        ? "Purpose of Attendance *"
+                        : "Assistant required for *"}
                     </label>
                     <textarea
                       name="assistantReq"
@@ -465,42 +569,64 @@ export default function ApplyPage() {
                       rows={2}
                       value={accFormData.assistantReq}
                       onChange={handleAccInputChange}
-                      placeholder="Specify operation assistance needed (e.g. Sales, CRM setup, hiring, scaling operations, etc.)"
+                      placeholder={
+                        accFormData.role === "Investor"
+                          ? "Briefly describe your investment sectors, stages of interest, and thesis..."
+                          : accFormData.role === "Exhibitor"
+                          ? "Describe what products, banners, or equipment you plan to display at your booth..."
+                          : accFormData.role === "Delegate"
+                          ? "What are your primary goals for attending? (e.g. Networking, identifying startups, learning)..."
+                          : "Specify operation assistance needed (e.g. Sales, CRM setup, hiring, scaling operations, etc.)"
+                      }
                       className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold resize-none"
                     />
                   </div>
 
-                  {/* Company profile */}
-                  <div className="flex flex-col gap-1.5 text-left">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Company Profile *
-                    </label>
-                    <textarea
-                      name="companyProfile"
-                      required
-                      rows={3}
-                      value={accFormData.companyProfile}
-                      onChange={handleAccInputChange}
-                      placeholder="Describe your company history, team size, vision, and market segment"
-                      className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold resize-none"
-                    />
-                  </div>
+                  {/* Textarea 2: Company Profile (hidden for Delegate) */}
+                  {accFormData.role !== "Delegate" && (
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        {accFormData.role === "Investor"
+                          ? "About Your Fund *"
+                          : accFormData.role === "Exhibitor"
+                          ? "Company & Brand Description *"
+                          : "Company Profile *"}
+                      </label>
+                      <textarea
+                        name="companyProfile"
+                        required
+                        value={accFormData.companyProfile}
+                        onChange={handleAccInputChange}
+                        rows={3}
+                        placeholder={
+                          accFormData.role === "Investor"
+                            ? "Describe your fund history, past investments, and geographic focus..."
+                            : accFormData.role === "Exhibitor"
+                            ? "Provide a brief description of your business and brand profile..."
+                            : "Describe your company history, team size, vision, and market segment"
+                        }
+                        className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold resize-none"
+                      />
+                    </div>
+                  )}
 
-                  {/* Product details */}
-                  <div className="flex flex-col gap-1.5 text-left">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Product Details *
-                    </label>
-                    <textarea
-                      name="productDetails"
-                      required
-                      rows={3}
-                      value={accFormData.productDetails}
-                      onChange={handleAccInputChange}
-                      placeholder="Describe your product offering, features, tech stack, and customer traction"
-                      className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold resize-none"
-                    />
-                  </div>
+                  {/* Textarea 3: Product Details (only for Startup) */}
+                  {accFormData.role === "Startup" && (
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        Product Details *
+                      </label>
+                      <textarea
+                        name="productDetails"
+                        required
+                        value={accFormData.productDetails}
+                        onChange={handleAccInputChange}
+                        rows={3}
+                        placeholder="Detail your product features, current user base, tech stack, and roadmap"
+                        className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold resize-none"
+                      />
+                    </div>
+                  )}
 
                   <div className="flex justify-end mt-4">
                     <button
@@ -688,34 +814,7 @@ export default function ApplyPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmitApp} className="flex flex-col gap-6">
-                    {/* Step Indicators */}
-                    <div className="flex items-center justify-between border-b border-gray-200 pb-6 mb-2">
-                      {[
-                        { step: 1, label: "Founder", icon: <User className="w-4 h-4" /> },
-                        { step: 2, label: "Startup", icon: <Briefcase className="w-4 h-4" /> },
-                        { step: 3, label: "Metrics", icon: <TrendingUp className="w-4 h-4" /> },
-                        { step: 4, label: "Capital", icon: <Coins className="w-4 h-4" /> },
-                      ].map((node) => (
-                        <div key={node.step} className="flex items-center gap-2">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                              wizardStep >= node.step
-                                ? "bg-gold border-gold text-bg-dark"
-                                : "bg-bg-surface border-gray-300 text-gray-500"
-                            }`}
-                          >
-                            {node.icon}
-                          </div>
-                          <span
-                            className={`text-xs font-bold uppercase tracking-wider hidden sm:inline ${
-                              wizardStep >= node.step ? "text-gold" : "text-gray-500"
-                            }`}
-                          >
-                            {node.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+
 
                     {/* Step 1: Founder details */}
                     {wizardStep === 1 && (
@@ -727,6 +826,11 @@ export default function ApplyPage() {
                         <h3 className="font-display font-bold text-lg text-white mb-2">
                           Founder Profile
                         </h3>
+
+                        <RoleSelector
+                          selectedRole={formData.role}
+                          onChange={(role) => setFormData({ ...formData, role })}
+                        />
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -738,7 +842,7 @@ export default function ApplyPage() {
                               required
                               value={formData.founderName}
                               onChange={handleInputChange}
-                              placeholder="E.g., Shreyas Kumar"
+                              placeholder="E.g., Aarav Sharma"
                               className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
                             />
                           </div>

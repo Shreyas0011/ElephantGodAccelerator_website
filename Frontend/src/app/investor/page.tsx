@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Award, Send, Coins } from "lucide-react";
+import RoleSelector from "@/components/RoleSelector";
 
 export default function InvestorPage() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ export default function InvestorPage() {
     preferredSector: "",
     preferredStage: "",
     thesis: "",
+    role: "Investor",
   });
   const [submitted, setSubmitted] = useState(false);
 
@@ -77,6 +79,11 @@ export default function InvestorPage() {
                   <Coins className="w-5 h-5 text-gold" />
                   Investor Registration Form
                 </h3>
+
+                <RoleSelector
+                  selectedRole={formData.role}
+                  onChange={(role) => setFormData({ ...formData, role })}
+                />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">

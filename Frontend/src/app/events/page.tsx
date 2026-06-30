@@ -150,12 +150,30 @@ interface StoredEvent {
 }
 
 export default function EventsPage() {
-  const [selectedDate, setSelectedDate] = useState<string | null>("2026-06-18");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [rsvpForm, setRsvpForm] = useState<Record<string, string>>({});
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
   // Loaded events from backend
   const [allEvents, setAllEvents] = useState<Record<string, Event>>({});
+
+  // Dynamic calendar: current view month/year with navigation
+  const [calYear, setCalYear] = useState(() => new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(() => new Date().getMonth()); // 0-indexed
+
+  // Helper to select an event and synchronize the calendar view to its month/year
+  const selectEvent = (dateStr: string) => {
+    setSelectedDate(dateStr);
+    setRsvpSuccess(false);
+    setRsvpForm({});
+
+    const parts = dateStr.split("-").map(Number);
+    if (parts.length === 3) {
+      const [yr, mo] = parts;
+      setCalYear(yr);
+      setCalMonth(mo - 1);
+    }
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -177,6 +195,27 @@ export default function EventsPage() {
               };
             });
             setAllEvents(eventMap);
+
+            // Select initial event dynamically based on the current date
+            const eventDates = Object.keys(eventMap);
+            if (eventDates.length > 0) {
+              const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+              
+              // Find closest upcoming or today's event
+              const upcomingDates = eventDates.filter((d) => d >= todayStr).sort();
+              let defaultDate = "";
+              if (upcomingDates.length > 0) {
+                defaultDate = upcomingDates[0];
+              } else {
+                // If no upcoming events, fall back to the latest past event
+                const pastDates = eventDates.filter((d) => d < todayStr).sort().reverse();
+                defaultDate = pastDates[0];
+              }
+
+              if (defaultDate) {
+                selectEvent(defaultDate);
+              }
+            }
           }
         }
       } catch (err) {
@@ -191,9 +230,7 @@ export default function EventsPage() {
 
   const handleDayClick = (dayStr: string) => {
     if (mockEvents[dayStr]) {
-      setSelectedDate(dayStr);
-      setRsvpSuccess(false);
-      setRsvpForm({});
+      selectEvent(dayStr);
     }
   };
 
@@ -223,10 +260,6 @@ export default function EventsPage() {
       console.error("Failed to submit RSVP to backend", err);
     }
   };
-
-  // Dynamic calendar: current view month/year with navigation
-  const [calYear, setCalYear] = useState(2026);
-  const [calMonth, setCalMonth] = useState(5); // 0-indexed: 5 = June
 
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -539,7 +572,7 @@ export default function EventsPage() {
                     <div className="flex flex-col sm:flex-row gap-2.5 pt-2 border-t border-white/5 mt-1">
                       <button
                         onClick={() => {
-                          setSelectedDate(dateStr);
+                          selectEvent(dateStr);
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                         className="flex-1 py-2.5 rounded-lg bg-white/5 border border-white/10 hover:border-gold/30 text-gray-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"
@@ -560,7 +593,7 @@ export default function EventsPage() {
                         !isPast && (
                           <button
                             onClick={() => {
-                              setSelectedDate(dateStr);
+                              selectEvent(dateStr);
                               window.scrollTo({ top: 0, behavior: "smooth" });
                             }}
                             className="flex-1 py-2.5 rounded-lg bg-gold/10 border border-gold/20 hover:bg-gold/20 text-gold font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"

@@ -1,0 +1,8 @@
+{
+  "name": "elephantgod-accelerator",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx -y concurrently \"npm run dev --prefix Backend\" \"npm run dev --prefix Frontend\""
+  }
+}

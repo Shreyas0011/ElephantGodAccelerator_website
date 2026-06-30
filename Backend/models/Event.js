@@ -36,6 +36,7 @@ const EventSchema = new mongoose.Schema(
         "Website Address"
       ],
     },
+    externalLink: String,
   },
   { timestamps: true }
 );

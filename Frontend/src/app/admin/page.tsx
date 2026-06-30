@@ -8,13 +8,14 @@ import { API_URL } from "@/lib/api";
 interface CohortEvent {
   id: string; date: string; title: string; desc: string; time: string; location: string; capacity: string;
   formFields?: string[];
+  externalLink?: string;
 }
 const STORAGE_KEY = "ega_admin_events";
 const defaultFormFields: string[] = [
   "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
   "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
 ];
-const defaultForm = { date: "", title: "", desc: "", time: "", location: "", capacity: "", formFields: defaultFormFields };
+const defaultForm = { date: "", title: "", desc: "", time: "", location: "", capacity: "", formFields: defaultFormFields, externalLink: "" };
 function loadEvents(): CohortEvent[] {
   if (typeof window === "undefined") return [];
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
@@ -205,7 +206,7 @@ export default function AdminPage() {
   const handleLogout = () => { setIsLoggedIn(false); sessionStorage.removeItem("ega_admin_session"); sessionStorage.removeItem("ega_admin_token"); };
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(()=>setSuccessMsg(""),3000); };
   const openAddForm = () => { setForm(defaultForm); setEditingId(null); setFormError(""); setNewFieldInput(""); setShowForm(true); };
-  const openEditForm = (ev: CohortEvent) => { setForm({date:ev.date,title:ev.title,desc:ev.desc,time:ev.time,location:ev.location,capacity:ev.capacity, formFields: ev.formFields || defaultFormFields}); setEditingId(ev.id); setFormError(""); setNewFieldInput(""); setShowForm(true); };
+  const openEditForm = (ev: CohortEvent) => { setForm({date:ev.date,title:ev.title,desc:ev.desc,time:ev.time,location:ev.location,capacity:ev.capacity, formFields: ev.formFields || defaultFormFields, externalLink: ev.externalLink || ""}); setEditingId(ev.id); setFormError(""); setNewFieldInput(""); setShowForm(true); };
   const closeForm = () => { setShowForm(false); setEditingId(null); setForm(defaultForm); setFormError(""); setNewFieldInput(""); };
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => setForm(p=>({...p,[e.target.name]:e.target.value}));
   const handleAddField = () => {
@@ -1037,6 +1038,20 @@ export default function AdminPage() {
                 <div className="flex flex-col gap-1.5"><label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-gold"/>Location <span className="text-red-400">*</span></label><input type="text" name="location" value={form.location} onChange={handleFormChange} placeholder="e.g. Bengaluru" required className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"/></div>
               </div>
               <div className="flex flex-col gap-1.5"><label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-gold"/>Capacity / Access</label><input type="text" name="capacity" value={form.capacity} onChange={handleFormChange} placeholder="e.g. Public / Invite Only" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"/></div>
+              
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                  External Registration Link (Optional)
+                </label>
+                <input 
+                  type="text" 
+                  name="externalLink" 
+                  value={form.externalLink || ""} 
+                  onChange={handleFormChange} 
+                  placeholder="e.g. https://nas.com/thehubbengaluru/events/night-school-special-edition" 
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"
+                />
+              </div>
               
               <div className="flex flex-col gap-2 mt-2">
                 <label className="text-xs font-bold text-gold uppercase tracking-wider">Required Registration Fields</label>

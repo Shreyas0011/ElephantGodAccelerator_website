@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Clock, Users, ArrowRight } from "lucide-react";
+import { MapPin, Clock, Users, ArrowRight, Calendar } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import RoleSelector from "@/components/RoleSelector";
 
@@ -12,7 +12,130 @@ interface Event {
   location: string;
   capacity: string;
   formFields?: string[];
+  externalLink?: string;
 }
+
+// Helper to parse date (YYYY-MM-DD) and time (e.g. "08:30 PM IST") to Date object
+function getEventTargetDate(dateStr: string, timeStr: string): Date {
+  let hour = 0;
+  let minute = 0;
+  
+  try {
+    const cleanTime = timeStr.split(/[-–—]/)[0].trim().toUpperCase();
+    const match = cleanTime.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/);
+    if (match) {
+      let h = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10);
+      const isPm = match[3] === "PM";
+      
+      if (isPm && h < 12) h += 12;
+      if (!isPm && h === 12) h = 0;
+      
+      hour = h;
+      minute = m;
+    } else {
+      const matchHr = cleanTime.match(/(\d{1,2})\s*(AM|PM)/);
+      if (matchHr) {
+        let h = parseInt(matchHr[1], 10);
+        const isPm = matchHr[2] === "PM";
+        if (isPm && h < 12) h += 12;
+        if (!isPm && h === 12) h = 0;
+        hour = h;
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing time string:", timeStr, e);
+  }
+
+  const [yr, mo, dy] = dateStr.split("-").map(Number);
+  // Defaulting to Indian Standard Time (IST) offset if timezone is not matched,
+  // or simply construct in local time for user's context.
+  return new Date(yr, mo - 1, dy, hour, minute);
+}
+
+const CountdownTimer = ({ dateStr, timeStr }: { dateStr: string; timeStr: string }) => {
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    isPast: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const targetDate = getEventTargetDate(dateStr, timeStr);
+      const difference = targetDate.getTime() - Date.now();
+
+      if (difference <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true });
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+        isPast: false,
+      });
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, [dateStr, timeStr]);
+
+  if (!timeLeft) return null;
+
+  if (timeLeft.isPast) {
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-bold bg-white/5 px-2.5 py-1 rounded-full border border-white/5 w-fit">
+        <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+        Event Completed
+      </div>
+    );
+  }
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-[9px] font-extrabold text-gold/80 uppercase tracking-widest block">
+        Time Remaining
+      </span>
+      <div className="flex items-center gap-1.5">
+        <div className="flex flex-col items-center">
+          <div className="bg-white/5 border border-white/10 rounded-lg px-2 py-0.5 text-xs font-black text-white min-w-8 text-center">
+            {pad(timeLeft.days)}
+          </div>
+          <span className="text-[8px] text-gray-500 font-bold uppercase mt-0.5">d</span>
+        </div>
+        <span className="text-white/60 font-bold mb-3">:</span>
+        <div className="flex flex-col items-center">
+          <div className="bg-white/5 border border-white/10 rounded-lg px-2 py-0.5 text-xs font-black text-white min-w-8 text-center">
+            {pad(timeLeft.hours)}
+          </div>
+          <span className="text-[8px] text-gray-500 font-bold uppercase mt-0.5">h</span>
+        </div>
+        <span className="text-white/60 font-bold mb-3">:</span>
+        <div className="flex flex-col items-center">
+          <div className="bg-white/5 border border-white/10 rounded-lg px-2 py-0.5 text-xs font-black text-white min-w-8 text-center">
+            {pad(timeLeft.minutes)}
+          </div>
+          <span className="text-[8px] text-gray-500 font-bold uppercase mt-0.5">m</span>
+        </div>
+        <span className="text-white/60 font-bold mb-3">:</span>
+        <div className="flex flex-col items-center">
+          <div className="bg-white/5 border border-white/10 rounded-lg px-2 py-0.5 text-xs font-black text-gold min-w-8 text-center">
+            {pad(timeLeft.seconds)}
+          </div>
+          <span className="text-[8px] text-gray-500 font-bold uppercase mt-0.5">s</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Admin-added events from localStorage have this shape
 interface StoredEvent {
@@ -50,6 +173,7 @@ export default function EventsPage() {
                 location: ev.location,
                 capacity: ev.capacity,
                 formFields: ev.formFields,
+                externalLink: ev.externalLink,
               };
             });
             setAllEvents(eventMap);
@@ -231,6 +355,11 @@ export default function EventsPage() {
                   </h3>
                 </div>
 
+                {/* Event Countdown */}
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4">
+                  <CountdownTimer dateStr={selectedDate} timeStr={mockEvents[selectedDate].time} />
+                </div>
+
                 <p className="text-gray-400 text-sm leading-relaxed">
                   {mockEvents[selectedDate].desc}
                 </p>
@@ -250,7 +379,21 @@ export default function EventsPage() {
                   </div>
                 </div>
 
-                {rsvpSuccess ? (
+                {mockEvents[selectedDate].externalLink ? (
+                  <div className="flex flex-col gap-3 mt-1">
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      This is an ecosystem event hosted externally. Click below to register and secure your spot on the official platform.
+                    </p>
+                    <a
+                      href={mockEvents[selectedDate].externalLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3.5 bg-gradient-to-tr from-primary to-secondary text-bg-dark font-extrabold text-xs uppercase tracking-wider rounded-lg hover:shadow-lg flex items-center justify-center shrink-0 cursor-pointer text-center shadow-[0_0_20px_rgba(201,169,110,0.2)] hover:scale-[1.01] transition-all"
+                    >
+                      Register via Nas.io <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                    </a>
+                  </div>
+                ) : rsvpSuccess ? (
                   <div className="p-4 rounded-xl bg-gold/10 border border-gold/20 text-center text-xs text-gold font-bold">
                     RSVP Confirmed! Calendar Invite sent to your email.
                   </div>
@@ -306,6 +449,130 @@ export default function EventsPage() {
                 Select an active highlighted date on the calendar grid to inspect event details.
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* All Upcoming & Past Events Directory */}
+      <section className="py-16 border-t border-white/5 bg-gradient-to-b from-transparent to-white/[0.01]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center md:text-left mb-10">
+            <span className="text-xs font-extrabold text-gold uppercase tracking-wider">
+              Cohort Roadmap
+            </span>
+            <h2 className="font-display font-black text-3xl text-white mt-1">
+              Events Directory & Countdowns
+            </h2>
+            <p className="text-gray-400 text-sm mt-2 max-w-xl leading-relaxed">
+              Track live countdowns, registrations, and dates for all cohort roadshows, expert rounds, and specialized masterclasses.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Object.entries(mockEvents)
+              .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+              .map(([dateStr, event]) => {
+                const targetDate = getEventTargetDate(dateStr, event.time);
+                const isPast = targetDate.getTime() <= Date.now();
+
+                return (
+                  <div
+                    key={dateStr}
+                    className={`glass-card rounded-3xl p-6 border transition-all flex flex-col justify-between gap-5 relative overflow-hidden group ${
+                      isPast
+                        ? "border-white/5 opacity-70"
+                        : "border-gold/15 hover:border-gold/30 hover:shadow-lg hover:shadow-gold/5"
+                    }`}
+                  >
+                    {/* Corner gradient for upcoming active card */}
+                    {!isPast && (
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gold/10 to-transparent rounded-bl-full pointer-events-none transition-all group-hover:scale-110" />
+                    )}
+
+                    <div className="flex flex-col gap-4">
+                      {/* Card Header: Date & Live Timer Badge */}
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-gold/10 border border-gold/20 text-gold flex items-center justify-center">
+                            <Calendar className="w-4 h-4" />
+                          </div>
+                          <span className="text-xs font-bold text-white tracking-wide">
+                            {new Date(dateStr + "T00:00:00").toLocaleDateString("en-IN", {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+
+                        {/* Live Timer or Past Badge */}
+                        <div className="shrink-0">
+                          <CountdownTimer dateStr={dateStr} timeStr={event.time} />
+                        </div>
+                      </div>
+
+                      {/* Event Text content */}
+                      <div>
+                        <h3 className="font-display font-black text-lg text-white mb-2 group-hover:text-gold transition-colors">
+                          {event.title}
+                        </h3>
+                        <p className="text-gray-400 text-xs leading-relaxed line-clamp-3">
+                          {event.desc}
+                        </p>
+                      </div>
+
+                      {/* Quick Details List */}
+                      <div className="grid grid-cols-2 gap-3 text-[11px] text-gray-400 border-t border-white/5 pt-4">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <Clock className="w-3.5 h-3.5 text-gold/80 shrink-0" />
+                          <span className="truncate">{event.time}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <MapPin className="w-3.5 h-3.5 text-gold/80 shrink-0" />
+                          <span className="truncate">{event.location}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Footer: Action Button */}
+                    <div className="flex flex-col sm:flex-row gap-2.5 pt-2 border-t border-white/5 mt-1">
+                      <button
+                        onClick={() => {
+                          setSelectedDate(dateStr);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="flex-1 py-2.5 rounded-lg bg-white/5 border border-white/10 hover:border-gold/30 text-gray-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        Inspect Calendar
+                      </button>
+                      
+                      {event.externalLink ? (
+                        <a
+                          href={event.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 py-2.5 rounded-lg bg-gradient-to-tr from-primary to-secondary text-bg-dark font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer text-center"
+                        >
+                          Register Now <ArrowRight className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        !isPast && (
+                          <button
+                            onClick={() => {
+                              setSelectedDate(dateStr);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                            className="flex-1 py-2.5 rounded-lg bg-gold/10 border border-gold/20 hover:bg-gold/20 text-gold font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            RSVP Locally <ArrowRight className="w-3 h-3 text-gold" />
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         </div>
       </section>

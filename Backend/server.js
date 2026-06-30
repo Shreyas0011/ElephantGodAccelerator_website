@@ -22,61 +22,74 @@ connectDB().then(async () => {
 
     // Seed Default Events
     const Event = require("./models/Event");
-    const eventCount = await Event.countDocuments();
-    if (eventCount === 0) {
-      const defaultEvents = [
-        {
-          date: "2026-06-05",
-          title: "EGA Masterclass: Go-To-Market and Retail Sprints",
-          desc: "An intensive strategy session led by Meera Nair mapping consumer retail networks, distributor incentives, and GTM rollouts in tier-2 cities.",
-          time: "03:00 PM IST",
-          location: "Bengaluru Hub & Zoom",
-          capacity: "Limited to 50 founders",
-          formFields: [
-            "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
-            "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
-          ]
-        },
-        {
-          date: "2026-06-12",
-          title: "Seed Valuation & Capital Structuring Audit",
-          desc: "EGA partners sit down with cohort CFOs to structure valuation projections, ESOP pools, and liquidation preferences prior to demo day.",
-          time: "11:00 AM IST",
-          location: "EGA Boardroom",
-          capacity: "Invite Only",
-          formFields: [
-            "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
-            "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
-          ]
-        },
-        {
-          date: "2026-06-18",
-          title: "Cohort 12 Demo Day: B2B Scaling Showcase",
-          desc: "12 selected Indian hardware, AI, and logistics startups pitch in front of 40+ active venture capital funds, family offices, and HNI syndicates.",
-          time: "02:00 PM IST",
-          location: "Hotel Grand Sheraton, Bengaluru",
-          capacity: "VCs and Accredited Angels only",
-          formFields: [
-            "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
-            "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
-          ]
-        },
-        {
-          date: "2026-06-25",
-          title: "Venture Terms & Cap Tables Masterclass",
-          desc: "An active negotiation drill detailing anti-dilution clauses, liquidation preferences, and MCA compliance requirements.",
-          time: "04:00 PM IST",
-          location: "Online (Zoom)",
-          capacity: "Public registration open",
-          formFields: [
-            "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
-            "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
-          ]
-        }
-      ];
-      await Event.insertMany(defaultEvents);
-      console.log("Default cohort events seeded in database");
+    const defaultEvents = [
+      {
+        date: "2026-06-05",
+        title: "EGA Masterclass: Go-To-Market and Retail Sprints",
+        desc: "An intensive strategy session led by Meera Nair mapping consumer retail networks, distributor incentives, and GTM rollouts in tier-2 cities.",
+        time: "03:00 PM IST",
+        location: "Bengaluru Hub & Zoom",
+        capacity: "Limited to 50 founders",
+        formFields: [
+          "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
+          "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
+        ]
+      },
+      {
+        date: "2026-06-12",
+        title: "Seed Valuation & Capital Structuring Audit",
+        desc: "EGA partners sit down with cohort CFOs to structure valuation projections, ESOP pools, and liquidation preferences prior to demo day.",
+        time: "11:00 AM IST",
+        location: "EGA Boardroom",
+        capacity: "Invite Only",
+        formFields: [
+          "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
+          "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
+        ]
+      },
+      {
+        date: "2026-06-18",
+        title: "Cohort 12 Demo Day: B2B Scaling Showcase",
+        desc: "12 selected Indian hardware, AI, and logistics startups pitch in front of 40+ active venture capital funds, family offices, and HNI syndicates.",
+        time: "02:00 PM IST",
+        location: "Hotel Grand Sheraton, Bengaluru",
+        capacity: "VCs and Accredited Angels only",
+        formFields: [
+          "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
+          "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
+        ]
+      },
+      {
+        date: "2026-06-25",
+        title: "Venture Terms & Cap Tables Masterclass",
+        desc: "An active negotiation drill detailing anti-dilution clauses, liquidation preferences, and MCA compliance requirements.",
+        time: "04:00 PM IST",
+        location: "Online (Zoom)",
+        capacity: "Public registration open",
+        formFields: [
+          "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
+          "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
+        ]
+      },
+      {
+        date: "2026-07-02",
+        title: "Night School : Special Edition",
+        desc: "Night School returns — and this one's different. This Thursday, the room belongs to Ramani Iyer, co-founder of JustDial. The man who built a company that still makes 1,300 crores a year, retained people for 25 and 30 years, and turned every adverse condition into a way to make money. The topic? A surprise. Ramani doesn't do scripts. He reads the room and the curriculum emerges from there. Sales, retention, building without funding, reading people, manufacturing serendipity, or something nobody saw coming. You'll find out when you walk in.",
+        time: "08:30 PM – 11:30 PM IST",
+        location: "The Hub Bengaluru",
+        capacity: "Limited Seats only",
+        externalLink: "https://nas.com/thehubbengaluru/events/night-school-special-edition",
+        formFields: [
+          "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
+          "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
+        ]
+      }
+    ];
+
+    for (const ev of defaultEvents) {
+      await Event.findOneAndUpdate({ date: ev.date }, ev, { upsert: true, new: true });
     }
+    console.log("Cohort events upserted and seeded in database successfully");
   } catch (err) {
     console.error("Error seeding default admin:", err.message);
   }

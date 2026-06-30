@@ -525,6 +525,210 @@ export default function HomePage() {
 
       <PremiumDivider />
 
+      {/* --- 3.2 INDUSTRY VALIDATION --- */}
+      <section className="py-16 bg-bg-dark relative overflow-hidden scroll-mt-24">
+        <SectionBackground seed="industry-validation" density="medium" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[130px] pointer-events-none z-0" />
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          
+          <div className="max-w-3xl mx-auto mb-10">
+            <span className="text-[10px] font-extrabold text-gold uppercase tracking-widest bg-gold/5 border border-gold/10 px-3 py-1 rounded-full">
+              Ecosystem Features
+            </span>
+            <h2 className="font-display font-black text-3.5xl sm:text-4xl text-white mt-4">
+              Industry Validation
+            </h2>
+            <p className="text-gray-400 text-sm mt-2 max-w-xl mx-auto">
+              Global recognition and key updates highlighting EGA's leadership presence at top-tier international venture summits.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Article 1 */}
+            <div className="premium-card p-6 flex flex-col justify-between items-start text-left hover:border-gold/30 hover:scale-[1.01] transition-all">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/15 px-2.5 py-0.5 rounded-full">
+                    Inflection Point Ventures
+                  </span>
+                  {/* LinkedIn Icon */}
+                  <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </div>
+                <h3 className="font-display font-bold text-white text-base sm:text-lg leading-snug">
+                  Celebrity Speaker Announcement: IPV Wealth Wise Investor Summit Middle East
+                </h3>
+              </div>
+              <div className="mt-6 w-full pt-4 border-t border-white/5">
+                <a
+                  href="https://www.linkedin.com/posts/ipventures_ipvwealthwise-wealthwise2025-investorsummit-ugcPost-7367438230591295489-m7oM/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-extrabold text-gold hover:text-white transition-colors inline-flex items-center gap-1 group cursor-pointer"
+                >
+                  View Article <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* Article 2 */}
+            <div className="premium-card p-6 flex flex-col justify-between items-start text-left hover:border-gold/30 hover:scale-[1.01] transition-all">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/15 px-2.5 py-0.5 rounded-full">
+                    Ramani Iyer (Chief Mentor)
+                  </span>
+                  {/* LinkedIn Icon */}
+                  <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </div>
+                <h3 className="font-display font-bold text-white text-base sm:text-lg leading-snug">
+                  Panel Keynotes & Executive Reflections: IPV Wealth Wise Investor Summit Dubai
+                </h3>
+              </div>
+              <div className="mt-6 w-full pt-4 border-t border-white/5">
+                <a
+                  href="https://www.linkedin.com/posts/ramani-iyer-03024178_celebrating-excellence-at-the-ipv-wealth-activity-7375391685876338688-9UH8?utm_source=social_share_send&utm_medium=android_app&rcm=ACoAABBoouQBwIgsJoSQVJKi3Obso5gDtzlNt3E&utm_campaign=whatsapp"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-extrabold text-gold hover:text-white transition-colors inline-flex items-center gap-1 group cursor-pointer"
+                >
+                  View Article <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* Article 3 */}
+            <div className="premium-card p-6 flex flex-col justify-between items-start text-left hover:border-gold/30 hover:scale-[1.01] transition-all">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/15 px-2.5 py-0.5 rounded-full">
+                    Happy Foods Group (Shriya Khanna)
+                  </span>
+                  {/* LinkedIn Icon */}
+                  <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </div>
+                <h3 className="font-display font-bold text-white text-base sm:text-lg leading-snug">
+                  B2B F&B Services Pivot & 500% YoY MRR Growth Success Story
+                </h3>
+              </div>
+              <div className="mt-6 w-full pt-4 border-t border-white/5">
+                <a
+                  href="https://www.linkedin.com/posts/khannashriya_happyfoodsgroup-b2btransformation-growthjourney-activity-7279191997364494336-k6-w?utm_source=social_share_send&utm_medium=android_app&rcm=ACoAABBoouQBwIgsJoSQVJKi3Obso5gDtzlNt3E&utm_campaign=whatsapp"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-extrabold text-gold hover:text-white transition-colors inline-flex items-center gap-1 group cursor-pointer"
+                >
+                  View Article <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* Article 4 */}
+            <div className="premium-card p-6 flex flex-col justify-between items-start text-left hover:border-gold/30 hover:scale-[1.01] transition-all">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/15 px-2.5 py-0.5 rounded-full">
+                    Ecosystem Community
+                  </span>
+                  {/* LinkedIn Icon */}
+                  <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </div>
+                <h3 className="font-display font-bold text-white text-base sm:text-lg leading-snug">
+                  Strategic Collaboration & Early-Stage Scaling Methodologies Case Study
+                </h3>
+              </div>
+              <div className="mt-6 w-full pt-4 border-t border-white/5">
+                <a
+                  href="https://www.linkedin.com/feed/update/urn:li:groupPost:3416532-7227670576394297345?utm_source=social_share_send&utm_medium=android_app&rcm=ACoAABBoouQBwIgsJoSQVJKi3Obso5gDtzlNt3E&utm_campaign=whatsapp"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-extrabold text-gold hover:text-white transition-colors inline-flex items-center gap-1 group cursor-pointer"
+                >
+                  View Article <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* Article 5 */}
+            <div className="premium-card p-6 flex flex-col justify-between items-start text-left hover:border-gold/30 hover:scale-[1.01] transition-all">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/15 px-2.5 py-0.5 rounded-full">
+                    BITS Pilani Conquest
+                  </span>
+                  {/* LinkedIn Icon */}
+                  <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </div>
+                <h3 className="font-display font-bold text-white text-base sm:text-lg leading-snug">
+                  Startup Accelerator Mentorship: BITS Pilani Conquest 2024 Invitation
+                </h3>
+              </div>
+              <div className="mt-6 w-full pt-4 border-t border-white/5">
+                <a
+                  href="https://www.linkedin.com/posts/ramani-iyer-03024178_two-months-ago-i-was-honored-to-receive-activity-7227670532186365954-HJCg?utm_source=social_share_send&utm_medium=android_app&rcm=ACoAABBoouQBwIgsJoSQVJKi3Obso5gDtzlNt3E&utm_campaign=whatsapp"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-extrabold text-gold hover:text-white transition-colors inline-flex items-center gap-1 group cursor-pointer"
+                >
+                  View Article <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* Article 6 */}
+            <div className="premium-card p-6 flex flex-col justify-between items-start text-left hover:border-gold/30 hover:scale-[1.01] transition-all">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-extrabold text-gold uppercase tracking-wider bg-gold/5 border border-gold/15 px-2.5 py-0.5 rounded-full">
+                    Melvin Jones Fashions
+                  </span>
+                  {/* LinkedIn Icon */}
+                  <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </div>
+                <h3 className="font-display font-bold text-white text-base sm:text-lg leading-snug">
+                  Melvin Jones Strategic Advisor & Mentor Appointment
+                </h3>
+              </div>
+              <div className="mt-6 w-full pt-4 border-t border-white/5">
+                <a
+                  href="https://www.linkedin.com/posts/swati-bhaskar-82ab064_ramaniiyer-melvinjones-melvinjonesfashions-share-7118127077945479168-pdbI?utm_source=social_share_send&utm_medium=android_app&rcm=ACoAABBoouQBwIgsJoSQVJKi3Obso5gDtzlNt3E&utm_campaign=whatsapp"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-extrabold text-gold hover:text-white transition-colors inline-flex items-center gap-1 group cursor-pointer"
+                >
+                  View Article <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-14 flex justify-center">
+            <Link
+              href="/industry-validation"
+              className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-cta-gradient text-xs font-black text-white hover:shadow-[0_0_30px_rgba(246,90,22,0.55)] hover:scale-[1.04] active:scale-[0.98] transition-all uppercase tracking-widest group cursor-pointer shadow-lg border border-white/10"
+            >
+              View All Articles
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
+      <PremiumDivider />
+
       {/* --- 3.5 SERVICES WE OFFER --- */}
       <section id="services" className="py-20 bg-bg-dark relative overflow-hidden scroll-mt-24">
         <SectionBackground seed="services" density="high" />
@@ -1067,7 +1271,7 @@ export default function HomePage() {
                 { icon: Coins, color: "text-secondary", accent: "border-secondary/25", bg: "bg-secondary/5" },
                 { icon: Users, color: "text-accent", accent: "border-accent/25", bg: "bg-accent/5" },
                 { icon: Award, color: "text-growth", accent: "border-growth/25", bg: "bg-growth/5" },
-                { icon: Map, color: "text-primary", accent: "border-primary/25", bg: "bg-primary/5" },
+                { icon: Map, color: "text-accent", accent: "border-accent/25", bg: "bg-accent/5" },
                 { icon: TrendingUp, color: "text-gold", accent: "border-gold/25", bg: "bg-gold/5" },
                 { icon: BarChart3, color: "text-secondary", accent: "border-secondary/25", bg: "bg-secondary/5" }
               ][idx] || { icon: Sparkles, color: "text-gold", accent: "border-gold/25", bg: "bg-gold/5" };

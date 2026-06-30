@@ -172,16 +172,44 @@ export const DEFAULT_CONTENT: SiteContent = {
     {
       quote:
         "ElephantGod Accelerator did not just consult us; they became our operational execution department. We optimized our core unit economics and restructured our CRM pipeline, leading to a 40% save in operating expenses.",
-      author: "Venkata Raman",
+      author: "Nikhil Gonsalves",
       title: "Co-Founder, Ingo Electric",
       impact: "40% Ops Savings",
     },
     {
       quote:
         "Mr. Ramani Iyer's active guidance helped us structure our distribution system. The shared services support for compliance and MCA audits saved us months of overhead.",
-      author: "Radha Krishnan",
+      author: "Nagasai Viswanath",
       title: "Founder, Ammamma's",
       impact: "MCA Compliance Cleared",
+    },
+    {
+      quote:
+        "Onboarding Justdial Co-Founder Ramani Iyer as a strategic investor and mentor is a game-changer. We are looking forward to taking Olive to the next level under his vision and mentorship.",
+      author: "Kahraman Yigit",
+      title: "Co-Founder & CEO, Olive Living",
+      impact: "Strategic Scale & Funding",
+    },
+    {
+      quote:
+        "You go big only when you think big, plan big, and collaborate big. Partnering with Ramani Iyer is a step ahead towards national and international expansion for Wow Mom Foods.",
+      author: "Shyama Jha",
+      title: "Founder, Wow Mom Foods",
+      impact: "National & Global Scale",
+    },
+    {
+      quote:
+        "We look forward to scaling and establishing Edujournal as a one-of-a-kind EdTech company with Mr. Ramani Iyer's visionary and strategic inputs as our strategic investor.",
+      author: "Edujournal Management",
+      title: "Founder, Edujournal",
+      impact: "EdTech Venture Scaling",
+    },
+    {
+      quote:
+        "The experiential insights and lessons from Mr. Ramani Iyer on zero to one growth gave our students and incubation cohort a masterclass in building multi-billion rupee enterprises.",
+      author: "Symbiosis Cell Team",
+      title: "SECC SIBM Pune",
+      impact: "Zero-to-One Masterclass",
     },
   ],
   expertise: [
@@ -301,7 +329,7 @@ export function loadSiteContent(): SiteContent {
       hero: { ...DEFAULT_CONTENT.hero, ...parsed.hero },
       services: parsed.services?.length ? parsed.services : DEFAULT_CONTENT.services,
       capitalNodes: parsed.capitalNodes?.length ? parsed.capitalNodes : DEFAULT_CONTENT.capitalNodes,
-      testimonials: parsed.testimonials?.length ? parsed.testimonials : DEFAULT_CONTENT.testimonials,
+      testimonials: (parsed.testimonials?.length && parsed.testimonials.length >= DEFAULT_CONTENT.testimonials.length) ? parsed.testimonials : DEFAULT_CONTENT.testimonials,
       expertise: parsed.expertise?.length ? parsed.expertise : DEFAULT_CONTENT.expertise,
       pricing: parsed.pricing?.length ? parsed.pricing : DEFAULT_CONTENT.pricing,
     };

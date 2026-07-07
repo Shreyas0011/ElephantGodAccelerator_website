@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Calendar, Clock, Sparkles } from "lucide-react";
+import { X, Calendar, Clock, Sparkles, Upload } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 
 import { API_URL } from "@/lib/api";
@@ -12,7 +12,15 @@ export default function MeetingModal() {
   const [email, setEmail] = useState("");
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
+  const [pitchDeck, setPitchDeck] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPitchDeck(file.name);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +30,7 @@ export default function MeetingModal() {
       email,
       date,
       timeSlot,
+      pitchDeck: pitchDeck || "",
     };
 
     try {
@@ -49,6 +58,7 @@ export default function MeetingModal() {
       setEmail("");
       setDate("");
       setTimeSlot("");
+      setPitchDeck(null);
       closeMeetingModal();
     }, 2000);
   };
@@ -162,6 +172,27 @@ export default function MeetingModal() {
                           04:30 PM IST
                         </option>
                       </select>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Upload Pitch Deck (Optional)
+                    </label>
+                    <div className="relative border border-dashed border-white/10 hover:border-gold/30 rounded-lg p-4 text-center bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center justify-center cursor-pointer">
+                      <input
+                        type="file"
+                        accept=".pdf,.ppt,.pptx"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <Upload className="w-5 h-5 text-gold mb-1.5" />
+                      <h4 className="font-display font-medium text-xs text-white">
+                        {pitchDeck ? pitchDeck : "Select or drag pitch deck"}
+                      </h4>
+                      <p className="text-[9px] text-gray-500 mt-0.5">
+                        PDF, PPT, or PPTX. Max 10MB.
+                      </p>
                     </div>
                   </div>
 

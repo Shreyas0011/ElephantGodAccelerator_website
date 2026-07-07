@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText } from "lucide-react";
+import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText, Upload } from "lucide-react";
 import { loadSiteContent, saveSiteContent, resetSiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 import type { SiteContent } from "@/lib/siteContent";
 import { API_URL } from "@/lib/api";
@@ -715,7 +715,7 @@ export default function AdminPage() {
                     alert("No audits to export.");
                     return;
                   }
-                  const allKeys = ["id", "createdAt", "email", "date", "timeSlot"];
+                  const allKeys = ["id", "createdAt", "email", "date", "timeSlot", "pitchDeck"];
                   const csvContent = [
                     allKeys.join(","),
                     ...audits.map(audit => 
@@ -774,6 +774,12 @@ export default function AdminPage() {
                           <Clock className="w-3.5 h-3.5 text-gold" />
                           Time Slot: <span className="text-white font-medium">{audit.timeSlot}</span>
                         </p>
+                        {audit.pitchDeck && (
+                          <p className="text-gray-400 text-xs flex items-center gap-1.5">
+                            <Upload className="w-3.5 h-3.5 text-gold" />
+                            Pitch Deck: <span className="text-white font-medium truncate max-w-[180px]" title={audit.pitchDeck}>{audit.pitchDeck}</span>
+                          </p>
+                        )}
                       </div>
                     </div>
                     

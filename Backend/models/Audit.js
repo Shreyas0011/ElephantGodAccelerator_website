@@ -14,6 +14,9 @@ const AuditSchema = new mongoose.Schema(
       type: String,
       required: [true, "Time slot is required"],
     },
+    pitchDeck: {
+      type: String,
+    },
     status: {
       type: String,
       enum: ["scheduled", "completed", "cancelled"],

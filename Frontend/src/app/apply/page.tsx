@@ -112,6 +112,8 @@ export default function ApplyPage() {
   // --- Acceleration Program Form State ---
   const [accFormData, setAccFormData] = useState({
     founderName: "",
+    founderEmail: "",
+    founderPhone: "",
     startupName: "",
     sector: "",
     revenue: "",
@@ -122,6 +124,7 @@ export default function ApplyPage() {
     website: "",
     role: "Startup",
   });
+  const [accFileUploaded, setAccFileUploaded] = useState<string | null>(null);
   const [accSubmitted, setAccSubmitted] = useState(false);
 
   const handleAccInputChange = (
@@ -130,11 +133,23 @@ export default function ApplyPage() {
     setAccFormData({ ...accFormData, [e.target.name]: e.target.value });
   };
 
+  const handleAccFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAccFileUploaded(file.name);
+    }
+  };
+
   const handleSubmitAcc = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (accFormData.role === "Startup" && !accFileUploaded) {
+      alert("Please upload your pitch deck file.");
+      return;
+    }
     const payload = {
       type: "acceleration",
       ...accFormData,
+      pitchDeck: accFileUploaded || "",
     };
     
     const apps = JSON.parse(localStorage.getItem("ega_applications") || "[]");
@@ -394,6 +409,40 @@ export default function ApplyPage() {
                     </div>
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Email address */}
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        {accFormData.role === "Startup" ? "Founder Email Address *" : "Email Address *"}
+                      </label>
+                      <input
+                        type="email"
+                        name="founderEmail"
+                        required
+                        value={accFormData.founderEmail}
+                        onChange={handleAccInputChange}
+                        placeholder="name@company.com"
+                        className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
+                      />
+                    </div>
+
+                    {/* Phone number */}
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        {accFormData.role === "Startup" ? "Founder Phone Number (WhatsApp) *" : "Phone Number (WhatsApp) *"}
+                      </label>
+                      <input
+                        type="text"
+                        name="founderPhone"
+                        required
+                        value={accFormData.founderPhone}
+                        onChange={handleAccInputChange}
+                        placeholder="+91 XXXXX XXXXX"
+                        className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold"
+                      />
+                    </div>
+                  </div>
+
                   <div className={`grid grid-cols-1 ${accFormData.role === "Startup" || accFormData.role === "Investor" ? "sm:grid-cols-2" : ""} gap-4`}>
                     {/* Sector / Designation */}
                     <div className="flex flex-col gap-1.5 text-left">
@@ -551,6 +600,35 @@ export default function ApplyPage() {
                       />
                     </div>
                   </div>
+
+                  {/* Pitch Deck Upload Section (dynamic based on role) */}
+                  {accFormData.role !== "Delegate" && (
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        {accFormData.role === "Startup"
+                          ? "Upload Pitch Deck (PDF, Max 10MB) *"
+                          : accFormData.role === "Investor"
+                          ? "Upload Fund Profile / Deck (Optional)"
+                          : "Upload Company Brochure / Deck (Optional)"}
+                      </label>
+                      <div className="relative border border-dashed border-gray-300 rounded-xl p-8 text-center bg-bg-surface hover:bg-bg-surface-light/80 transition-all flex flex-col items-center justify-center cursor-pointer">
+                        <input
+                          type="file"
+                          required={accFormData.role === "Startup"}
+                          accept=".pdf,.ppt,.pptx"
+                          onChange={handleAccFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <Upload className="w-8 h-8 text-gold mb-3" />
+                        <h4 className="font-display font-semibold text-sm text-white mb-1">
+                          {accFileUploaded ? accFileUploaded : "Drag & Drop Pitch Deck File"}
+                        </h4>
+                        <p className="text-[10px] text-gray-500">
+                          PDF, PPT, or PPTX. Max size 10MB.
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Textarea 1: Custom label/placeholder based on category */}
                   <div className="flex flex-col gap-1.5 text-left">

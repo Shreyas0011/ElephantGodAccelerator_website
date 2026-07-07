@@ -929,6 +929,20 @@ export default function AdminPage() {
 
               {selectedApp.type === "acceleration" && (
                 <>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Founder Email</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.founderEmail || "—"}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Founder Phone</span>
+                    <span className="text-sm font-semibold text-white">{selectedApp.founderPhone || "—"}</span>
+                  </div>
+                  {selectedApp.pitchDeck && (
+                    <div className="flex flex-col gap-1 sm:col-span-2">
+                      <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck File Name</span>
+                      <span className="text-sm font-semibold text-white">{selectedApp.pitchDeck}</span>
+                    </div>
+                  )}
                   <div className="flex flex-col gap-1 sm:col-span-2">
                     <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Assistant Required For</span>
                     <p className="text-sm text-gray-300 bg-white/5 border border-white/10 rounded-xl p-3 leading-relaxed">{selectedApp.assistantReq || "—"}</p>

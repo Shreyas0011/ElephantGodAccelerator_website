@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText, Upload } from "lucide-react";
+import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText, Upload, Download } from "lucide-react";
 import { loadSiteContent, saveSiteContent, resetSiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 import type { SiteContent } from "@/lib/siteContent";
 import { API_URL } from "@/lib/api";
@@ -50,6 +50,43 @@ export default function AdminPage() {
 
   // Audits State
   const [audits, setAudits] = useState<any[]>([]);
+
+  // Helper: programmatic cross-origin file download
+  const downloadPitchDeck = async (filePath: string, label: string) => {
+    // Old submissions only stored the bare filename (e.g. "deck.pdf"), not an actual server path.
+    // New submissions store a server path starting with "/uploads/".
+    const isServerFile = filePath.startsWith("/uploads/");
+
+    if (!isServerFile) {
+      alert(
+        `This submission was made before file uploading was enabled.\n\nThe file name on record is: "${filePath}"\n\nPlease ask the applicant to resubmit their pitch deck.`
+      );
+      return;
+    }
+
+    try {
+      const base = API_URL.replace("/api", "");
+      // Ensure exactly one slash between base and path
+      const url = `${base.replace(/\/$/, "")}${filePath}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      // Use the last segment of the path as the download filename
+      const fileName = filePath.split("/").pop() || label;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      alert("Could not download pitch deck. The file may not be available on the server.");
+      console.error(err);
+    }
+  };
+
 
   useEffect(() => {
     if (sessionStorage.getItem("ega_admin_session") === "active") setIsLoggedIn(true);
@@ -923,8 +960,18 @@ export default function AdminPage() {
                     <span className="text-sm font-black text-gold">{selectedApp.scorecardPercentage !== undefined ? `${selectedApp.scorecardPercentage}%` : "—"}</span>
                   </div>
                   <div className="flex flex-col gap-1 sm:col-span-2">
-                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck File Name</span>
-                    <span className="text-sm font-semibold text-white">{selectedApp.pitchDeck || "—"}</span>
+                    <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck</span>
+                    {selectedApp.pitchDeck ? (
+                      <button
+                        onClick={() => downloadPitchDeck(selectedApp.pitchDeck, selectedApp.startupName || "pitch-deck")}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold w-fit cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Download Pitch Deck
+                      </button>
+                    ) : (
+                      <span className="text-sm font-semibold text-white">—</span>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1 sm:col-span-2">
                     <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Elevator Pitch</span>
@@ -945,8 +992,14 @@ export default function AdminPage() {
                   </div>
                   {selectedApp.pitchDeck && (
                     <div className="flex flex-col gap-1 sm:col-span-2">
-                      <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck File Name</span>
-                      <span className="text-sm font-semibold text-white">{selectedApp.pitchDeck}</span>
+                      <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck</span>
+                      <button
+                        onClick={() => downloadPitchDeck(selectedApp.pitchDeck, selectedApp.startupName || "pitch-deck")}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold w-fit cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Download Pitch Deck
+                      </button>
                     </div>
                   )}
                   <div className="flex flex-col gap-1 sm:col-span-2">

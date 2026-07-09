@@ -1,7 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 const connectDB = require("./config/db");
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Connect to Database
 connectDB().then(async () => {
@@ -102,6 +110,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve uploaded files (pitch decks, etc.) as static assets
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Root Route
 app.get("/", (req, res) => {
   res.send("Elephant God Accelerator API is running...");
@@ -109,6 +120,7 @@ app.get("/", (req, res) => {
 
 // Define Routes
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/upload", require("./routes/upload"));
 app.use("/api/applications", require("./routes/applications"));
 app.use("/api/audits", require("./routes/audits"));
 app.use("/api/events", require("./routes/events"));

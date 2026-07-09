@@ -125,7 +125,10 @@ export default function ApplyPage() {
     role: "Startup",
   });
   const [accFileUploaded, setAccFileUploaded] = useState<string | null>(null);
+  const [accFileObj, setAccFileObj] = useState<File | null>(null);
   const [accSubmitted, setAccSubmitted] = useState(false);
+  const [accUploading, setAccUploading] = useState(false);
+  const [accUploadError, setAccUploadError] = useState<string | null>(null);
 
   const handleAccInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -136,29 +139,49 @@ export default function ApplyPage() {
   const handleAccFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAccFileObj(file);
       setAccFileUploaded(file.name);
+      setAccUploadError(null);
     }
   };
 
   const handleSubmitAcc = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (accFormData.role === "Startup" && !accFileUploaded) {
+    if (accFormData.role === "Startup" && !accFileObj) {
       alert("Please upload your pitch deck file.");
       return;
     }
+
+    setAccUploading(true);
+    setAccUploadError(null);
+
+    let pitchDeckUrl = "";
+    if (accFileObj) {
+      try {
+        const formData = new FormData();
+        formData.append("pitchDeck", accFileObj);
+        const uploadRes = await fetch(`${API_URL}/upload/pitch-deck`, {
+          method: "POST",
+          body: formData,
+        });
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json();
+          throw new Error(err.error || "File upload failed.");
+        }
+        const uploadData = await uploadRes.json();
+        pitchDeckUrl = uploadData.fileUrl;
+      } catch (err: any) {
+        setAccUploading(false);
+        setAccUploadError(err.message || "Failed to upload pitch deck.");
+        return;
+      }
+    }
+
     const payload = {
       type: "acceleration",
       ...accFormData,
-      pitchDeck: accFileUploaded || "",
+      pitchDeck: pitchDeckUrl,
     };
-    
-    const apps = JSON.parse(localStorage.getItem("ega_applications") || "[]");
-    apps.push({
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      ...payload,
-    });
-    localStorage.setItem("ega_applications", JSON.stringify(apps));
 
     try {
       await fetch(`${API_URL}/applications`, {
@@ -167,9 +190,10 @@ export default function ApplyPage() {
         body: JSON.stringify(payload),
       });
     } catch (err) {
-      console.error("Failed to post to API, using localStorage fallback", err);
+      console.error("Failed to post to API", err);
     }
-    
+
+    setAccUploading(false);
     setAccSubmitted(true);
   };
 
@@ -194,7 +218,10 @@ export default function ApplyPage() {
     role: "Startup",
   });
   const [fileUploaded, setFileUploaded] = useState<string | null>(null);
+  const [fileObj, setFileObj] = useState<File | null>(null);
   const [appSubmitted, setAppSubmitted] = useState(false);
+  const [appUploading, setAppUploading] = useState(false);
+  const [appUploadError, setAppUploadError] = useState<string | null>(null);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -205,7 +232,9 @@ export default function ApplyPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setFileObj(file);
       setFileUploaded(file.name);
+      setAppUploadError(null);
     }
   };
 
@@ -236,25 +265,40 @@ export default function ApplyPage() {
 
   const handleSubmitApp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fileUploaded) {
+    if (!fileObj) {
       alert("Please upload your pitch deck file.");
+      return;
+    }
+
+    setAppUploading(true);
+    setAppUploadError(null);
+
+    let pitchDeckUrl = "";
+    try {
+      const fd = new FormData();
+      fd.append("pitchDeck", fileObj);
+      const uploadRes = await fetch(`${API_URL}/upload/pitch-deck`, {
+        method: "POST",
+        body: fd,
+      });
+      if (!uploadRes.ok) {
+        const err = await uploadRes.json();
+        throw new Error(err.error || "File upload failed.");
+      }
+      const uploadData = await uploadRes.json();
+      pitchDeckUrl = uploadData.fileUrl;
+    } catch (err: any) {
+      setAppUploading(false);
+      setAppUploadError(err.message || "Failed to upload pitch deck.");
       return;
     }
 
     const payload = {
       type: "membership",
       ...formData,
-      pitchDeck: fileUploaded,
+      pitchDeck: pitchDeckUrl,
       scorecardPercentage: finalScore,
     };
-
-    const apps = JSON.parse(localStorage.getItem("ega_applications") || "[]");
-    apps.push({
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      ...payload,
-    });
-    localStorage.setItem("ega_applications", JSON.stringify(apps));
 
     try {
       await fetch(`${API_URL}/applications`, {
@@ -263,9 +307,10 @@ export default function ApplyPage() {
         body: JSON.stringify(payload),
       });
     } catch (err) {
-      console.error("Failed to post to API, using localStorage fallback", err);
+      console.error("Failed to post to API", err);
     }
 
+    setAppUploading(false);
     setAppSubmitted(true);
   };
 
@@ -706,12 +751,29 @@ export default function ApplyPage() {
                     </div>
                   )}
 
+                  {accUploadError && (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-semibold">
+                      {accUploadError}
+                    </div>
+                  )}
+
                   <div className="flex justify-end mt-4">
                     <button
                       type="submit"
-                      className="px-8 py-3 bg-cta-gradient text-[#ffffff] font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5 shadow-md shadow-primary/10 hover:shadow-primary/20 cursor-pointer"
+                      disabled={accUploading}
+                      className="px-8 py-3 bg-cta-gradient text-[#ffffff] font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5 shadow-md shadow-primary/10 hover:shadow-primary/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      Submit Acceleration Application
+                      {accUploading ? (
+                        <>
+                          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                          </svg>
+                          Uploading...
+                        </>
+                      ) : (
+                        "Submit Acceleration Application"
+                      )}
                     </button>
                   </div>
                 </form>
@@ -1260,6 +1322,12 @@ export default function ApplyPage() {
                           </div>
                         </div>
 
+                        {appUploadError && (
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-semibold">
+                            {appUploadError}
+                          </div>
+                        )}
+
                         <div className="flex justify-between mt-4">
                           <button
                             type="button"
@@ -1270,9 +1338,20 @@ export default function ApplyPage() {
                           </button>
                           <button
                             type="submit"
-                            className="px-8 py-3 bg-cta-gradient text-[#ffffff] font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5 shadow-md shadow-primary/10 hover:shadow-primary/20 cursor-pointer"
+                            disabled={appUploading}
+                            className="px-8 py-3 bg-cta-gradient text-[#ffffff] font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5 shadow-md shadow-primary/10 hover:shadow-primary/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                           >
-                            Submit Cohort Application
+                            {appUploading ? (
+                              <>
+                                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                                </svg>
+                                Uploading...
+                              </>
+                            ) : (
+                              "Submit Cohort Application"
+                            )}
                           </button>
                         </div>
                       </motion.div>

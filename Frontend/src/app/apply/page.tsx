@@ -14,6 +14,7 @@ import {
   Briefcase,
   TrendingUp,
   Coins,
+  X,
 } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import RoleSelector from "@/components/RoleSelector";
@@ -223,10 +224,72 @@ export default function ApplyPage() {
   const [appUploading, setAppUploading] = useState(false);
   const [appUploadError, setAppUploadError] = useState<string | null>(null);
 
+  // --- Sector Selection Dialog State ---
+  const [isSectorModalOpen, setIsSectorModalOpen] = useState(false);
+  const [customSectorInput, setCustomSectorInput] = useState("");
+  const [modalTarget, setModalTarget] = useState<"accSector" | "startupSector" | null>(null);
+  const [customSectors, setCustomSectors] = useState<string[]>([]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleAccSectorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === "Other") {
+      setModalTarget("accSector");
+      setCustomSectorInput("");
+      setIsSectorModalOpen(true);
+    } else {
+      setAccFormData((prev) => ({ ...prev, sector: val }));
+    }
+  };
+
+  const handleStartupSectorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === "Other") {
+      setModalTarget("startupSector");
+      setCustomSectorInput("");
+      setIsSectorModalOpen(true);
+    } else {
+      setFormData((prev) => ({ ...prev, startupSector: val }));
+    }
+  };
+
+  const handleCloseSectorModal = () => {
+    setIsSectorModalOpen(false);
+    // Reset back to empty selection if cancelled
+    if (modalTarget === "accSector") {
+      setAccFormData((prev) => ({ ...prev, sector: "" }));
+    } else if (modalTarget === "startupSector") {
+      setFormData((prev) => ({ ...prev, startupSector: "" }));
+    }
+    setModalTarget(null);
+    setCustomSectorInput("");
+  };
+
+  const handleConfirmSector = () => {
+    const val = customSectorInput.trim();
+    if (!val) {
+      alert("Please enter a valid sector name.");
+      return;
+    }
+
+    if (!customSectors.includes(val)) {
+      setCustomSectors((prev) => [...prev, val]);
+    }
+
+    if (modalTarget === "accSector") {
+      setAccFormData((prev) => ({ ...prev, sector: val }));
+    } else if (modalTarget === "startupSector") {
+      setFormData((prev) => ({ ...prev, startupSector: val }));
+    }
+
+    setIsSectorModalOpen(false);
+    setModalTarget(null);
+    setCustomSectorInput("");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -519,7 +582,7 @@ export default function ApplyPage() {
                             name="sector"
                             required
                             value={accFormData.sector}
-                            onChange={handleAccInputChange}
+                            onChange={handleAccSectorChange}
                             className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
                           >
                             <option value="" className="text-gray-500">Select Sector</option>
@@ -528,6 +591,9 @@ export default function ApplyPage() {
                             <option value="Mobility" className="text-gray-700">Mobility</option>
                             <option value="Sustainability" className="text-gray-700">Sustainability</option>
                             <option value="Technology" className="text-gray-700">Technology & SaaS</option>
+                            {customSectors.map((sec) => (
+                              <option key={sec} value={sec} className="text-gray-700">{sec}</option>
+                            ))}
                             <option value="Other" className="text-gray-700">Other</option>
                           </select>
                         </>
@@ -1090,7 +1156,7 @@ export default function ApplyPage() {
                               name="startupSector"
                               required
                               value={formData.startupSector}
-                              onChange={handleInputChange}
+                              onChange={handleStartupSectorChange}
                               className="bg-bg-surface border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-gold cursor-pointer"
                             >
                               <option value="" className="text-gray-500">Select Sector</option>
@@ -1099,6 +1165,10 @@ export default function ApplyPage() {
                               <option value="Mobility" className="text-gray-700">Mobility</option>
                               <option value="Sustainability" className="text-gray-700">Sustainability</option>
                               <option value="Technology" className="text-gray-700">Technology & SaaS</option>
+                              {customSectors.map((sec) => (
+                                <option key={sec} value={sec} className="text-gray-700">{sec}</option>
+                              ))}
+                              <option value="Other" className="text-gray-700">Other</option>
                             </select>
                           </div>
                           <div className="flex flex-col gap-1.5">
@@ -1363,6 +1433,82 @@ export default function ApplyPage() {
           </section>
         </>
       )}
+
+      <AnimatePresence>
+        {isSectorModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleCloseSectorModal}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-none"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="relative w-full max-w-md bg-bg-surface border border-gold/15 rounded-2xl shadow-2xl p-6 overflow-hidden z-10"
+            >
+              {/* Header Glow */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-primary to-secondary blur-sm" />
+
+              {/* Close button */}
+              <button
+                type="button"
+                onClick={handleCloseSectorModal}
+                className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-white rounded-lg bg-white/5 border border-white/5 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Content */}
+              <div className="flex flex-col gap-4 mt-2 text-left">
+                <h3 className="font-display font-bold text-lg text-white">
+                  Enter Custom Sector
+                </h3>
+                <p className="text-gray-400 text-xs">
+                  Specify your startup's operating sector if it's not listed in the default categories.
+                </p>
+                <input
+                  type="text"
+                  value={customSectorInput}
+                  onChange={(e) => setCustomSectorInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleConfirmSector();
+                    }
+                  }}
+                  placeholder="E.g., Web3 & Blockchain, EdTech, FinTech"
+                  className="bg-bg-dark border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold w-full"
+                  autoFocus
+                />
+                <div className="flex justify-end gap-3 mt-2">
+                  <button
+                    type="button"
+                    onClick={handleCloseSectorModal}
+                    className="px-4 py-2 border border-gray-300 text-gray-400 hover:text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmSector}
+                    className="px-5 py-2 bg-cta-gradient text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all hover:shadow-lg cursor-pointer"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

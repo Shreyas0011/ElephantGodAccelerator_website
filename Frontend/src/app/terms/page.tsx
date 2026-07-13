@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Link from "next/link";
 import { 
   Shield, 
   Clock, 
@@ -21,7 +22,8 @@ import {
   FileImage,
   Zap,
   Globe,
-  Smartphone
+  Smartphone,
+  ArrowLeft
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -42,10 +44,24 @@ export default function TermsAndConditionsPage() {
       <section className="relative py-16 overflow-hidden border-b border-gray-200 bg-gradient-to-r from-bg-dark to-bg-surface/30">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <motion.span 
+          <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="mb-6 flex justify-center"
+          >
+            <Link 
+              href="/#site-footer" 
+              className="inline-flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-gold hover:border-gold/30 transition-all bg-bg-surface-light/40 border border-gray-200/10 px-4 py-2 rounded-full backdrop-blur-sm shadow-sm"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Back to Home
+            </Link>
+          </motion.div>
+          <motion.span 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="text-xs font-extrabold text-gold uppercase tracking-wider bg-bg-surface border border-gray-200 px-3 py-1 rounded-full"
           >
             General Terms

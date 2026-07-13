@@ -29,7 +29,7 @@ import { motion } from "framer-motion";
 
 export default function TermsAndConditionsPage() {
   useEffect(() => {
-    document.title = "Terms & Conditions – India Startup Week 2026";
+    document.title = "Terms & Conditions – Elephant God Accelerator";
   }, []);
 
   return (
@@ -140,7 +140,7 @@ export default function TermsAndConditionsPage() {
                 className="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-gold/10 via-gold/2 to-transparent border border-gold/20 scroll-mt-28"
               >
                 <p className="text-sm sm:text-base text-gray-200 leading-relaxed">
-                  These General Terms and Conditions (the <strong className="text-white">"Terms"</strong>) set out the terms applicable to the use of India Startup Week Services, including the website <strong className="text-white">www.indiastartupweek.in</strong>, mobile applications, online platforms, and physical events (collectively, <strong className="text-white">"Services"</strong>). By using these Services, you agree to comply with and be bound by these Terms.
+                  These General Terms and Conditions (the <strong className="text-white">"Terms"</strong>) set out the terms applicable to the use of Elephant God Accelerator Services, including the website <strong className="text-white">www.elephantgodaccelerator.com</strong>, mobile applications, online platforms, and physical events (collectively, <strong className="text-white">"Services"</strong>). By using these Services, you agree to comply with and be bound by these Terms.
                 </p>
               </motion.div>
 
@@ -187,7 +187,7 @@ export default function TermsAndConditionsPage() {
                     <div>
                       <p className="text-white font-semibold">Account Termination</p>
                       <p className="text-gray-400 text-xs mt-0.5">
-                        India Startup Week reserves the right to terminate any account at its discretion, particularly in cases of breach of these Terms, misleading information, or illegal activity.
+                        Elephant God Accelerator reserves the right to terminate any account at its discretion, particularly in cases of breach of these Terms, misleading information, or illegal activity.
                       </p>
                     </div>
                   </div>
@@ -245,7 +245,7 @@ export default function TermsAndConditionsPage() {
                       Age Restriction
                     </span>
                     <p className="text-xs text-gray-400">
-                      Persons under the age of 18 are not permitted entry to the venue or platform without prior written permission from India Startup Week.
+                      Persons under the age of 18 are not permitted entry to the venue or platform without prior written permission from Elephant God Accelerator.
                     </p>
                   </div>
 
@@ -303,7 +303,7 @@ export default function TermsAndConditionsPage() {
                   <div className="flex gap-2.5 border-t border-gray-200/5 pt-3">
                     <Check className="w-4 h-4 text-gold shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-white">Usage Right:</strong> By submitting content, you grant India Startup Week the right to use it for providing and developing Services, including for promotional and statistical purposes.
+                      <strong className="text-white">Usage Right:</strong> By submitting content, you grant Elephant God Accelerator the right to use it for providing and developing Services, including for promotional and statistical purposes.
                     </div>
                   </div>
                 </div>
@@ -335,7 +335,7 @@ export default function TermsAndConditionsPage() {
                     <div>
                       <h4 className="text-white font-semibold text-xs uppercase tracking-wider mb-1">Ownership</h4>
                       <p className="text-xs text-gray-400 leading-relaxed">
-                        India Startup Week owns all intellectual property rights related to the Services, including the brand name, logo, and website content.
+                        Elephant God Accelerator owns all intellectual property rights related to the Services, including the brand name, logo, and website content.
                       </p>
                     </div>
                   </div>
@@ -345,7 +345,7 @@ export default function TermsAndConditionsPage() {
                     <div>
                       <h4 className="text-white font-semibold text-xs uppercase tracking-wider mb-1">Third-Party Events Restriction</h4>
                       <p className="text-xs text-gray-400 leading-relaxed">
-                        No company or individual may organize an event purporting to be related to India Startup Week without prior written consent.
+                        No company or individual may organize an event purporting to be related to Elephant God Accelerator without prior written consent.
                       </p>
                     </div>
                   </div>
@@ -386,7 +386,7 @@ export default function TermsAndConditionsPage() {
                 <div className="mt-4 p-4 bg-bg-surface-light/30 rounded-xl border border-gray-200/5">
                   <h4 className="text-white font-bold text-sm mb-1">Limitation of Liability</h4>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    To the maximum extent permitted by law, India Startup Week is not liable for any direct or indirect damages arising from your participation in the event or use of the Services.
+                    To the maximum extent permitted by law, Elephant God Accelerator is not liable for any direct or indirect damages arising from your participation in the event or use of the Services.
                   </p>
                 </div>
                 <div className="mt-4 p-4 bg-gold/5 border border-gold/15 rounded-xl">
@@ -452,8 +452,8 @@ export default function TermsAndConditionsPage() {
                   <Mail className="w-5 h-5 text-gold shrink-0" />
                   <div>
                     <h4 className="text-xs text-gray-500 font-bold uppercase tracking-wider">Email Address</h4>
-                    <a href="mailto:hello@indiastartupweek.in" className="text-gold hover:underline text-sm font-semibold block mt-0.5">
-                      hello@indiastartupweek.in
+                    <a href="mailto:info@elephantgodaccelerator.com" className="text-gold hover:underline text-sm font-semibold block mt-0.5">
+                      info@elephantgodaccelerator.com
                     </a>
                   </div>
                 </div>
@@ -473,7 +473,7 @@ export default function TermsAndConditionsPage() {
                   General Terms & Conditions Agreement
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  By utilizing <strong className="text-white">www.indiastartupweek.in</strong>, our digital online tools, or by registering for and attending India Startup Week Events, you explicitly accept, declare consent, and agree to be bound by these Terms & Conditions.
+                  By utilizing <strong className="text-white">www.elephantgodaccelerator.com</strong>, our digital online tools, or by registering for and attending Elephant God Accelerator Events, you explicitly accept, declare consent, and agree to be bound by these Terms & Conditions.
                 </p>
               </motion.div>
 

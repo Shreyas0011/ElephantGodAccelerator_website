@@ -26,7 +26,7 @@ import { motion } from "framer-motion";
 
 export default function PrivacyPolicyPage() {
   useEffect(() => {
-    document.title = "Privacy Policy – India Startup Week 2026";
+    document.title = "Privacy Policy – Elephant God Accelerator";
   }, []);
 
   return (
@@ -154,7 +154,7 @@ export default function PrivacyPolicyPage() {
                   </h2>
                 </div>
                 <p className="mb-4">
-                  India Startup Week (hereinafter <strong className="text-white">“ISW”</strong>, <strong className="text-white">“we”</strong>, or <strong className="text-white">“us”</strong>) is a platform dedicated to fostering the Indian startup ecosystem through events, networking, and digital services. To provide our services (the “Services”) and organize our flagship and satellite events (the “Events”), we process personal data of our attendees, speakers, partners, and volunteers (<strong className="text-white">“User”</strong> or <strong className="text-white">“you”</strong>).
+                  Elephant God Accelerator (hereinafter <strong className="text-white">“Elephant God Accelerator”</strong>, <strong className="text-white">“we”</strong>, or <strong className="text-white">“us”</strong>) is a platform dedicated to fostering the Indian startup ecosystem through events, networking, and digital services. To provide our services (the “Services”) and organize our flagship and satellite events (the “Events”), we process personal data of our attendees, speakers, partners, and volunteers (<strong className="text-white">“User”</strong> or <strong className="text-white">“you”</strong>).
                 </p>
                 <p className="mb-4">
                   This Privacy Policy explains:
@@ -204,8 +204,8 @@ export default function PrivacyPolicyPage() {
                     <Mail className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-xs text-gray-500 font-bold uppercase tracking-wider">Email Address</h4>
-                      <a href="mailto:hello@indiastartupweek.in" className="text-gold hover:underline text-sm font-semibold mt-1 block">
-                        hello@indiastartupweek.in
+                      <a href="mailto:info@elephantgodaccelerator.com" className="text-gold hover:underline text-sm font-semibold mt-1 block">
+                        info@elephantgodaccelerator.com
                       </a>
                     </div>
                   </div>
@@ -214,7 +214,7 @@ export default function PrivacyPolicyPage() {
                     <div>
                       <h4 className="text-xs text-gray-500 font-bold uppercase tracking-wider">Address</h4>
                       <p className="text-white text-xs mt-1 leading-relaxed">
-                        71/2, Sai Arcade, Kanakpura Main Road, 6th Phase, J.P. Nagar, Bengaluru, KA 560078
+                        Third Floor, F 459/5, 10" Main, F Block, Sahakara Nagar, Bengaluru 560092
                       </p>
                     </div>
                   </div>
@@ -501,8 +501,8 @@ export default function PrivacyPolicyPage() {
                   <Info className="w-5 h-5 text-gold shrink-0" />
                   <p className="text-xs text-gray-300">
                     To exercise these rights, please contact us at{" "}
-                    <a href="mailto:hello@indiastartupweek.in" className="text-gold font-bold hover:underline">
-                      hello@indiastartupweek.in
+                    <a href="mailto:info@elephantgodaccelerator.com" className="text-gold font-bold hover:underline">
+                      info@elephantgodaccelerator.com
                     </a>.
                   </p>
                 </div>
@@ -529,7 +529,7 @@ export default function PrivacyPolicyPage() {
                   We use cookies to personalize content and analyze our traffic. You can manage your cookie preferences through your browser settings.
                 </p>
                 <p className="text-gray-400 text-xs">
-                  Please note that declining or disabling cookies may limit your ability to use or access certain interactive features of the ISW platform.
+                  Please note that declining or disabling cookies may limit your ability to use or access certain interactive features of the Elephant God Accelerator platform.
                 </p>
               </motion.div>
 
@@ -572,7 +572,7 @@ export default function PrivacyPolicyPage() {
                   Consent & Acceptance
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  By using <strong className="text-white">www.indiastartupweek.in</strong> and registering for our Events, you acknowledge that you have read and understood this Privacy Policy.
+                  By using <strong className="text-white">www.elephantgodaccelerator.com</strong> and registering for our Events, you acknowledge that you have read and understood this Privacy Policy.
                 </p>
               </motion.div>
 

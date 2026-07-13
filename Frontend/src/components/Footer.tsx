@@ -199,15 +199,12 @@ export default function Footer() {
             © {new Date().getFullYear()} Elephant God Accelerator (EGA). All Rights Reserved.
           </span>
           <div className="flex flex-wrap items-center gap-6">
-            <a href="#" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
+            <Link href="/privacy" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
               Privacy Policy
-            </a>
-            <a href="#" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
-              Terms & Governance
-            </a>
-            <a href="#" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
-              Accessibility
-            </a>
+            </Link>
+            <Link href="/terms" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
+              Terms & Conditions
+            </Link>
           </div>
         </div>
       </div>

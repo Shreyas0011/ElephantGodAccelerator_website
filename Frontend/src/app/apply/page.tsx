@@ -148,8 +148,8 @@ export default function ApplyPage() {
 
   const handleSubmitAcc = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (accFormData.role === "Startup" && !accFileObj) {
-      alert("Please upload your pitch deck file.");
+    if (accFormData.role !== "Delegate" && !accFileObj) {
+      alert("Please upload your pitch deck file to proceed.");
       return;
     }
 
@@ -328,38 +328,14 @@ export default function ApplyPage() {
 
   const handleSubmitApp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fileObj) {
-      alert("Please upload your pitch deck file.");
-      return;
-    }
 
     setAppUploading(true);
     setAppUploadError(null);
 
-    let pitchDeckUrl = "";
-    try {
-      const fd = new FormData();
-      fd.append("pitchDeck", fileObj);
-      const uploadRes = await fetch(`${API_URL}/upload/pitch-deck`, {
-        method: "POST",
-        body: fd,
-      });
-      if (!uploadRes.ok) {
-        const err = await uploadRes.json();
-        throw new Error(err.error || "File upload failed.");
-      }
-      const uploadData = await uploadRes.json();
-      pitchDeckUrl = uploadData.fileUrl;
-    } catch (err: any) {
-      setAppUploading(false);
-      setAppUploadError(err.message || "Failed to upload pitch deck.");
-      return;
-    }
-
     const payload = {
       type: "membership",
       ...formData,
-      pitchDeck: pitchDeckUrl,
+      pitchDeck: "",
       scorecardPercentage: finalScore,
     };
 
@@ -717,27 +693,30 @@ export default function ApplyPage() {
                     <div className="flex flex-col gap-1.5 text-left">
                       <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                         {accFormData.role === "Startup"
-                          ? "Upload Pitch Deck (PDF, Max 10MB) *"
+                          ? "Upload Pitch Deck (PDF Only) *"
                           : accFormData.role === "Investor"
-                          ? "Upload Fund Profile / Deck (Optional)"
-                          : "Upload Company Brochure / Deck (Optional)"}
+                          ? "Upload Fund Profile / Deck (PDF Only) *"
+                          : "Upload Company Brochure / Deck (PDF Only) *"}
                       </label>
                       <div className="relative border border-dashed border-gray-300 rounded-xl p-8 text-center bg-bg-surface hover:bg-bg-surface-light/80 transition-all flex flex-col items-center justify-center cursor-pointer">
                         <input
                           type="file"
-                          required={accFormData.role === "Startup"}
-                          accept=".pdf,.ppt,.pptx"
+                          required
+                          accept=".pdf"
                           onChange={handleAccFileChange}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         />
                         <Upload className="w-8 h-8 text-gold mb-3" />
                         <h4 className="font-display font-semibold text-sm text-white mb-1">
-                          {accFileUploaded ? accFileUploaded : "Drag & Drop Pitch Deck File"}
+                          {accFileUploaded ? accFileUploaded : "Drag & Drop Pitch Deck PDF File"}
                         </h4>
                         <p className="text-[10px] text-gray-500">
-                          PDF, PPT, or PPTX. Max size 10MB.
+                          PDF only. Max size 10MB.
                         </p>
                       </div>
+                      <p className="text-[10px] text-gold/80 font-medium mt-0.5">
+                        Please upload the pitch deck to proceed
+                      </p>
                     </div>
                   )}
 
@@ -1370,33 +1349,6 @@ export default function ApplyPage() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-1.5 mt-2">
-                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            Upload Pitch Deck (PDF, Max 10MB) *
-                          </label>
-                          <div className="relative border border-dashed border-gray-300 rounded-xl p-8 text-center bg-bg-surface hover:bg-bg-surface-light/80 transition-all flex flex-col items-center justify-center cursor-pointer">
-                            <input
-                              type="file"
-                              required
-                              accept=".pdf,.ppt,.pptx"
-                              onChange={handleFileChange}
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                            />
-                            <Upload className="w-8 h-8 text-gold mb-3" />
-                            <h4 className="font-display font-semibold text-sm text-white mb-1">
-                              {fileUploaded ? fileUploaded : "Drag & Drop Pitch Deck File"}
-                            </h4>
-                            <p className="text-[10px] text-gray-500">
-                              PDF, PPT, or PPTX. Max size 10MB.
-                            </p>
-                          </div>
-                        </div>
-
-                        {appUploadError && (
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-semibold">
-                            {appUploadError}
-                          </div>
-                        )}
 
                         <div className="flex justify-between mt-4">
                           <button

@@ -5,6 +5,12 @@ const path = require("path");
 const fs = require("fs");
 const connectDB = require("./config/db");
 
+// Ensure media directory exists
+const mediaDir = path.join(__dirname, "media");
+if (!fs.existsSync(mediaDir)) {
+  fs.mkdirSync(mediaDir, { recursive: true });
+}
+
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) {
@@ -111,6 +117,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded files (pitch decks, etc.) as static assets
+app.use("/media", express.static(path.join(__dirname, "media")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Root Route

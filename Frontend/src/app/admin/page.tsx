@@ -55,7 +55,7 @@ export default function AdminPage() {
   const downloadPitchDeck = async (filePath: string, label: string) => {
     // Old submissions only stored the bare filename (e.g. "deck.pdf"), not an actual server path.
     // New submissions store a server path starting with "/uploads/".
-    const isServerFile = filePath.startsWith("/uploads/");
+    const isServerFile = filePath.startsWith("/uploads/") || filePath.startsWith("/media/");
 
     if (!isServerFile) {
       alert(
@@ -86,6 +86,23 @@ export default function AdminPage() {
       console.error(err);
     }
   };
+
+  const viewPitchDeck = (filePath: string) => {
+    const isServerFile = filePath.startsWith("/uploads/") || filePath.startsWith("/media/");
+    if (!isServerFile) {
+      alert(
+        `This submission was made before file uploading was enabled.\n\nThe file name on record is: "${filePath}"\n\nPlease ask the applicant to resubmit their pitch deck.`
+      );
+      return;
+    }
+
+    const base = API_URL.replace("/api", "");
+    const url = `${base.replace(/\/$/, "")}${filePath}`;
+    window.open(url, "_blank");
+  };
+
+
+
 
 
   useEffect(() => {
@@ -814,7 +831,21 @@ export default function AdminPage() {
                         {audit.pitchDeck && (
                           <p className="text-gray-400 text-xs flex items-center gap-1.5">
                             <Upload className="w-3.5 h-3.5 text-gold" />
-                            Pitch Deck: <span className="text-white font-medium truncate max-w-[180px]" title={audit.pitchDeck}>{audit.pitchDeck}</span>
+                            Pitch Deck: <span className="text-white font-medium truncate max-w-[120px]" title={audit.pitchDeck}>{audit.pitchDeck.split("/").pop()}</span>
+                            <button
+                              onClick={() => viewPitchDeck(audit.pitchDeck)}
+                              className="p-1 hover:bg-white/10 rounded text-gold transition-colors inline-flex items-center justify-center cursor-pointer"
+                              title="View Pitch Deck"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => downloadPitchDeck(audit.pitchDeck, audit.email || "pitch-deck")}
+                              className="p-1 hover:bg-white/10 rounded text-gold transition-colors inline-flex items-center justify-center cursor-pointer"
+                              title="Download Pitch Deck"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
                           </p>
                         )}
                       </div>
@@ -962,13 +993,22 @@ export default function AdminPage() {
                   <div className="flex flex-col gap-1 sm:col-span-2">
                     <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck</span>
                     {selectedApp.pitchDeck ? (
-                      <button
-                        onClick={() => downloadPitchDeck(selectedApp.pitchDeck, selectedApp.startupName || "pitch-deck")}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold w-fit cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Download Pitch Deck
-                      </button>
+                      <div className="flex items-center gap-2 mt-1">
+                        <button
+                          onClick={() => viewPitchDeck(selectedApp.pitchDeck)}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          View Pitch Deck
+                        </button>
+                        <button
+                          onClick={() => downloadPitchDeck(selectedApp.pitchDeck, selectedApp.startupName || "pitch-deck")}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          Download Pitch Deck
+                        </button>
+                      </div>
                     ) : (
                       <span className="text-sm font-semibold text-white">—</span>
                     )}
@@ -993,13 +1033,22 @@ export default function AdminPage() {
                   {selectedApp.pitchDeck && (
                     <div className="flex flex-col gap-1 sm:col-span-2">
                       <span className="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">Pitch Deck</span>
-                      <button
-                        onClick={() => downloadPitchDeck(selectedApp.pitchDeck, selectedApp.startupName || "pitch-deck")}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold w-fit cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Download Pitch Deck
-                      </button>
+                      <div className="flex items-center gap-2 mt-1">
+                        <button
+                          onClick={() => viewPitchDeck(selectedApp.pitchDeck)}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          View Pitch Deck
+                        </button>
+                        <button
+                          onClick={() => downloadPitchDeck(selectedApp.pitchDeck, selectedApp.startupName || "pitch-deck")}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all text-xs font-bold cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          Download Pitch Deck
+                        </button>
+                      </div>
                     </div>
                   )}
                   <div className="flex flex-col gap-1 sm:col-span-2">

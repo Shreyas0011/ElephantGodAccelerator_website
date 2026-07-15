@@ -4,16 +4,16 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "..", "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// Ensure media directory exists
+const mediaDir = path.join(__dirname, "..", "media");
+if (!fs.existsSync(mediaDir)) {
+  fs.mkdirSync(mediaDir, { recursive: true });
 }
 
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir);
+    cb(null, mediaDir);
   },
   filename: (req, file, cb) => {
     // Prefix with timestamp to avoid collisions
@@ -23,19 +23,15 @@ const storage = multer.diskStorage({
   },
 });
 
-// Filter: accept only PDF and common deck formats
+// Filter: accept only PDF
 const fileFilter = (req, file, cb) => {
   const allowed = [
     "application/pdf",
-    "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "application/zip",
-    "application/octet-stream",
   ];
-  if (allowed.includes(file.mimetype)) {
+  if (allowed.includes(file.mimetype) || file.originalname.toLowerCase().endsWith(".pdf")) {
     cb(null, true);
   } else {
-    cb(new Error("Only PDF and PowerPoint files are allowed."), false);
+    cb(new Error("Only PDF files are allowed."), false);
   }
 };
 
@@ -50,10 +46,11 @@ const upload = multer({
 // @access  Public
 router.post("/pitch-deck", upload.single("pitchDeck"), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded or invalid file type." });
+    return res.status(400).json({ error: "No file uploaded or invalid file type. Please upload a PDF." });
   }
 
-  const fileUrl = `/uploads/${req.file.filename}`;
+  const fileUrl = `/media/${req.file.filename}`;
+
   res.json({
     success: true,
     fileUrl,

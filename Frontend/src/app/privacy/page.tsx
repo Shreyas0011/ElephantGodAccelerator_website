@@ -20,7 +20,8 @@ import {
   Cookie,
   RefreshCw,
   Check,
-  Briefcase
+  Briefcase,
+  Phone
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -192,7 +193,7 @@ export default function PrivacyPolicyPage() {
                     Controller Contact Details
                   </h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-bg-surface-light/40 border border-gray-200/5 p-4 rounded-xl flex items-start gap-3">
                     <Building className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                     <div>
@@ -200,12 +201,21 @@ export default function PrivacyPolicyPage() {
                       <p className="text-white text-sm font-semibold mt-1">U2O3Info Tech Pvt Ltd</p>
                     </div>
                   </div>
-                  <div className="bg-bg-surface-light/40 border border-gray-200/5 p-4 rounded-xl flex items-start gap-3">
+                  <div className="bg-bg-surface-light/40 border border-gray-200/5 p-4 rounded-xl flex items-start gap-3 min-w-0">
                     <Mail className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-                    <div>
+                    <div className="min-w-0">
                       <h4 className="text-xs text-gray-500 font-bold uppercase tracking-wider">Email Address</h4>
-                      <a href="mailto:info@elephantgodaccelerator.com" className="text-gold hover:underline text-sm font-semibold mt-1 block">
+                      <a href="mailto:info@elephantgodaccelerator.com" className="text-gold hover:underline text-xs sm:text-sm font-semibold mt-1 block break-all">
                         info@elephantgodaccelerator.com
+                      </a>
+                    </div>
+                  </div>
+                  <div className="bg-bg-surface-light/40 border border-gray-200/5 p-4 rounded-xl flex items-start gap-3">
+                    <Phone className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs text-gray-500 font-bold uppercase tracking-wider">Phone Number</h4>
+                      <a href="tel:+918904073584" className="text-gold hover:underline text-sm font-semibold mt-1 block">
+                        +91 8904073584
                       </a>
                     </div>
                   </div>

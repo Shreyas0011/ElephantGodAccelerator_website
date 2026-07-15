@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Send, Mail } from "lucide-react";
+import { Send, Mail, Phone, MapPin } from "lucide-react";
 import TransparentLogo from "./TransparentLogo";
 
 export default function Footer() {
@@ -167,12 +167,30 @@ export default function Footer() {
                 <Send className="w-4 h-4" />
               </button>
             </form>
-            <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
-              <Mail className="w-3.5 h-3.5" />
-              <span>Contact:</span>
-              <a href="mailto:info@elephantgodaccelerator.com" className="text-gray-500 hover:text-gold transition-colors">
-                info@elephantgodaccelerator.com
-              </a>
+            <div className="flex flex-col gap-2.5 mt-2">
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <Mail className="w-3.5 h-3.5 text-gold shrink-0" />
+                <span className="font-bold text-gray-300">Email:</span>
+                <a href="mailto:info@elephantgodaccelerator.com" className="text-gray-500 hover:text-gold transition-colors">
+                  info@elephantgodaccelerator.com
+                </a>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <Phone className="w-3.5 h-3.5 text-gold shrink-0" />
+                <span className="font-bold text-gray-300">Phone:</span>
+                <a href="tel:+918904073584" className="text-gray-500 hover:text-gold transition-colors">
+                  +91 8904073584
+                </a>
+              </div>
+              <div className="flex items-start gap-2 text-xs text-gray-400">
+                <MapPin className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" />
+                <div className="flex flex-col">
+                  <span className="font-bold text-gray-300">Address:</span>
+                  <span className="text-gray-500 mt-0.5 leading-relaxed">
+                    Third Floor, F 459/5, 10" Main, F Block, Sahakara Nagar, Bengaluru 560092
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -204,6 +222,9 @@ export default function Footer() {
             </Link>
             <Link href="/terms" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
               Terms & Conditions
+            </Link>
+            <Link href="/cancellation-refund" className="text-gray-500 hover:text-gray-400 text-xs transition-colors">
+              Cancellation & Refund Policy
             </Link>
           </div>
         </div>

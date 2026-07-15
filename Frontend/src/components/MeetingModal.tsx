@@ -13,24 +13,57 @@ export default function MeetingModal() {
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [pitchDeck, setPitchDeck] = useState<string | null>(null);
+  const [fileObj, setFileObj] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setPitchDeck(file.name);
+      setFileObj(file);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !date || !timeSlot) return;
+    if (!fileObj) {
+      setUploadError("Please upload the pitch deck to proceed.");
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    let pitchDeckUrl = "";
+    if (fileObj) {
+      try {
+        const formData = new FormData();
+        formData.append("pitchDeck", fileObj);
+        const uploadRes = await fetch(`${API_URL}/upload/pitch-deck`, {
+          method: "POST",
+          body: formData,
+        });
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json();
+          throw new Error(err.error || "File upload failed.");
+        }
+        const uploadData = await uploadRes.json();
+        pitchDeckUrl = uploadData.fileUrl;
+      } catch (err: any) {
+        setIsUploading(false);
+        setUploadError(err.message || "Failed to upload pitch deck.");
+        return;
+      }
+    }
 
     const auditData = {
       email,
       date,
       timeSlot,
-      pitchDeck: pitchDeck || "",
+      pitchDeck: pitchDeckUrl || "",
     };
 
     try {
@@ -39,28 +72,32 @@ export default function MeetingModal() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(auditData),
       });
+
+      // Keep localStorage backup
+      const meetings = JSON.parse(localStorage.getItem("ega_meetings") || "[]");
+      meetings.push({
+        id: Date.now(),
+        ...auditData,
+        createdAt: new Date().toISOString(),
+      });
+      localStorage.setItem("ega_meetings", JSON.stringify(meetings));
+
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setEmail("");
+        setDate("");
+        setTimeSlot("");
+        setPitchDeck(null);
+        setFileObj(null);
+        setIsUploading(false);
+        closeMeetingModal();
+      }, 2000);
     } catch (err) {
       console.error("Failed to submit strategy audit request", err);
+      setUploadError("Failed to submit request. Please try again.");
+      setIsUploading(false);
     }
-
-    // Keep localStorage backup
-    const meetings = JSON.parse(localStorage.getItem("ega_meetings") || "[]");
-    meetings.push({
-      id: Date.now(),
-      ...auditData,
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem("ega_meetings", JSON.stringify(meetings));
-
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setEmail("");
-      setDate("");
-      setTimeSlot("");
-      setPitchDeck(null);
-      closeMeetingModal();
-    }, 2000);
   };
 
   return (
@@ -177,31 +214,40 @@ export default function MeetingModal() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                      Upload Pitch Deck (Optional)
+                      Upload Pitch Deck (PDF Only) *
                     </label>
                     <div className="relative border border-dashed border-white/10 hover:border-gold/30 rounded-lg p-4 text-center bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center justify-center cursor-pointer">
                       <input
                         type="file"
-                        accept=".pdf,.ppt,.pptx"
+                        required
+                        accept=".pdf"
                         onChange={handleFileChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
                       <Upload className="w-5 h-5 text-gold mb-1.5" />
                       <h4 className="font-display font-medium text-xs text-white">
-                        {pitchDeck ? pitchDeck : "Select or drag pitch deck"}
+                        {pitchDeck ? pitchDeck : "Select or drag pitch deck PDF"}
                       </h4>
                       <p className="text-[9px] text-gray-500 mt-0.5">
-                        PDF, PPT, or PPTX. Max 10MB.
+                        PDF only. Max 10MB.
                       </p>
                     </div>
+                    <p className="text-[10px] text-gold/80 mt-1 font-medium">
+                      Please upload the pitch deck to proceed
+                    </p>
                   </div>
+
+                  {uploadError && (
+                    <p className="text-red-500 text-xs font-semibold text-center mt-1">{uploadError}</p>
+                  )}
 
                   <button
                     type="submit"
-                    className="w-full mt-4 py-3 bg-gradient-to-r from-primary to-secondary text-bg-dark font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-1.5"
+                    disabled={isUploading}
+                    className="w-full mt-4 py-3 bg-gradient-to-r from-primary to-secondary text-bg-dark font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Clock className="w-4 h-4" />
-                    Confirm Consultation Slot
+                    {isUploading ? "Uploading pitch deck..." : "Confirm Consultation Slot"}
                   </button>
                 </form>
               </div>

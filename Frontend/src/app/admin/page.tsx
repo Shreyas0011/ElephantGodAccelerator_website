@@ -73,6 +73,19 @@ export default function AdminPage() {
   const [paymentSortField, setPaymentSortField] = useState<string>("createdAt");
   const [paymentSortOrder, setPaymentSortOrder] = useState<"asc"|"desc">("desc");
 
+  // Pitch Deck Preview States
+  const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
+  const [previewPdfTitle, setPreviewPdfTitle] = useState<string>("");
+  const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
+
+  const closePreview = () => {
+    if (previewPdfUrl) {
+      URL.revokeObjectURL(previewPdfUrl);
+    }
+    setPreviewPdfUrl(null);
+    setPreviewPdfTitle("");
+  };
+
   // Helper: programmatic cross-origin file download
   const downloadPitchDeck = async (pitchDeckParam: any, label: string) => {
     if (!pitchDeckParam) {
@@ -125,7 +138,7 @@ export default function AdminPage() {
     }
   };
 
-  const viewPitchDeck = (pitchDeckParam: any) => {
+  const viewPitchDeck = async (pitchDeckParam: any) => {
     if (!pitchDeckParam) {
       alert("No pitch deck file available.");
       return;
@@ -152,7 +165,35 @@ export default function AdminPage() {
       const base = API_URL.replace("/api", "");
       url = `${base.replace(/\/$/, "")}${filePath}`;
     }
-    window.open(url, "_blank");
+
+    const fileName = typeof pitchDeckParam === "object" && pitchDeckParam && pitchDeckParam.originalFileName
+      ? pitchDeckParam.originalFileName
+      : filePath.split("/").pop() || "pitch-deck.pdf";
+
+    // Clean up previous preview URL if any
+    if (previewPdfUrl) {
+      URL.revokeObjectURL(previewPdfUrl);
+    }
+
+    setPreviewPdfTitle(fileName);
+    setLoadingPreview(true);
+    setPreviewPdfUrl(null);
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Server returned status ${res.status}`);
+      const blob = await res.blob();
+      
+      // Explicitly set MIME type to application/pdf so it renders inline in iframe
+      const pdfBlob = new Blob([blob], { type: "application/pdf" });
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      setPreviewPdfUrl(blobUrl);
+    } catch (err) {
+      alert("Could not load pitch deck preview. The file may not be available on the server.");
+      console.error(err);
+    } finally {
+      setLoadingPreview(false);
+    }
   };
 
 
@@ -1592,6 +1633,54 @@ export default function AdminPage() {
                 <button type="submit" className="flex-1 py-3 bg-gradient-to-tr from-primary to-secondary text-bg-dark font-extrabold text-xs uppercase tracking-wider rounded-xl hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2"><Save className="w-4 h-4"/>{editingId?"Save Changes":"Add to Calendar"}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Preview Spinner */}
+      {loadingPreview && (
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 p-8 glass-card rounded-2xl border border-gold/15 shadow-2xl">
+            <svg className="animate-spin h-8 w-8 text-gold" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-sm font-bold text-white tracking-wide">Loading Pitch Deck Preview...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Pitch Deck Preview Modal */}
+      {previewPdfUrl && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <div className="relative w-full max-w-5xl h-[85vh] glass-card rounded-3xl border border-gold/15 shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+              <div className="flex items-center gap-2.5 truncate">
+                <FileText className="w-5 h-5 text-gold shrink-0" />
+                <span className="font-display font-black text-sm sm:text-base text-white truncate" title={previewPdfTitle}>
+                  {previewPdfTitle}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={closePreview}
+                  className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                  title="Close Preview"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body / iframe */}
+            <div className="flex-1 w-full bg-neutral-900/50">
+              <iframe
+                src={previewPdfUrl}
+                className="w-full h-full border-none"
+                title="Pitch Deck PDF Preview"
+              />
+            </div>
           </div>
         </div>
       )}

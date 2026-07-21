@@ -99,11 +99,61 @@ router.post("/pitch-deck", (req, res) => {
       res.status(500).json({
         success: false,
         code: "UPLOAD_FAILURE",
-        message: "Failed to upload file to Cloudinary. Please try again."
+        message: "Failed to upload file to Cloudinary. Please try again.",
+        error: uploadErr.message || uploadErr
       });
     }
   });
 });
+
+// @desc    Test Cloudinary configuration and connection
+// @route   GET /api/upload/test-config
+// @access  Public
+router.get("/test-config", async (req, res) => {
+  const config = {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME ? "Configured" : "Missing",
+    apiKey: process.env.CLOUDINARY_API_KEY ? "Configured" : "Missing",
+    apiSecret: process.env.CLOUDINARY_API_SECRET ? "Configured" : "Missing",
+  };
+
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    return res.status(400).json({
+      success: false,
+      message: "One or more Cloudinary environment variables are missing on the server.",
+      config
+    });
+  }
+
+  try {
+    // Attempt a dummy upload
+    const dummyBuffer = Buffer.from("Cloudinary Diagnostics Test");
+    const result = await uploadFromStream(dummyBuffer, "diagnostics", {
+      founderEmail: "system-diagnostics",
+      message: "Diagnostics connection test"
+    });
+
+    // Cleanup the diagnostics file
+    try {
+      await deleteFromCloudinary(result.public_id, { message: "Diagnostics cleanup" });
+    } catch (delErr) {
+      console.error("Failed to delete diagnostics file:", delErr);
+    }
+
+    return res.json({
+      success: true,
+      message: "Cloudinary configuration and connection test succeeded!",
+      config
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Cloudinary connection test failed. See error details.",
+      error: error.message || error,
+      config
+    });
+  }
+});
+
 
 // @desc    Delete a pitch deck file from Cloudinary (temporary file cleanup)
 // @route   DELETE /api/upload/pitch-deck

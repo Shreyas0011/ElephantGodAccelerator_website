@@ -13,6 +13,8 @@ interface Event {
   capacity: string;
   formFields?: string[];
   externalLink?: string;
+  isPaid?: boolean;
+  price?: number;
 }
 
 // Helper to parse date (YYYY-MM-DD) and time (e.g. "08:30 PM IST") to Date object
@@ -153,6 +155,7 @@ export default function EventsPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [rsvpForm, setRsvpForm] = useState<Record<string, string>>({});
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
+  const [rsvpError, setRsvpError] = useState<string | null>(null);
 
   // Loaded events from backend
   const [allEvents, setAllEvents] = useState<Record<string, Event>>({});
@@ -165,6 +168,7 @@ export default function EventsPage() {
   const selectEvent = (dateStr: string) => {
     setSelectedDate(dateStr);
     setRsvpSuccess(false);
+    setRsvpError(null);
     setRsvpForm({});
 
     const parts = dateStr.split("-").map(Number);
@@ -192,6 +196,8 @@ export default function EventsPage() {
                 capacity: ev.capacity,
                 formFields: ev.formFields,
                 externalLink: ev.externalLink,
+                isPaid: ev.isPaid,
+                price: ev.price,
               };
             });
             setAllEvents(eventMap);
@@ -237,6 +243,7 @@ export default function EventsPage() {
   const handleRsvp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDate) return;
+    setRsvpError(null);
 
     const payload = {
       eventDate: selectedDate,
@@ -246,18 +253,30 @@ export default function EventsPage() {
     };
 
     try {
-      const res = await fetch(`${API_URL}/registrations`, {
+      const res = await fetch(`${API_URL}/payment/initiate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to submit RSVP to backend");
+      }
+
+      const data = await res.json();
+
+      if (data.redirect) {
+        // Redirection mode: redirect user to ICICI PG
+        window.location.href = data.redirectURL;
+      } else {
+        // Free event direct registration confirmation
         setRsvpSuccess(true);
         setRsvpForm({});
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to submit RSVP to backend", err);
+      setRsvpError(err.message || "Failed to submit RSVP to backend");
     }
   };
 
@@ -410,6 +429,12 @@ export default function EventsPage() {
                     <Users className="w-4 h-4 text-gold shrink-0" />
                     <span>Capacity: {mockEvents[selectedDate].capacity}</span>
                   </div>
+                  {mockEvents[selectedDate].isPaid && mockEvents[selectedDate].price && (
+                    <div className="flex items-center gap-2 text-xs text-gold bg-gold/5 border border-gold/10 px-3 py-1.5 rounded-xl w-fit font-bold mt-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+                      <span>Registration Fee: ₹{mockEvents[selectedDate].price.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
 
                 {mockEvents[selectedDate].externalLink ? (
@@ -468,11 +493,19 @@ export default function EventsPage() {
                         </div>
                       );
                     })}
+                    {rsvpError && (
+                      <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-400 font-medium">
+                        {rsvpError}
+                      </div>
+                    )}
                     <button
                       type="submit"
                       className="w-full py-3 bg-gradient-to-tr from-primary to-secondary text-bg-dark font-bold text-xs uppercase tracking-wider rounded-lg hover:shadow-lg flex items-center justify-center shrink-0 mt-2 cursor-pointer"
                     >
-                      Register for Event <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                      {mockEvents[selectedDate].isPaid && mockEvents[selectedDate].price 
+                        ? `Pay ₹${mockEvents[selectedDate].price.toFixed(2)} & Register` 
+                        : "Register for Event"}
+                      <ArrowRight className="w-3.5 h-3.5 ml-1" />
                     </button>
                   </form>
                 )}

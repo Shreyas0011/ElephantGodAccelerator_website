@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText, Upload, Download } from "lucide-react";
+import { Lock, LogOut, Plus, Trash2, Edit3, Calendar, Clock, MapPin, Users, Save, X, CheckCircle2, AlertCircle, Eye, EyeOff, Shield, Settings, FileText, Upload, Download, CreditCard } from "lucide-react";
 import { loadSiteContent, saveSiteContent, resetSiteContent, DEFAULT_CONTENT } from "@/lib/siteContent";
 import type { SiteContent } from "@/lib/siteContent";
 import { API_URL } from "@/lib/api";
@@ -9,13 +9,15 @@ interface CohortEvent {
   id: string; date: string; title: string; desc: string; time: string; location: string; capacity: string;
   formFields?: string[];
   externalLink?: string;
+  isPaid?: boolean;
+  price?: number;
 }
 const STORAGE_KEY = "ega_admin_events";
 const defaultFormFields: string[] = [
   "Founder Name", "Email Address", "Startup Name", "Sector", "Revenue",
   "Assistant Required For", "Funding Requirement", "Company Profile", "Product Details", "Website Address"
 ];
-const defaultForm = { date: "", title: "", desc: "", time: "", location: "", capacity: "", formFields: defaultFormFields, externalLink: "" };
+const defaultForm = { date: "", title: "", desc: "", time: "", location: "", capacity: "", formFields: defaultFormFields, externalLink: "", isPaid: false, price: 0 };
 function loadEvents(): CohortEvent[] {
   if (typeof window === "undefined") return [];
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
@@ -28,7 +30,7 @@ export default function AdminPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [loginAttempts, setLoginAttempts] = useState(0);
-  const [activeTab, setActiveTab] = useState<"events"|"hero"|"services"|"testimonials"|"pricing"|"applications"|"event-applications"|"audits">("events");
+  const [activeTab, setActiveTab] = useState<"events"|"event-applications"|"payments"|"applications"|"audits"|"hero"|"services"|"testimonials"|"pricing">("events");
   const [events, setEvents] = useState<CohortEvent[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string|null>(null);
@@ -51,11 +53,43 @@ export default function AdminPage() {
   // Audits State
   const [audits, setAudits] = useState<any[]>([]);
 
+  // Payments States
+  const [paymentsData, setPaymentsData] = useState<{
+    summary: {
+      totalRevenue: number;
+      todayRevenue: number;
+      paidRegistrations: number;
+      pendingPayments: number;
+      failedPayments: number;
+      refundedPayments: number;
+      paymentSuccessRate: number;
+      averageTicketSize: number;
+    };
+    payments: any[];
+  } | null>(null);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+  const [paymentSearch, setPaymentSearch] = useState("");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("ALL");
+  const [paymentSortField, setPaymentSortField] = useState<string>("createdAt");
+  const [paymentSortOrder, setPaymentSortOrder] = useState<"asc"|"desc">("desc");
+
   // Helper: programmatic cross-origin file download
-  const downloadPitchDeck = async (filePath: string, label: string) => {
-    // Old submissions only stored the bare filename (e.g. "deck.pdf"), not an actual server path.
-    // New submissions store a server path starting with "/uploads/".
-    const isServerFile = filePath.startsWith("/uploads/") || filePath.startsWith("/media/");
+  const downloadPitchDeck = async (pitchDeckParam: any, label: string) => {
+    if (!pitchDeckParam) {
+      alert("No pitch deck file available.");
+      return;
+    }
+
+    // Resolve URL from parameter (legacy string or nested object)
+    const filePath = typeof pitchDeckParam === "object" && pitchDeckParam ? pitchDeckParam.url : pitchDeckParam;
+    
+    if (!filePath) {
+      alert("No pitch deck file URL available.");
+      return;
+    }
+
+    const isCloudinary = filePath.startsWith("http://") || filePath.startsWith("https://");
+    const isServerFile = filePath.startsWith("/uploads/") || filePath.startsWith("/media/") || isCloudinary;
 
     if (!isServerFile) {
       alert(
@@ -65,17 +99,21 @@ export default function AdminPage() {
     }
 
     try {
-      const base = API_URL.replace("/api", "");
-      // Ensure exactly one slash between base and path
-      const url = `${base.replace(/\/$/, "")}${filePath}`;
+      let url = filePath;
+      if (!isCloudinary) {
+        const base = API_URL.replace("/api", "");
+        url = `${base.replace(/\/$/, "")}${filePath}`;
+      }
+      
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobUrl;
-      // Use the last segment of the path as the download filename
-      const fileName = filePath.split("/").pop() || label;
+      const fileName = typeof pitchDeckParam === "object" && pitchDeckParam && pitchDeckParam.originalFileName
+        ? pitchDeckParam.originalFileName
+        : filePath.split("/").pop() || label;
       a.download = fileName;
       document.body.appendChild(a);
       a.click();
@@ -87,8 +125,21 @@ export default function AdminPage() {
     }
   };
 
-  const viewPitchDeck = (filePath: string) => {
-    const isServerFile = filePath.startsWith("/uploads/") || filePath.startsWith("/media/");
+  const viewPitchDeck = (pitchDeckParam: any) => {
+    if (!pitchDeckParam) {
+      alert("No pitch deck file available.");
+      return;
+    }
+
+    const filePath = typeof pitchDeckParam === "object" && pitchDeckParam ? pitchDeckParam.url : pitchDeckParam;
+
+    if (!filePath) {
+      alert("No pitch deck file URL available.");
+      return;
+    }
+
+    const isCloudinary = filePath.startsWith("http://") || filePath.startsWith("https://");
+    const isServerFile = filePath.startsWith("/uploads/") || filePath.startsWith("/media/") || isCloudinary;
     if (!isServerFile) {
       alert(
         `This submission was made before file uploading was enabled.\n\nThe file name on record is: "${filePath}"\n\nPlease ask the applicant to resubmit their pitch deck.`
@@ -96,8 +147,11 @@ export default function AdminPage() {
       return;
     }
 
-    const base = API_URL.replace("/api", "");
-    const url = `${base.replace(/\/$/, "")}${filePath}`;
+    let url = filePath;
+    if (!isCloudinary) {
+      const base = API_URL.replace("/api", "");
+      url = `${base.replace(/\/$/, "")}${filePath}`;
+    }
     window.open(url, "_blank");
   };
 
@@ -112,7 +166,96 @@ export default function AdminPage() {
     fetchApplications();
     loadEventRsvps();
     fetchAudits();
+    loadPayments();
   }, []);
+
+  const loadPayments = async () => {
+    setLoadingPayments(true);
+    try {
+      const res = await fetch(`${API_URL}/payment/admin/dashboard`);
+      if (res.ok) {
+        const data = await res.json();
+        setPaymentsData(data);
+      }
+    } catch (err) {
+      console.error("Failed to load payments", err);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
+
+  const handleSortPayments = (field: string) => {
+    if (paymentSortField === field) {
+      setPaymentSortOrder(prev => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setPaymentSortField(field);
+      setPaymentSortOrder("desc");
+    }
+  };
+
+  const exportPaymentsCSV = () => {
+    if (!paymentsData?.payments || paymentsData.payments.length === 0) {
+      alert("No payments to export.");
+      return;
+    }
+    const allKeys = ["receiptNo", "createdAt", "founderName", "startupName", "email", "eventTitle", "eventDate", "amount", "status", "txnID", "merchantTxnNo", "paymentMode"];
+    const csvContent = [
+      allKeys.join(","),
+      ...paymentsData.payments.map(p => 
+        allKeys.map(key => {
+          let val = p[key];
+          if (val === undefined || val === null) return '""';
+          if (key === "createdAt") val = new Date(val).toLocaleString("en-IN");
+          return `"${String(val).replace(/"/g, '""')}"`;
+        }).join(",")
+      )
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ega_payments_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportPaymentsExcel = () => {
+    if (!paymentsData?.payments || paymentsData.payments.length === 0) {
+      alert("No payments to export.");
+      return;
+    }
+    const allKeys = ["receiptNo", "createdAt", "founderName", "startupName", "email", "eventTitle", "eventDate", "amount", "status", "txnID", "merchantTxnNo", "paymentMode"];
+    
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+    html += '<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Payments</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>';
+    html += '<body><table><thead><tr>';
+    allKeys.forEach(k => { html += `<th>${k}</th>`; });
+    html += '</tr></thead><tbody>';
+    paymentsData.payments.forEach(p => {
+      html += '<tr>';
+      allKeys.forEach(key => {
+        let val = p[key];
+        if (key === "createdAt" && val) {
+          val = new Date(val).toLocaleString("en-IN");
+        }
+        html += `<td>${val !== undefined && val !== null ? val : ""}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table></body></html>';
+
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `ega_payments_${new Date().toISOString().split('T')[0]}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const fetchEvents = async () => {
     try {
@@ -260,9 +403,18 @@ export default function AdminPage() {
   const handleLogout = () => { setIsLoggedIn(false); sessionStorage.removeItem("ega_admin_session"); sessionStorage.removeItem("ega_admin_token"); };
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(()=>setSuccessMsg(""),3000); };
   const openAddForm = () => { setForm(defaultForm); setEditingId(null); setFormError(""); setNewFieldInput(""); setShowForm(true); };
-  const openEditForm = (ev: CohortEvent) => { setForm({date:ev.date,title:ev.title,desc:ev.desc,time:ev.time,location:ev.location,capacity:ev.capacity, formFields: ev.formFields || defaultFormFields, externalLink: ev.externalLink || ""}); setEditingId(ev.id); setFormError(""); setNewFieldInput(""); setShowForm(true); };
+  const openEditForm = (ev: CohortEvent) => { setForm({date:ev.date,title:ev.title,desc:ev.desc,time:ev.time,location:ev.location,capacity:ev.capacity, formFields: ev.formFields || defaultFormFields, externalLink: ev.externalLink || "", isPaid: ev.isPaid || false, price: ev.price || 0}); setEditingId(ev.id); setFormError(""); setNewFieldInput(""); setShowForm(true); };
   const closeForm = () => { setShowForm(false); setEditingId(null); setForm(defaultForm); setFormError(""); setNewFieldInput(""); };
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => setForm(p=>({...p,[e.target.name]:e.target.value}));
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+    const { name, type, value } = e.target;
+    let val: any = value;
+    if (type === "checkbox") {
+      val = (e.target as HTMLInputElement).checked;
+    } else if (name === "price") {
+      val = parseFloat(value) || 0;
+    }
+    setForm(p=>({...p, [name]: val}));
+  };
   const handleAddField = () => {
     if (!newFieldInput.trim()) return;
     setForm(p => ({ ...p, formFields: [...(p.formFields || defaultFormFields), newFieldInput.trim()] }));
@@ -372,6 +524,7 @@ export default function AdminPage() {
   const tabs = [
     {id:"events",label:"Events",icon:<Calendar className="w-4 h-4"/>},
     {id:"event-applications",label:"Event Applications",icon:<Users className="w-4 h-4"/>},
+    {id:"payments",label:"Payments",icon:<CreditCard className="w-4 h-4"/>},
     {id:"applications",label:"Applications",icon:<FileText className="w-4 h-4"/>},
     {id:"audits",label:"Strategy Audits",icon:<Clock className="w-4 h-4"/>},
     {id:"hero",label:"Hero & Stats",icon:<Settings className="w-4 h-4"/>},
@@ -429,6 +582,9 @@ export default function AdminPage() {
                           <span className="flex items-center gap-1.5 text-xs text-gray-500"><Clock className="w-3.5 h-3.5 text-gold"/>{event.time||"—"}</span>
                           <span className="flex items-center gap-1.5 text-xs text-gray-500"><MapPin className="w-3.5 h-3.5 text-gold"/>{event.location}</span>
                           <span className="flex items-center gap-1.5 text-xs text-gray-500"><Users className="w-3.5 h-3.5 text-gold"/>{event.capacity||"Open"}</span>
+                          <span className={`flex items-center gap-1.5 text-xs font-bold ${event.isPaid ? "text-gold" : "text-emerald-400"}`}>
+                            {event.isPaid ? `Paid (₹${(event.price || 0).toFixed(2)})` : "Free"}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -749,6 +905,197 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {activeTab==="payments" && (
+        <section className="py-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="font-display font-black text-2xl text-white">Payment Transactions</h2>
+                <p className="text-gray-400 text-xs mt-1">Review event revenues, transaction statuses, and download receipts.</p>
+              </div>
+              <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                <input
+                  type="text"
+                  placeholder="Search payments..."
+                  value={paymentSearch}
+                  onChange={e => setPaymentSearch(e.target.value)}
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-gray-500 focus:outline-none focus:border-gold/60 w-full sm:w-48"
+                />
+                <select 
+                  value={paymentStatusFilter} 
+                  onChange={e => setPaymentStatusFilter(e.target.value)} 
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-400 uppercase tracking-wider focus:outline-none focus:border-gold/60 cursor-pointer"
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="SUCCESS">Success</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="FAILED">Failed</option>
+                  <option value="REFUNDED">Refunded</option>
+                </select>
+                <button 
+                  onClick={exportPaymentsCSV}
+                  className="px-4 py-2.5 bg-white/5 border border-white/10 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" /> CSV
+                </button>
+                <button 
+                  onClick={exportPaymentsExcel}
+                  className="px-4 py-2.5 bg-white/5 border border-white/10 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" /> Excel
+                </button>
+              </div>
+            </div>
+
+            {/* Stat Cards */}
+            {paymentsData?.summary && (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Total Revenue</span>
+                  <div className="text-lg font-black text-gold mt-1">₹{paymentsData.summary.totalRevenue.toFixed(2)}</div>
+                </div>
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Today's Revenue</span>
+                  <div className="text-lg font-black text-gold mt-1">₹{paymentsData.summary.todayRevenue.toFixed(2)}</div>
+                </div>
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Paid RSVPs</span>
+                  <div className="text-lg font-black text-emerald-400 mt-1">{paymentsData.summary.paidRegistrations}</div>
+                </div>
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Pending</span>
+                  <div className="text-lg font-black text-amber-400 mt-1">{paymentsData.summary.pendingPayments}</div>
+                </div>
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Failed</span>
+                  <div className="text-lg font-black text-rose-500 mt-1">{paymentsData.summary.failedPayments}</div>
+                </div>
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Refunded</span>
+                  <div className="text-lg font-black text-gray-400 mt-1">{paymentsData.summary.refundedPayments}</div>
+                </div>
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Success Rate</span>
+                  <div className="text-lg font-black text-accent mt-1">{paymentsData.summary.paymentSuccessRate}%</div>
+                </div>
+                <div className="glass-card rounded-xl p-4 border border-white/5">
+                  <span className="text-[10px] text-gray-500 font-extrabold uppercase tracking-wider">Avg Ticket</span>
+                  <div className="text-lg font-black text-gold mt-1">₹{paymentsData.summary.averageTicketSize.toFixed(2)}</div>
+                </div>
+              </div>
+            )}
+
+            {/* Payments Table */}
+            {loadingPayments ? (
+              <div className="text-center py-10"><p className="text-gray-400 text-sm">Loading transactions...</p></div>
+            ) : !paymentsData?.payments || paymentsData.payments.length === 0 ? (
+              <div className="glass-card rounded-3xl p-16 border border-white/5 text-center flex flex-col items-center gap-4">
+                <CreditCard className="w-12 h-12 text-gray-600" />
+                <p className="text-gray-400 font-bold">No payment transactions found.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto glass-card rounded-2xl border border-white/5">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/5 bg-white/[0.02] text-[10px] text-gray-500 uppercase font-extrabold tracking-wider">
+                      <th className="px-5 py-4 cursor-pointer select-none" onClick={() => handleSortPayments("receiptNo")}>
+                        Receipt / Date {paymentSortField === "receiptNo" && (paymentSortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th className="px-5 py-4 cursor-pointer select-none" onClick={() => handleSortPayments("founderName")}>
+                        Founder / Startup {paymentSortField === "founderName" && (paymentSortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th className="px-5 py-4 cursor-pointer select-none" onClick={() => handleSortPayments("eventTitle")}>
+                        Event Details {paymentSortField === "eventTitle" && (paymentSortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th className="px-5 py-4 cursor-pointer select-none text-right" onClick={() => handleSortPayments("amount")}>
+                        Amount {paymentSortField === "amount" && (paymentSortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th className="px-5 py-4">Transaction IDs</th>
+                      <th className="px-5 py-4 cursor-pointer select-none" onClick={() => handleSortPayments("status")}>
+                        Status {paymentSortField === "status" && (paymentSortOrder === "asc" ? "▲" : "▼")}
+                      </th>
+                      <th className="px-5 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-xs text-gray-300">
+                    {[...paymentsData.payments]
+                      .filter(p => {
+                        if (paymentStatusFilter !== "ALL" && p.status !== paymentStatusFilter) return false;
+                        if (!paymentSearch) return true;
+                        const s = paymentSearch.toLowerCase();
+                        return (
+                          p.founderName?.toLowerCase().includes(s) ||
+                          p.startupName?.toLowerCase().includes(s) ||
+                          p.email?.toLowerCase().includes(s) ||
+                          p.txnID?.toLowerCase().includes(s) ||
+                          p.merchantTxnNo?.toLowerCase().includes(s) ||
+                          p.receiptNo?.toLowerCase().includes(s)
+                        );
+                      })
+                      .sort((a, b) => {
+                        let fieldA = a[paymentSortField];
+                        let fieldB = b[paymentSortField];
+                        if (typeof fieldA === "string") {
+                          fieldA = fieldA.toLowerCase();
+                          fieldB = (fieldB || "").toLowerCase();
+                        }
+                        if (fieldA < fieldB) return paymentSortOrder === "asc" ? -1 : 1;
+                        if (fieldA > fieldB) return paymentSortOrder === "asc" ? 1 : -1;
+                        return 0;
+                      })
+                      .map(p => (
+                        <tr key={p.id} className="hover:bg-white/[0.01] transition-colors">
+                          <td className="px-5 py-4">
+                            <span className="font-semibold text-white block">{p.receiptNo}</span>
+                            <span className="text-[10px] text-gray-500 block mt-0.5">
+                              {new Date(p.createdAt).toLocaleDateString("en-IN")} {new Date(p.createdAt).toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className="font-semibold text-white block">{p.founderName}</span>
+                            <span className="text-gray-500 block">{p.startupName}</span>
+                            <span className="text-[10px] text-gray-500 block mt-0.5">{p.email}</span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className="font-semibold text-white block max-w-[150px] truncate" title={p.eventTitle}>{p.eventTitle}</span>
+                            <span className="text-[10px] text-gray-500 block mt-0.5">{p.eventDate}</span>
+                          </td>
+                          <td className="px-5 py-4 font-bold text-white text-right">₹{p.amount.toFixed(2)}</td>
+                          <td className="px-5 py-4">
+                            <span className="text-gray-400 block font-mono">Gateway: {p.txnID || "—"}</span>
+                            <span className="text-[10px] text-gray-500 block font-mono mt-0.5">Merchant: {p.merchantTxnNo}</span>
+                            {p.paymentMode && <span className="text-[9px] font-extrabold text-gold uppercase tracking-wider mt-1 block">{p.paymentMode}</span>}
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                              p.status === "SUCCESS" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
+                              p.status === "PENDING" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                              p.status === "FAILED" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" :
+                              "bg-white/5 text-gray-400 border border-white/10"
+                            }`}>
+                              {p.status}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4 text-right">
+                            {p.status === "SUCCESS" && (
+                              <button
+                                onClick={() => window.open(`${API_URL}/payment/receipt/${p.merchantTxnNo}/download`, "_blank")}
+                                className="px-3 py-1.5 rounded-lg bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 text-[10px] font-extrabold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 ml-auto"
+                              >
+                                <Download className="w-3 h-3" /> Receipt
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
@@ -1174,6 +1521,39 @@ export default function AdminPage() {
                   className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"
                 />
               </div>
+
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3 mt-1">
+                <input 
+                  type="checkbox" 
+                  name="isPaid" 
+                  id="isPaid" 
+                  checked={form.isPaid || false} 
+                  onChange={handleFormChange}
+                  className="w-4 h-4 rounded border-white/10 text-gold focus:ring-gold bg-white/5"
+                />
+                <label htmlFor="isPaid" className="text-xs font-bold text-gray-300 cursor-pointer select-none">
+                  Paid Event (Ticket required)
+                </label>
+              </div>
+
+              {(form.isPaid || false) && (
+                <div className="flex flex-col gap-1.5 animate-fadeIn">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Ticket Price (₹) <span className="text-red-400">*</span>
+                  </label>
+                  <input 
+                    type="number" 
+                    name="price" 
+                    value={form.price || ""} 
+                    onChange={handleFormChange} 
+                    placeholder="e.g. 500" 
+                    min="0"
+                    step="0.01"
+                    required
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold/60 placeholder:text-gray-600"
+                  />
+                </div>
+              )}
               
               <div className="flex flex-col gap-2 mt-2">
                 <label className="text-xs font-bold text-gold uppercase tracking-wider">Required Registration Fields</label>

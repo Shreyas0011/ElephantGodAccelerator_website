@@ -15,7 +15,13 @@ const AuditSchema = new mongoose.Schema(
       required: [true, "Time slot is required"],
     },
     pitchDeck: {
-      type: String,
+      assetId: String,
+      publicId: String,
+      url: String,
+      originalFileName: String,
+      uploadedAt: Date,
+      size: Number,
+      mimeType: String
     },
     status: {
       type: String,

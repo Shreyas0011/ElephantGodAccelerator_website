@@ -40,7 +40,15 @@ const ApplicationSchema = new mongoose.Schema(
     startupRegistered: String,
     startupRaised: String,
     startupFundingReq: String,
-    pitchDeck: String,
+    pitchDeck: {
+      assetId: String,
+      publicId: String,
+      url: String,
+      originalFileName: String,
+      uploadedAt: Date,
+      size: Number,
+      mimeType: String
+    },
     scorecardPercentage: Number,
     
     status: {

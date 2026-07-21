@@ -1,70 +1,134 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-
-// Ensure media directory exists
-const mediaDir = path.join(__dirname, "..", "media");
-if (!fs.existsSync(mediaDir)) {
-  fs.mkdirSync(mediaDir, { recursive: true });
-}
-
-// Configure multer storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, mediaDir);
-  },
-  filename: (req, file, cb) => {
-    // Prefix with timestamp to avoid collisions
-    const uniquePrefix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-    cb(null, uniquePrefix + "-" + safeName);
-  },
-});
-
-// Filter: accept only PDF
-const fileFilter = (req, file, cb) => {
-  const allowed = [
-    "application/pdf",
-  ];
-  if (allowed.includes(file.mimetype) || file.originalname.toLowerCase().endsWith(".pdf")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only PDF files are allowed."), false);
-  }
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB max
-});
+const upload = require("../middleware/uploadMiddleware");
+const { uploadFromStream, deleteFromCloudinary } = require("../services/uploadService");
+const TemporaryUpload = require("../models/TemporaryUpload");
 
 // @desc    Upload a pitch deck file
 // @route   POST /api/upload/pitch-deck
 // @access  Public
-router.post("/pitch-deck", upload.single("pitchDeck"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded or invalid file type. Please upload a PDF." });
-  }
+router.post("/pitch-deck", (req, res) => {
+  upload.single("pitchDeck")(req, res, async (err) => {
+    // Handle multer specific or filter errors
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({
+          success: false,
+          code: "FILE_TOO_LARGE",
+          message: "File is too large. Max limit is 20 MB."
+        });
+      }
+      if (err.code === "INVALID_FILE") {
+        return res.status(400).json({
+          success: false,
+          code: "INVALID_FILE",
+          message: err.message
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        code: "UPLOAD_ERROR",
+        message: err.message
+      });
+    }
 
-  const fileUrl = `/media/${req.file.filename}`;
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        code: "NO_FILE",
+        message: "No file uploaded. Please upload a PDF."
+      });
+    }
 
-  res.json({
-    success: true,
-    fileUrl,
-    originalName: req.file.originalname,
-    fileName: req.file.filename,
+    // Extract oldPublicId (if replacing a temporary upload) and other context
+    const { oldPublicId } = req.body || req.query || {};
+    const founderEmail = req.body.founderEmail || req.body.email || req.query.founderEmail || "anonymous";
+    const uploadPurpose = req.body.uploadPurpose || req.query.uploadPurpose || "application";
+
+    // Handle consecutive upload: delete the previous temporary file from Cloudinary and DB
+    if (oldPublicId) {
+      try {
+        await deleteFromCloudinary(oldPublicId, {
+          founderEmail,
+          message: "Consecutive upload cleanup"
+        });
+        await TemporaryUpload.deleteOne({ publicId: oldPublicId });
+      } catch (delErr) {
+        console.error(`Error deleting consecutive upload target ${oldPublicId}:`, delErr);
+      }
+    }
+
+    try {
+      const folder = "startup-pitch-decks";
+      
+      // Stream buffer directly to Cloudinary
+      const result = await uploadFromStream(req.file.buffer, folder, {
+        founderEmail,
+        message: "Pitch deck upload"
+      });
+
+      // Track the upload in our TemporaryUpload collection
+      const tempUpload = await TemporaryUpload.create({
+        publicId: result.public_id,
+        assetId: result.asset_id,
+        secureUrl: result.secure_url,
+        originalFileName: req.file.originalname,
+        uploadedBy: founderEmail,
+        uploadPurpose: uploadPurpose,
+      });
+
+      // Return production-ready structured response
+      res.json({
+        success: true,
+        pitchDeck: {
+          assetId: result.asset_id,
+          publicId: result.public_id,
+          url: result.secure_url,
+          originalFileName: req.file.originalname,
+          uploadedAt: tempUpload.createdAt,
+          size: req.file.size,
+          mimeType: req.file.mimetype
+        },
+        // Maintain backwards compatibility:
+        fileUrl: result.secure_url,
+        fileName: result.public_id,
+        originalName: req.file.originalname
+      });
+    } catch (uploadErr) {
+      console.error("Cloudinary upload stream execution failed:", uploadErr);
+      res.status(500).json({
+        success: false,
+        code: "UPLOAD_FAILURE",
+        message: "Failed to upload file to Cloudinary. Please try again."
+      });
+    }
   });
 });
 
-// Error handler for multer
-router.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError || err.message) {
-    return res.status(400).json({ error: err.message });
+// @desc    Delete a pitch deck file from Cloudinary (temporary file cleanup)
+// @route   DELETE /api/upload/pitch-deck
+// @access  Public
+router.delete("/pitch-deck", async (req, res) => {
+  const { publicId } = req.body || req.query || {};
+  if (!publicId) {
+    return res.status(400).json({
+      success: false,
+      code: "MISSING_PUBLIC_ID",
+      message: "publicId is required."
+    });
   }
-  next(err);
+
+  try {
+    await deleteFromCloudinary(publicId, { message: "Manual temporary file deletion" });
+    await TemporaryUpload.deleteOne({ publicId });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      code: "DELETE_FAILURE",
+      message: error.message
+    });
+  }
 });
 
 module.exports = router;

@@ -5,18 +5,6 @@ const path = require("path");
 const fs = require("fs");
 const connectDB = require("./config/db");
 
-// Ensure media directory exists
-const mediaDir = path.join(__dirname, "media");
-if (!fs.existsSync(mediaDir)) {
-  fs.mkdirSync(mediaDir, { recursive: true });
-}
-
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
 // Connect to Database
 connectDB().then(async () => {
   try {
@@ -116,10 +104,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files (pitch decks, etc.) as static assets
-app.use("/media", express.static(path.join(__dirname, "media")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 // Root Route
 app.get("/", (req, res) => {
   res.send("Elephant God Accelerator API is running...");
@@ -132,6 +116,7 @@ app.use("/api/applications", require("./routes/applications"));
 app.use("/api/audits", require("./routes/audits"));
 app.use("/api/events", require("./routes/events"));
 app.use("/api/registrations", require("./routes/registrations"));
+app.use("/api/payment", require("./routes/payment"));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -143,6 +128,14 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+// Initialize Event Reminder Cron Scheduler
+const { startScheduler } = require("./services/reminderScheduler");
+startScheduler();
+
+// Initialize Temporary Uploads Cleanup Scheduler
+const { startCleanupScheduler } = require("./services/cleanupScheduler");
+startCleanupScheduler();
 
 app.listen(PORT, () => {
   console.log(`Server running in development mode on port ${PORT}`);

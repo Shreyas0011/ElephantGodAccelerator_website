@@ -37,21 +37,24 @@ export default function MeetingModal() {
     setIsUploading(true);
     setUploadError(null);
 
-    let pitchDeckUrl = "";
+    let pitchDeckMeta = null;
     if (fileObj) {
       try {
         const formData = new FormData();
         formData.append("pitchDeck", fileObj);
+        formData.append("founderEmail", email || "");
+        formData.append("uploadPurpose", "audit");
+
         const uploadRes = await fetch(`${API_URL}/upload/pitch-deck`, {
           method: "POST",
           body: formData,
         });
         if (!uploadRes.ok) {
           const err = await uploadRes.json();
-          throw new Error(err.error || "File upload failed.");
+          throw new Error(err.message || err.error || "File upload failed.");
         }
         const uploadData = await uploadRes.json();
-        pitchDeckUrl = uploadData.fileUrl;
+        pitchDeckMeta = uploadData.pitchDeck;
       } catch (err: any) {
         setIsUploading(false);
         setUploadError(err.message || "Failed to upload pitch deck.");
@@ -63,7 +66,7 @@ export default function MeetingModal() {
       email,
       date,
       timeSlot,
-      pitchDeck: pitchDeckUrl || "",
+      pitchDeck: pitchDeckMeta,
     };
 
     try {

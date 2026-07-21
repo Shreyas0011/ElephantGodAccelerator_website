@@ -1,0 +1,2713 @@
+1
+Interface Specification
+Document
+
+-- 1 of 76 --
+
+2
+Table of Contents
+Chapter 1: Introduction ............................................................................................................ 3
+Chapter 2: API Severity ........................................................................................................... 4
+Chapter 3: Initiate Sale ............................................................................................................. 6
+Chapter 4: Generate OTP ...................................................................................................... 17
+Chapter 5: Verify OTP ........................................................................................................... 18
+Chapter 6: Authorize ............................................................................................................. 20
+Chapter 7: Authorization Redirect Request ............................................................................. 23
+Chapter 8: Payment Advice ................................................................................................... 28
+Chapter 9: Settlement Advice ................................................................................................ 30
+Chapter 10: Generate ǪR ...................................................................................................... 33
+Chapter 11: Refund/Auth/Void ............................................................................................... 38
+Chapter 12: Transaction Status ............................................................................................. 41
+Chapter 13: Settlement Status ............................................................................................... 45
+Chapter 14: Settlement Summary Request Parameters ........................................................... 48
+Chapter 15: Settlement Details Request Parameters ............................................................... 51
+Chapter 16: Get Card Bin ....................................................................................................... 55
+Chapter 17: UserCancel API................................................................................................... 58
+Chapter 18: Get Service Charges API ..................................................................................... 60
+Sample HTML for Standard Mode Integration ......................................................................... 63
+Sample HTML for Direct Mode Integration .............................................................................. 64
+Payment Response ............................................................................................................... 65
+Refund/Auth Response.......................................................................................................... 66
+Transaction Status Response ................................................................................................ 66
+Settlement Status Response .................................................................................................. 67
+Hash Calculation................................................................................................................... 68
+Hash Calculation (v2) ............................................................................................................ 70
+Sample API Request and Response ....................................................................................... 71
+URLs .................................................................................................................................... 75
+
+-- 2 of 76 --
+
+3
+Chapter 1: Introduction
+This document provides detailed integration process for Merchants to process
+payments through Payment Gateway. This integration will allow the consumers to
+select payment options, provide payment instrument credentials and process
+payments on the Merchant website.
+Direct Integration mode
+Step 1: All the payment details will be collected on the Merchant website for payment
+transaction.
+Step 2: Merchant submits the details to sale URL in a server-to-server call (initiateSale API call).
+The initiateSale API responds back with response parameters as part of API Response.
+Browser is not involved in this step.
+Step 3: Merchant handles API response and does the following:
+1. Redirection (for 3DSecure on Card Issuer’s domain)
+When showOTPCapture is ‘N’ in the API Response, follow further steps:
+1) Redirect to the redirect URI available in the initiateSale API Response
+with relevant parameters
+2) Once Authentication and Authorization is done the response will
+be posted back (via browser POST) to the merchant’s return URL.
+2. Seamless
+When showOTPCapturePage is ‘Y’ in the API Response, further Steps:
+1) Merchant submits generateOTP GET request to the generateOTP URI
+available in the initiateSale response with relevant parameters.
+Response will be provided as json.
+2) After successful generateOTP, merchant captures OTP on their domain
+and submits verifyOTP POST request to the verifyOTP URI available in
+the initiateSaleResponse with json request parameters.
+3) Merchant can resend generateOTP requests up to 3 times and verify
+OTP.
+4) After successful verifyOTP, merchant submits authorize POST request to
+the authorize URI available in the initiateSale Response with json
+request parameters. Response will be provided as json.
+
+-- 3 of 76 --
+
+4
+Chapter 2: API Severity
+The APIs are categorized into severity levels based on the criticality or the sensitivity of the
+processing or data that it handles. The table below gives information on how severity is
+determined.
+Severity Level Guidelines for classifying an API at this level
+High
+1. APIs which are used for transaction generation using parameters coming from
+request.
+2. APIs that can modify or add data in the system.
+3. APIs that contain sensitive/PII data.
+If any of the above is true for an API, then it should fall under this severity.
+Medium
+1. APIs used for viewing transaction information
+2. All inbound web API’s that is not fitting in HIGH severity.
+Low
+1. Outbound APIs (e.g., Advice/Notifications) sent from system.
+2. Any others
+Below table provides the API wise severity level.
+API Name Severity
+Initiate Sale High
+Generate OTP High
+Verify OTP High
+Authorize High
+Authorization Redirect Request Medium
+Payment Response High
+Payment Advice Low
+Settlement Advice Low
+Generate ǪR High
+MerchantCreditToCustomer Request High
+
+-- 4 of 76 --
+
+5
+Refund/Auth/Void Request High
+Transaction Status Request Medium
+Settlement Status Request Medium
+Settlement Summary Request Medium
+Settlement Details Request Medium
+Get Card Bin Request Medium
+User Cancel High
+Get Service Charges Medium
+
+-- 5 of 76 --
+
+6
+Chapter 3: Initiate Sale
+The Sale Request is a json request.
+The following URL can be used to initiate a sale:
+URL - https://pgpay.icicibank.com/pg/api/v2/initiateSale
+3.1 Initiate Sale Request Parameters
+Parameter Description Type Size Mandatory Remarks
+merchantId Merchant account
+ID
+Numeric 20 Yes Merchant account ID
+merchantTxnN
+o
+Txn ref Number Alphanumeric 20 Yes
+Unique ref no to identify the
+request.
+Should have only alphanumeric
+characters. No other characters
+allowed.
+amount Transaction
+amount
+Numeric 9,2 No 9 significant and 2
+decimal/precision
+e.g., nnnnnnnnn.nn
+currencyCode Transaction
+Currency
+Numeric 3 Yes 356
+payType
+Possible values are
+0, 1
+Where,
+0 = Standard
+(Redirection)
+1 = Direct
+(Seamless)
+Numeric NA Yes Implemented for both ‘0’ and ‘1’
+customerEmailI
+D
+Email ID of
+customer
+Alphanumeric
+(confirm
+special
+characters
+like @, #, $, %,
+etc)
+48 Yes Send notification emails to the
+customer email id.
+
+-- 6 of 76 --
+
+7
+transactionTyp
+e
+Type of
+Transaction
+ SALE
+Alphanumeric NA Yes Type of transaction.
+SALE
+paymentMode
+Payment
+instrument
+restriction list CSV,
+ CARD
+ NB
+ WALLET
+ UPI
+Alphanumeric NA C
+Can be used to restrict the
+payment options.
+For payType = 1, this field should
+indicate the exact paymentMode.
+For AADHAAR the payType has
+to be 1.
+returnURL Return URL after
+transaction
+completion
+Alphanumeric
+(confirm
+special
+characters
+like @, #, $,
+%, etc)
+128 C Call back url on which response
+will be posted payment
+success/rejection.
+If available in request, the same
+would be used for response else
+the preconfigured URL of the
+merchant would be used.
+In case the transaction involves
+OTP capture on merchant page
+then the return URL is not used.
+txnDate Transaction Date Numeric 14 Yes YYYYMMDDHHMISS
+cardNo Card Number /
+Token Number (in
+case tokenized
+card)
+Numeric 19 C Mandatory, if payType is ‘1’ and
+paymentMode is CARD
+cardExpiry Card expiration
+(YYYYMM)
+Numeric 6 C Mandatory, if payType is ‘1’ and
+paymentMode is CARD
+nameOnCard Cardholder Name Alphanumeric 45 C Mandatory, if payType is ‘1’ and
+paymentMode is CARD
+cvv Card verification
+value
+Numeric 4 C Mandatory, if payType is ‘1’ and
+paymentMode is CARD.
+Optional in case token number is
+passed in cardNo field
+tokenCryptogr
+am
+Cryptogram /
+TAVV received
+from TRG/T for
+transacting using
+Alphanumeric 128 C Can contain Alphanumeric &
+Base64 characters.
+
+-- 7 of 76 --
+
+8
+token number
+tokenRefId Token ReferenceID
+corresponding to
+the token number
+Alphanumeric 64 No Optional.
+saveCardIndica
+tor
+Customer
+authorization to
+tokenize the card
+Alpha 1 No
+Y / N.
+Default is N
+Y – Indicates that the customer
+has opted to tokenize the card.
+Applicable only if the card passed
+is an actual card (not applicable
+for token card No)
+authOnlyIndica
+tor
+Indicates the
+transaction as an
+authentication
+only transaction.
+Alpha 1 No
+Y / N.
+Default is N.
+Y – The transaction is on for
+authentication.
+Save card indicator would also
+need to be sent as for authOnly to
+work.
+This field is for supporting Rupay
+tokenization with Authentication
+(no authorization).
+Note: amount field is not required
+for authOnly transaction.
+tokenizeOnAut
+h
+Indicates whether
+to tokenize the
+card during
+Authentication
+Only transaction
+Alpha 1 No Y / N.
+Default is N.
+Y – Tokenize the card du the
+transaction.
+Auth only indicator would also
+need to be sent as Y for this to
+work.
+This field is for supporting Rupay
+tokenization with Authentication
+(no authorization).
+panReferenceI
+d
+PAN reference Id
+of the card
+generated during
+the earlier
+tokenization call
+Alpha 64 C This will be used for
+authentication & tokenization.
+Either card number or
+panReferenceId should be
+present in the request.
+
+-- 8 of 76 --
+
+9
+Auth Only indicator would also
+need to be Y for this work.
+customerUPIAli
+as
+Customer’s Alias Alphanumeric 45 C If paymentMode is UPI then this
+field will be used to the payer’s
+UPI Alias (VPA)
+aggregatorID Merchant
+Aggregator ID
+Alphanumeric 20 C Only applicable for Aggregator’s
+customerName Customer Name Alphanumeric 45 No -
+customerMobil
+eNo
+Customer Mobile
+No
+Numeric 13 No
+-
+invoiceNo Merchant Invoice
+No
+Alphanumeric 32 No
+-
+addlParam1 Additional info 1 Alphanumeric 64 No Additional information
+addlParam2 Additional info 2 Alphanumeric 64 No Additional information
+country Two-digit country
+code
+Alphanumeric 2 No e.g., IN, US
+txnChannel
+WEB,
+MOBILE Alphanumeric 10 No
+If nothing is sent, then WEB is
+taken by default.
+terminalID Terminal ID
+provided by
+acquirer
+Alphanumeric 8 C Contact support on how to use
+this field.
+Not for PG.
+customerID ID of customer as
+identified by
+Merchant
+Alphanumeric 48 No
+For Broker integration:
+customerID as registered in
+merchant account.
+For Nach debit request this field is
+mandatory and should match
+with the customerID sent in the
+registration of Nach request.
+accountNo The customer
+account number
+Alphanumeric 16 No
+For Broker integration:
+If merchant needs to validate the
+account from which payment is
+made.
+If not sent, then the registered
+
+-- 9 of 76 --
+
+10
+account details of customerID
+would be used.
+accountIFSC The IFSC code Alphanumeric 12 No
+For Broker integration:
+The IFSC Code of the accountNo
+If not sent, then the registered
+account details of customerID
+would be used.
+gstIn GSTIN of the
+merchant
+Alphanumeric 15 C GSTIN of the merchant.
+Required if gst details are passed
+on by the merchant.
+gst GST amount Numeric 9.2 C
+The GST amount calculated by
+the merchant.
+cgst The CGST amount. Numeric 9,2 C
+The CGST amount.
+Sgst The SGST amount. Numeric 9,2 C
+The SGST amount.
+igst The IGST amount. Numeric 9,2 C
+The IGST amount.
+cess CESS amount Numeric 9,2 C
+CESS amount
+gstIncentive GST Incentive Numeric 9,2 C
+GST Incentive
+gstPercentage GST Percentage
+used.
+Numeric 2 C
+GST Percentage used.
+udfFields
+UDFFields Json
+Object to send
+user defined fields.
+Json NA No
+UDFFields Json Object which is
+used to pass user defined fields
+(like udf21, udf22, udf23,
+udf24,……, udf35).
+billingData Customer Data
+Json Object
+Json NA No Customer Data Json Object
+shippingData Customer Data
+Json Object
+Json NA No Customer Data Json Object
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 10 of 76 --
+
+11
+Following fields are AADHAAR specific and mandatory for paymentMode of AADHAAR
+rdsId Unique ID of the
+Registered device
+service
+Alphanumeric 16 C Provided by the registered device
+service
+rdsVer Registered device
+service version
+Alphanumeric 12 C -
+dpId Unique code
+assigned to RD
+provider
+Alphanumeric 24 C Provided by the register device
+(RD)
+mi Model of the
+registered device
+Alphanumeric 12 C Model of the registered device
+mc Public key
+certificate the
+registered device
+Alphanumeric 2048 C Public key
+certificate the registered device
+dc Unique device
+code of the
+registered
+biometric device
+Alphanumeric 48 C Unique device code of the
+registered biometric device
+paymentInstID Aadhaar Number Alphanumeric 12 C
+bankiin IIN of the bank 6 C
+Hmac HMAC for the
+pidData
+128 C Provided by the RD
+pidFormatType X 1 C Currently only “X” (XML)
+supported
+pidData Encrypted pid data 3000 C Provided by the register device
+service
+imageType The fingerprint
+image type
+3 C Currently only “FMR” is supported
+sessionKey Session key used
+for pidData
+encryption
+512 C Provided by the RD
+
+-- 11 of 76 --
+
+12
+aadhaarCertific
+ate
+The certificateID of
+the UIDAI public
+certification used
+to encrypt the
+pidData
+8 YYYYMMDD
+UDF Fields JSON Object
+Parameter Description Type Size Mandatory Remarks
+udf21 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf22 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf23 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf24 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf25 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf26 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf27 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf28 User Defined Field Alphanumer
+ic (All
+special
+128 No User Defined Field
+
+-- 12 of 76 --
+
+13
+characters
+@, #, $, %,
+etc)
+udf29 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf30 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf31 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf32 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf33 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf34 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+udf35 User Defined Field Alphanumer
+ic (All
+special
+characters
+@, #, $, %,
+etc)
+128 No User Defined Field
+
+-- 13 of 76 --
+
+14
+Customer Data JSON Object
+These are an array of JSON objects, representing a customer record specific to business or
+transaction purposes.
+Parameter Description Type Size Mandatory Remarks
+firstName Customer first
+name
+Alphanumeric 64 No Customer First Name
+lastName Customer last
+name
+Alphanumeric 64 No Customer Last Name
+address Customer address Alphanumeric
+(All special
+characters @,
+#, $, %, etc)
+1500 No Customer address
+city User Defined Field Alphanumeric 64 No User Defined Field
+state User Defined Field Alphanumeric 64 No User Defined Field
+country User Defined Field Alphanumeric 64 No User Defined Field
+zipCode User Defined Field Numeric 12 No User Defined Field
+emailId User Defined Field Alphanumeric 64 No User Defined Field
+mobileNo User Defined Field Numeric 128 No User Defined Field
+
+-- 14 of 76 --
+
+15
+3.2 Initiate Sale Response Parameters
+The following Initiate Sale Response parameters will be available as json response.
+Parameter Description Type Size Mandatory Remarks
+responseCode Response code
+indicating
+success/failure
+Alphanumeric 4 Yes R1000 – Request Initiated
+successfully
+Any other value indicates failure.
+responseDescri
+ption
+Description of
+failure
+Alphanumeric 45 Yes Ignore for success response.
+merchantId Merchant account
+ID
+Numeric 20 Yes Echo of request field
+aggregatorID Merchant
+aggregator ID
+Numeric 20 C Echo of request field (if available
+in request)
+merchantTxnN
+o
+Merchant Txn ref
+Number
+Alphanumeric 20 C Echo of request field
+Should have only alphanumeric
+characters. No other characters
+allowed.
+redirectURI Redirection URL Alphanumeric
+(All special
+characters @,
+#, $, %, etc)
+128 C Will be available in case merchant
+is required to redirect to complete
+payment authorization.
+Either this field or
+showOTPCapturePage field will
+be available in response.
+generateOTPU
+RI
+generateOTPUrl Alphanumeric
+(All special
+characters @,
+#, $, %, etc)
+C Will be available when
+showOTPCapturePage is ’Y’
+verifyOTPURI verifyOTPURL Alphanumeric
+(All special
+characters @,
+#, $, %, etc)
+C Will be available when
+showOTPCapturePage is ’Y’
+
+-- 15 of 76 --
+
+16
+authorizeURI authorizeURL Alphanumeric
+(All special
+characters @,
+#, $, %, etc)
+C Will be available when
+showOTPCapturePage is ’Y’
+showOTPCapt
+urePage
+Show OTP Page
+indicator
+Alpha 1 C
+Y / N
+Y – Merchant should display a
+page to for OTP. Please do
+contact integration team for OTP
+capture page requirements
+tranCtx The transaction
+context generated
+by the PG
+Alphanumeric 512 C Needs to be sent as is to the
+redirectURI / authorizeURI
+endpoint
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 16 of 76 --
+
+17
+Chapter 4: Generate OTP
+Merchant needs to send request if showOTPCapturePage is ‘Y’ in initiate sale
+response. The generateOTP is a GET request.
+<genearateOTP URI available in initiateSale Response>?tranCtx=<tranCtx available in sale
+Response>
+4.1 Generate OTP Response Parameters
+The Generate OTP Response parameters will be available as json response.
+Parameter Description Type Size Mandatory Remarks
+responseCode
+Response code
+indicating
+success/failure
+Alphanumeric 4 Yes 0000 – Success
+responseDescri
+ption
+Response
+Description
+Alphanumeric NA Yes OTP Generated Successfully
+-
+status
+Status of
+transaction Alphanumeric - Yes Status of transaction
+merchantId
+Merchant account
+ID Numeric
+20
+C
+merchantId of original transaction
+aggregatorID Merchant
+aggregator ID
+Numeric 20 C
+aggregatorId of original
+transaction
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 C
+merchantTxnNo of original
+transaction
+secureHash Hash value Alphanumeric 64 C
+Check Hash Calculation for
+logic
+
+-- 17 of 76 --
+
+18
+Chapter 5: Verify OTP
+The Merchant needs to send request after generate OTP request is successful. The
+verifyOTP request is a POST request.
+<verifyOTP URI available in initiateSale Response> Json Request Message as below:
+5.1 Verify OTP Request Parameters
+Will be sent as json request
+Param Description Type Size Mandatory Remarks
+tranCtx
+The transaction
+context generated
+by the PG
+Alphanumeric 512 Yes tranCtx sent in initiateSale
+Response
+otp OTP received by
+customer
+Numeric 6 Yes Merchant needs to provide OTP
+received by customer
+5.2 Verify OTP Response Parameters
+Will be available as json response
+Parameter Description Type Size Mandatory Remarks
+responseCode Response code
+indicating
+success/failure
+Alphanumeric 4 Yes 0000 – Success
+responseDescri
+ption
+Response
+Description
+Alphanumeric NA Yes
+OTP verified successfully
+status Status of
+transaction
+Alphanumeric - Yes Status of transaction
+merchantId Merchant account Numeric 20 C merchantId of original transaction
+
+-- 18 of 76 --
+
+19
+aggregatorID
+Merchant
+aggregator ID Numeric 20
+C aggregatorId of original
+transaction
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 C merchantTxnNo of original
+transaction
+nwAuthRefNo Network Auth
+reference
+Alpha 64 C Currently it is only applicable for
+Rupay card. This will be available
+if customer has opted for
+saveCard & authOnly as Y. This
+value needs to be used when
+initiating tokenization with
+RuPay’s Token Server.
+panReferenceId Pan Reference ID
+the card number
+this token is
+generated
+Alpha 64 C It will be present in the response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+maskedCardNo Masked Card
+number
+Alpha 19 C It will be present in the response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+tokenReferenceI
+d
+Token reference Id
+identify a token for
+a card number
+Alphanumeric 64 C It will be present in the response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+tokenReferenceI
+dHash
+Token reference id
+hash to validate t
+token reference id
+Alphanumeric 64 C It will be present in the response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+cardExpiry Card expiration
+(YYYYMM)
+Numeric 6 C It will be present in the response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+secureHash Hash value Alphanumeric 64 C Check Hash Calculation for logic
+
+-- 19 of 76 --
+
+20
+Chapter 6: Authorize
+The merchant needs to send request after verify OTP request is successful. The authorize
+request is a POST request.
+<authorizeURI available in initiateSale Response>
+6.1 Authorize Request Parameters
+Will be sent as json request
+Param Description Type Size Mandatory Remarks
+tranCtx
+The transaction
+context generated
+by the PG
+Alphanumeric 512 Yes tranCtx sent in initiateSale
+Response
+6.2 Authorize Response Parameters
+Will be available as json response.
+Parameter Description Type Size Mandatory Remarks
+responseCode
+Response code
+indicating
+success/failure Alphanumeric 4 Yes
+000 and 0000 – Success
+R1000 – Request Initiated
+successfully (mostly used for UPI
+Initiation where the payment is out
+of band.)
+Any other value indicates failure.
+respDescription Description of
+failure
+Alphanumeric 45 Yes Ignore for success response.
+merchantId Merchant account
+ID
+Numeric 20 C Echo of request field
+
+-- 20 of 76 --
+
+21
+aggregatorID Merchant
+aggregator ID
+Numeric 20 C Echo of request field (if available
+request)
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 C Echo of request field
+txnID
+The unique ref
+number generated
+by the PG
+Numeric 24 C The unique ref number generated
+by the PG
+paymentDateTi
+me
+Authorization date
+time
+Numeric 16 C YYYYMMDDHHMISS
+paymentID
+The
+authorization/paym
+ent generated by
+the authorization
+system
+Numeric 24 C The authorization/payment
+generated by the authorization
+system
+paymentMode
+The payment mode
+used CARD, NB,
+UPI, Wallet
+Alphanumeric 12 C
+Available only to merchants who
+have opted for this. Determined
+using configuration or using the
+request url used.
+paymentSubIns
+tType
+The payment sub
+instrument type.
+Will contain the
+bank name case of
+payment using NB
+case of card
+payment this will be
+either DC or CC.
+Alphanumeric 64 C The payment sub instrument type.
+Will contain the bank name case
+of payment using NB case of card
+payment this will be either DC or
+CC.
+Amount The amount paid. Numeric 9,2 C The amount paid.
+txnChannel
+The channel used
+for transactions
+(WEB)
+Alphanumeric
+5 C For POS, this will be returned
+always for successful txns.
+If not available, it is to be treated
+WEB transaction.
+
+-- 21 of 76 --
+
+22
+customerMobile
+No
+The customer
+mobile num as sent
+by merchant
+Alphanumeric 13
+C
+Echo of request field.
+Available based on configuration
+sale url used
+customerEmailI
+d
+The emailID of the
+custom as sent by
+merchant
+Alphanumeric
+(special
+characters like
+@, #, $, %,
+etc)
+48
+C
+Echo of request field
+Available based on configuration
+sale url used
+addlParam1 Additional info 1 Alphanumeric 64 C Echo of request field
+addlParam2 Additional info 2 Alphanumeric 64 C Echo of request field
+convenienceFee Convenience fee
+charged customer
+Numeric 9, 2 C
+Applicable only if merchant has
+specified for this additional field in
+the returnURL addlResParams
+parameter
+serviceTax Service tax Numeric 9, 2 C Applicable only if merchant has
+specified for this additional field in
+the returnURL addlResParams
+parameter
+cardNetwork Card Network Alphanumeric
+12
+C
+Applicable only if merchant has
+specified for this additional field in
+the returnURL addlResParams
+parameter
+nwAuthRefNo
+Network Auth ref
+No
+Alpha 64 C
+Currently it is only applicable for
+Rupay cards. This will be available
+if customer has opted for saveCar
+This value needs to be used when
+initiating tokenization with
+RuPay’s Token Server.
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 22 of 76 --
+
+23
+Chapter 7: Authorization Redirect Request
+The Merchant needs to redirect to the redirect URI in the following request format when
+showOTPCapturePage is ‘N’ is sale response.
+<redirectURL available in Sale Response>?tranCtx=<tranCtx available in sale Response>
+The payment response would be posted back to the merchants return URL (in form url encoded
+format) as form post.
+7.1 Payment Response Parameters
+
+-- 23 of 76 --
+
+24
+Parameter Description Type Size Mandatory Remarks
+responseCode
+Response code
+indicate
+success/failure
+Alphanumeric 4 Yes
+000 and 0000 – Success
+R1000 – Request Initiated
+successful (mostly used for UPI
+Initiation where the payment is
+out band.)
+Any other value indicates failure.
+respDescription Description of
+failure
+Alphanumeric 45 Yes Ignore for success response.
+merchantId Merchant account
+ID
+Numeric 20 Yes Echo of request field
+aggregatorID Merchant
+aggregator ID
+Numeric 20 C Echo of request field (if available
+in request)
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 Yes Echo of request field
+txnID The unique ref
+number generated
+by the PG
+Numeric 24 Yes The unique ref number generated
+by the PG
+paymentDateTi
+me
+Authorization date
+time
+Numeric 14 Y YYYYMMDDHHMISS
+paymentID The authorization /
+payment generated
+by the
+authorization
+system
+Numeric 24 C The authorization / payment
+generated by the authorization
+system
+paymentMode
+The payment mode
+used
+CARD, NB, Wallet,
+UPI, etc.
+Alphanumeric 12 C
+Available only for the merchants
+who have opted for this.
+Determined using configuration or
+using the sale request url used.
+
+-- 24 of 76 --
+
+25
+paymentSubIns
+tType
+The payment sub
+instrument type.
+Will contain the
+bank name in case
+of payment using
+NB. In case of card
+payment this field
+will be either DC or
+CC.
+Alphanumeric 64 C The payment sub instrument type.
+In case of UPI, the values will be:
+SAVING
+CREDIT
+PPIWALLET
+Amount The amount paid Numeric 9,2 C The amount paid
+oth_charge Charges applied for
+the transaction
+Numeric 9,2 C Charges applied for the
+transaction
+txnChannel
+The channel used
+for transactions
+(WEB)
+Alphanumeric 5 C
+Default, it is to be treated as WEB
+transaction.
+customerMobile
+No
+The customer
+mobile number as
+sent by merchant
+Alphanumeric 13 C
+Echo of request field.
+Available based on configuration /
+sale used.
+customerEmailI
+D
+The emailID of the
+customer as sent
+by merchant
+Alphanumeric
+(special
+characters @,
+#, $, %, etc)
+48 C
+Echo of request field.
+Available based on configuration /
+sale used.
+addlParam1 Additional info 1 Alphanumeric 64 C Echo of request field
+addlParam2 Additional info 2 Alphanumeric 64 C Echo of request field
+convenienceFee Convenience fee
+charged to
+customer
+Numeric 9,2 C
+Applicable only if merchant has
+specified for this additional field in
+the returnURL addlResParams
+parameter
+serviceTax Service tax Numeric 9,2 C
+Applicable only if merchant has
+specified for this additional field in
+the returnURL addlResParams
+parameter
+cardNetwork Card Network Alphanumeric 12 C
+Applicable only if merchant has
+specified for this additional field in
+the returnURL addlResParams
+parameter
+
+-- 25 of 76 --
+
+26
+nwAuthRefNo Network Auth ref
+No
+Alpha 64 C
+Currently only applicable for
+Rupay cards. This will be available
+if customs have opted for
+saveCard. This value needs to be
+used when initiating tokenization
+with RuPay’s Toke Server.
+panReferenceId
+Pan Reference ID
+of the card number
+for this token is
+generated
+Alpha 64 C
+It will be present in response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+maskedCardNo Masked Card
+number
+Alpha 19 C It will be present in response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+tokenReferenceI
+d
+Token reference Id
+to identify a token
+for a card number
+Alphanumeric 64 C It will be present in response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+tokenReferenceI
+dHash
+Token reference id
+hash to validate
+the token reference
+id
+Alphanumeric 64 C It will be present in response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+cardExpiry Card expiration
+(YYYYMM)
+Numeric 6 C It will be present in response if
+tokenizeOnAuth was Y in the
+initiateSale request.
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 26 of 76 --
+
+27
+Note: Only POST parameters are considered for secureHash calculation. Ǫuery parameters are
+not considered for secureHash calculation.
+Sample Response form
+<form id='myForm' name='myForm' action='${merchantReturnURL}'
+method='post' enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="responseCode" value="000" />
+<input type="hidden" name="respDescription" value="SUCCESS" />
+<input type="hidden" name="merchantId" value="M000001" />
+<input type="hidden" name="merchantTxnNo" value="M0099999221" />
+<input type="hidden" name="txnID" value="T1472640294491" />
+<input type="hidden" name="paymentDateTime" value="20160831041454" />
+<input type="hidden" name="paymentID" value="006503" />
+<input type="hidden" name="secureHash"
+value="39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2"/>
+</form>
+
+-- 27 of 76 --
+
+28
+Chapter 8: Payment Advice
+In case merchant wants payment status to be updated to its system, Transaction
+Gateway can push the status of the payment. Payment advice is same as payment
+response but only used by the payment gateway to inform the merchant system of a later
+change in transaction status which can occur after the online transaction has been
+completed. This will be a server-to-server API call (not involving the browser). Merchant
+has to expose a URL for consuming the payment advice. The parameters will be sent as
+POST request, and the parameters will be same as that used for the online payment
+response.
+Any response with http status code of 200 is considered as successful delivery of the
+advice. Advice can be configured to be retried in case of unsuccessful delivery (non 200
+http status code).
+Note: The addlResParams if specified in returnURL are only used for redirection parameters
+and not used for payment advice.
+Payment advice message by default would be posted to the advice url of the merchant with
+content- type of “application/x-www-form-urlencoded”. In this format the request body
+would contain all the parameters in name value pairs. The merchant server can handle this
+in the same manner how it handles any form post.
+responseCode=0000&respDescription=Transaction%20successful&merchantId=T_05022&merc
+h antTxnNo=
+638948982&txnID=T002473066701&paymentDateTime=20210817060032&paymentID=
+In case the merchant has opted for json format (during merchant onboarding). The same
+advice above would be sent in json format. For json message, the content type would be
+“application/json”
+{
+"responseCode":"0000", "respDescription":"Transaction successful", "merchantId":"T_05022",
+"merchantTxnNo":"638948982", "txnID":"T002473066701",
+"paymentDateTime":"202108170 60032", "paymentID":"700788003737",
+
+-- 28 of 76 --
+
+29
+Any response with http status code of 200 is taken as a successful response.
+
+-- 29 of 76 --
+
+30
+Chapter 9: Settlement Advice
+Settlement advice will be a server-to-server API call initiated by the system. Merchant must
+expose a URL for consuming the settlement advice. The parameters will be sent as POST
+request (with json data in POST body).
+9.1 Settlement Advice Request Parameters
+Parameter Description Type Size Mandatory Remarks
+aggregatorID Merchant
+aggregator
+Alphanumeric 20 C Echo of request field (if available
+in original payment request)
+merchantId Merchant account
+ID
+Alphanumeric 20 Yes Merchant account ID
+merchantTxnNo Merchant Txn ref
+Num
+Alphanumeric 20 Yes Echo of request field, the merchant
+txn reference no. sent by the
+merchant while initiating the
+payment request.
+For payment against invoices
+(orders created in ICICI Bank
+system), this field will be an auto
+generated field.
+invoiceNos List of Invoices
+(comm separated)
+for which t
+payment was done
+Alphanumeric 160 C
+Echo of request field.
+In case of payment against
+multiple invoices, this field will
+contain a separated coma list of
+invoice reference nos.
+paymentMode The payment
+mode/type used for
+the payment
+Alphanumeric 32 C e.g., CARD, NB, Wallet, UPI
+
+-- 30 of 76 --
+
+31
+paymentSubIns
+tType
+The sub type for
+the payment mode
+used.
+Alphanumeric 32 C If paymentMode is CARD then
+possible values would be DC, CC.
+For other payment modes it will be
+NA (Not Applicable).
+txnChannel The txn channel
+used (Applicable
+only for CARD)
+Alphanumeric 32 C Default value is WEB.
+txnAmount
+Transaction
+amount Amount 9,2 C
+Applicable only if the charges are
+paid by Merchant & certified to
+receive this field
+txnCharges
+Applicable only if
+the charges are
+paid by Merchant &
+certified to receive
+this field
+Amount 9,2 C
+Applicable only if the charges are
+paid by Merchant & certified to
+receive this field
+serviceTax
+Applicable only if
+the charges are
+paid by Merchant
+and certified to
+receive this field.
+Amount 9,2 C
+Applicable only if the charges are
+paid by Merchant and certified to
+receive this field.
+settlementID
+The
+settlementID/credit
+reference no linked
+to invoice
+settlement
+Alphanumeric 32 Yes
+The settlementID/credit reference
+no linked to invoice settlement.
+settlementDate Settlement Date Alphanumeric 8 Yes YYYYMMDD
+settlementAcco
+unt
+Settlement Account Alphanumeric 21 Yes
+Available only if the merchant has
+certified to receive this field.
+settlementAcco
+untIFSC
+Settlement Account
+IFSC Code
+Alphanumeric 8 Yes Available only if the merchant has
+certified to receive this field.
+settledAmount Settlement Amount Amount 9,2 Yes
+Available only if the merchant has
+certified to receive this field.
+
+-- 31 of 76 --
+
+32
+cardNetwork Card network Alpha 8 Yes
+Available only if the merchant has
+certified to receive this field and
+the paymentMode is Card.
+Possible values are
+VISA / MasterCard / AMEX /
+RUPAY
+addlParam1 Additional Param
+sent initial sale
+request
+Alphanumeric 64 C Echo of request field (if present in
+request)
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+Request would be in json format. Sample request is given below.
+{
+“aggregatorID”: “A001”,
+“merchantId”: “123243”,
+“merchantTxnNo”: ”RF12937”,
+“invoiceNos” : “343223”,
+“settlementID”: ”A00121-20171101-010”,
+“settlementDate”: ”20171101”,
+“paymentMode”: ”card”,
+“paymentSubInstType”: ”DC”,
+“cardNetwork”: “VISA”,
+“txnChannel”: ”WEB”,
+“secureHash”:
+“39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2”
+}
+Any response with http status code of 200 is taken as a successful response.
+
+-- 32 of 76 --
+
+33
+Chapter 10: Generate ǪR
+10.1 Generate QR Request Parameters
+Below are the field details for GenerateQR Request Parameters:
+Parameter Description Type Size Mandatory Remarks
+merchantd Merchant account
+ID
+Numeric 12 Yes Merchant account ID
+merchanRefNo Txn ref Number Alphanumeric 12 Yes Unique ref no to identify the
+request.
+amount Transaction
+amount
+Numeric 9,2 Yes 9 significant and decimal/precision
+e.g., nnnnnnnnn.nn
+currency Transaction
+Currency Code
+Numeric 3 Yes 356
+emailID Email ID of
+customer
+Alphanumeric
+(special
+characters @,
+#, $, %, etc)
+36 Yes In case Customer email ID is not
+available, send
+guest@ICICIBank.com
+mobileNo Customer Mobile
+No
+Numeric 15 No Customer Mobile No
+invoiceNo Merchant Invoice
+No
+Alphanumeric 32 C Merchant Invoice No
+requestType Request Type Alphanumeric 12 C Applicable values is
+“UPIǪR”
+aggregatorID Merchant
+Aggregator ID
+Alphanumeric 20 C Only applicable for Aggregator’s
+taxableValue Taxable amount Numeric 9,2 C Taxable amount
+
+-- 33 of 76 --
+
+34
+gstIn Alphanumeric 15 C GSTIN of the merchant. Required
+if gst details are passed on by the
+merchant.
+gst Numeric 9,2 C The GST amount calculated by the
+merchant
+cgst Numeric 9,2 C The CGST amount
+sgst Numeric 9,2 C The SGST amount
+Igst Numeric 9,2 C The IGST amount
+cess Numeric 9,2 C CESS amount
+gstIncentive Numeric 9,2 C GST Incentive
+gstPercentage Numeric 2 C GST Percentage used.
+customerID Customer ID Alphanumeric 15 No -
+customerN Customer Name Alphanumeric 45 No -
+invoiceDate Invoice Date Numeric 8 No YYYYMMDD
+accountNo Alphanumeric 16 No For Broker integration:
+If a merchant needs to validate
+the account from which payment
+is made.
+If not sent, then the registered
+account details of customerID
+would be used.
+
+-- 34 of 76 --
+
+35
+accountIFSC Alphanumeric 12 No
+For Broker integration:
+The IFSC Code of the accountNo.
+If not sent, then the registered
+account details of customerID
+would be used.
+udfFields UDFFields Json
+Object to send user
+defined fields
+Json No UDFFields Json Object to send
+user defined fields
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic.
+UDF Fields Json Object
+Parameter Description Type Size Mandatory Remarks
+udf1 User Defined Field Alphanumeric 128 No User Defined Field
+udf2 User Defined Field Alphanumeric 128 No User Defined Field
+udf3 User Defined Field Alphanumeric 128 No User Defined Field
+udf4 User Defined Field Alphanumeric 128 No User Defined Field
+udf5 User Defined Field Alphanumeric 128 No User Defined Field
+udf6 User Defined Field Alphanumeric 128 No User Defined Field
+udf7 User Defined Field Alphanumeric 128 No User Defined Field
+udf8 User Defined Field Alphanumeric 128 No User Defined Field
+udf9 User Defined Field Alphanumeric 128 No User Defined Field
+udf10 User Defined Field Alphanumeric 128 No User Defined Field
+udf11 User Defined Field Alphanumeric 128 No User Defined Field
+udf12 User Defined Field Alphanumeric 128 No User Defined Field
+
+-- 35 of 76 --
+
+36
+udf13 User Defined Field Alphanumeric 128 No User Defined Field
+udf14 User Defined Field Alphanumeric 128 No User Defined Field
+udf15 User Defined Field Alphanumeric 128 No User Defined Field
+10.2 Generate QR Response Parameters
+Parameter Description Type Size Mandatory Remarks
+returnCode Return code
+indicating
+success/failure
+of the
+generation
+request
+Numeric 3 Yes 200 – Success
+Any other value failure.
+responseDescrip
+tion
+Description of
+failure
+Alphanumeric 45 Yes Ignore for success response.
+merchantID Merchant
+account ID
+Alphanumeric 20 Yes Echo of request field
+aggregatorID Merchant
+account ID
+Alphanumeric 20 C Echo of request field
+merchantRefNo Merchant Txn
+ref Number
+Alphanumeric 12 C Echo of request field
+upiǪR Generated UPI
+ǪR String
+Alphanumeric NA C Generated UPI ǪR String
+
+-- 36 of 76 --
+
+37
+Sample Request of Generate ǪR request
+curl --location 'https://pgpayuat.icicibank.com/tsp/pg/api/generateQR' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'merchantId=T_S00067' \
+--data-urlencode 'merchantRefNo=208850085911' \
+--data-urlencode 'amount=40' \
+--data-urlencode 'currency=356' \
+--data-urlencode 'mobileNo=8208191623' \
+--data-urlencode 'emailID=test@gmail.com' \
+--data-urlencode 'requestType=UPIQR' \
+--data-urlencode 'customerID=CSDRR1' \
+--data-urlencode 'invoiceDate=20251008' \
+--data-urlencode
+'secureHash=5c860cb28cb5a0e94911cb9759f1d39cf5fbb73388499d7783480d7da510f730' \
+--data-urlencode 'accountNo=001701378981' \
+--data-urlencode 'accountIFSC=ICIC0000017' \
+--data-urlencode 'aggregatorID=J_D0001'
+Sample Response (json) of Generate ǪR request
+{"respHeader":{"returnCode":200,"desc":"Success","upiRespDesc":"SUC"},"respBody":{"mercha
+ntID":"T_S00067","aggregatorID":"J_D0001","merchantRefNo":"208850085911","bharatQR":n
+ull,"upiQR":"upi://pay?pa=phicomm@icici&pn=Saavn
+Media&mc=3018&tr=1773361794809801&am=40.00&cu=INR&invoiceDate=2025-10-
+08T00:00:00+05:30","expiry":null,"serviceChargeUPI":"0","serviceChargeBharatQR":null}}
+
+-- 37 of 76 --
+
+38
+Chapter 11: Refund/Auth/Void
+11.1 Refund/Auth/Void Request Parameters
+This is a server-to-server API Call which uses POST method with content type as
+"application/x- www- form-urlencoded”
+Parameter Description Type Size Mandatory Remarks
+merchantID Merchant account
+ID
+Alphanumeric 20 Yes Echo of request field
+aggregatorID Aggregator ID Alphanumeric 20 C Required if the original txn was
+initiated from Aggregator
+merchantTxnNo Txn ref Number Alphanumeric 20 Yes The new reference No. for this
+request.
+originalTxnNo Original txn refNo Alphanumeric 20 yes The reference No. of the initial
+transaction for which the
+refund/auth/void is initiated.
+amount
+Amount to be
+authorized or
+refunded to the
+customer
+Numeric 9,2 Yes
+9 significant and 2
+decimal/precision.
+This cannot be more than the
+original transaction amount.
+This field should be set to 0 for
+void.
+transactionTyp
+e
+Type of
+Transaction
+REFUND
+Alpha 6 Yes Type of REFUND transactions
+addlParam1 Additional info 1 Alphanumeric 64 No Additional information.
+
+-- 38 of 76 --
+
+39
+addlParam2 Additional info 2 Alphanumeric 64 No Additional information.
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+11.2 Refund/Auth/Void Response Parameters
+Parameter Description Type Size Mandatory Remarks
+responseCode
+Response code
+indicating
+success/failure
+Numeric 3 Yes 000 – Success
+Failure for any other value.
+respDescription Description of
+failure
+Alphanumeric 45 Yes Ignore for success response.
+merchantId Merchant account
+ID
+Alphanumeric 20 C Echo of request field
+merchantTxnNo
+Merchant Txn ref
+Number Alphanumeric 20 C Echo of request field
+txnID
+The unique ref
+number generated
+by the PG
+Numeric 24 C The unique ref number generated
+by the PG
+paymentDateTi
+me
+Authorization date
+time Numeric 14 C YYYYMMDDHHMISS
+txnAuthID
+The authorization /
+payment ID
+generated by the
+authorization
+system
+Alphanumeric 24 C The authorization / payment ID
+generated by the authorization
+system
+addlParam1 Additional info 1 Alphanumeric 64 C Echo of request field
+
+-- 39 of 76 --
+
+40
+addlParam2 Additional info 2 Alphanumeric 64 C Echo of request field
+secureHash Hash value Alphanumeric 64 Yes
+Check Hash Calculation in
+Appendix
+
+-- 40 of 76 --
+
+41
+Chapter 12: Transaction Status
+12.1 Transaction Status Request Parameters
+This is a server-to-server API Call which uses POST method with content type as "application/x-
+www- form-urlencoded”.
+Parameter Description Type Size Mandatory Remarks
+merchantID Merchant account
+ID
+Alphanumeric 20 Yes Merchant account ID
+aggregatorID Aggregator ID Alphanumeric 20 C Required if the original txn was
+initiated from Aggregator
+merchantTxnNo Txn ref Number Alphanumeric 20 Yes Same as originalTxnNo.
+originalTxnNo Original Txn ref
+Number
+Alphanumeric 20 Yes The original refNo for which status
+is requested.
+transactionType Type of
+Transaction
+STATUS
+Alpha 6 Yes Type of transaction (Status)
+oth_charge Charges applied on
+the transaction
+Numeric 9,2 C Charges applied on the
+transaction
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 41 of 76 --
+
+42
+12.2 Transaction Status Response Parameters
+Parameter Description Type Size Mandatory Remarks
+responseCode Response code
+indicating
+success/failure of
+the transaction
+status request
+Alphanumeric 4 Yes 000 / 0000 – Success
+Any other value indicates status
+request failure / original
+transaction not found.
+For status of the original txn
+always check txnStatus and
+txnResponseCode.
+respDescription Description of
+failure
+Alphanumeric 45 Yes Ignore for success response.
+merchantID Merchant account
+ID
+Numeric 20 Yes Echo of request field
+aggregatorID Merchant
+Aggregator ID
+Numeric 20 C Echo of request field
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 C Echo of request field
+txnStatus Status of original
+txn
+ENUM 3 Yes REǪ – Request received and in
+process
+SUC – Transaction Successful
+REJ – Transaction Rejected
+ERR – Error in transaction process
+txnResponseCo
+de
+The response code
+for the original txn
+Alphanumeric 24 Yes Original txn response code.
+000 / 0000 – Success
+Any other value indicates failure.
+txnRespDescrip
+tion
+Response
+description for
+original txn
+Alphanumeric 24 Yes Response description for original
+txn
+
+-- 42 of 76 --
+
+43
+txnID The unique ref
+number generated
+by the gateway
+Alphanumeric 24 Yes System generated Transaction ID
+paymentDateTi
+me
+Authorization date
+time
+Numeric 14 Yes YYYYMMDDHHMISS
+txnAuthID The authorization /
+payment ID
+generated by the
+authorization
+system
+Numeric 24 C The auth ID generated by the
+bank.
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+Sample Transaction Status Check Request
+curl --location &#39;https://pgpayuat.icicibank.com/tsp/pg/api/command&#39; \
+--header &#39;Content-Type: application/x-www-form-urlencoded&#39; \
+--data-urlencode &#39;merchantId=T_S00067&#39; \
+--data-urlencode &#39;merchantTxnNo=Test03102025&#39; \
+--data-urlencode &#39;originalTxnNo=7700206371536&#39; \
+--data-urlencode &#39;transactionType=STATUS&#39; \
+--data-urlencode
+&#39;secureHash=8dead97d14d846cbb5674a46385675d242dbb35e54b37e423f241cbca85519f6&#
+39; \
+--data-urlencode &#39;addlParam1=Additional Information&#39;
+
+-- 43 of 76 --
+
+44
+Sample Transaction Status Check Response
+{&quot;txnRespDescription&quot;:&quot;Transaction
+successful&quot;,&quot;secureHash&quot;:&quot;2e2f67b7038a6f86d8383b59f8b7c6bf443b71d783
+212e9a29b6dc09abfbef
+12&quot;,&quot;amount&quot;:&quot;550.00&quot;,&quot;txnResponseCode&quot;:&quot;0000&q
+uot;,&quot;txnAuthID&quot;:&quot;811069696857&quot;,&quot;authCode&quot;:&quot;770020
+1930022&quot;,&quot;respDescription&quot;:&quot;Request processed
+successfully&quot;,&quot;paymentMode&quot;:&quot;UPI&quot;,&quot;customerEmailID&quot;:&q
+uot;guest@icici.com&quot;,&quot;TransmissionDateTime&quot;:&quot;2
+0251003155304&quot;,&quot;oth_charge&quot;:false,&quot;paymentInstId&quot;:&quot;95520122
+31@upi&quot;,&quot;responseCode&quot;:&quot;000&quot;,&quot;cust
+omerMobileNo&quot;:&quot;7912403781&quot;,&quot;txnStatus&quot;:&quot;SUC&quot;,&quot;m
+erchantId&quot;:&quot;T_S00067&quot;,&quot;merchantTxnNo&quot;:&quot;77002
+06371536&quot;,&quot;addlParam1&quot;:&quot;Additional
+Information&quot;,&quot;paymentDateTime&quot;:&quot;20251003155335&quot;,&quot;txnID&qu
+ot;:&quot;7700206371536&quot;}
+
+-- 44 of 76 --
+
+45
+Chapter 13: Settlement Status
+13.1 Settlement Status Request Parameters
+Settlement status API should be used only to check the settlement status of the transaction
+and never used for checking the payment status of original transaction. The payment
+transaction gets reflected in settlement only after the settlement cycle which might take
+anywhere up to 12hrs.
+This is a server-to-server API Call which uses POST method with content type as
+"application/x- www- form-urlencoded”.
+Parameter Description Type Size Mandatory Remarks
+merchantID Merchant account
+ID
+Alphanumeric 20 Yes Merchant ID of original
+transaction.
+aggregatorID Aggregator ID Alphanumeric 20 C Aggregator ID of original
+transaction.
+originalTxnNo Original Txn ref
+Number
+Alphanumeric 20 Yes The original merchant refNo for
+which status requested.
+transactionTyp
+e
+Type of
+Transaction
+SETTLSTATUS
+Alpha 11 Yes Type of Transaction
+SETTLSTATUS
+SecureHash Hash value Alphanumeric 64 Yes Check appendix for hash logic
+
+-- 45 of 76 --
+
+46
+13.2 Settlement Status Response Parameters
+Parameter Description Type Size Mandatory Remarks
+responseCode
+Response code
+indicating
+success/failure of
+the transaction
+status request
+Alphanumeric 4 Yes
+000 / 0000 – Success
+Any other value indicates request
+failure / transaction found in
+settlement system.
+For settlement status of the t
+always check settlementStatus.
+respDescription Description of
+settlement status
+Alphanumeric 45 Yes Ignore for success response.
+merchantId Merchant account
+ID
+Numeric 20 Yes Echo of request field
+aggregatorID Merchant
+Aggregator ID
+Numeric 20 C Echo of request field
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 Yes Echo of request field
+settlementStatu
+s
+Status of
+settlement
+Alpha 3 Yes NSD – Not yet settled
+STD – Settled
+txnStatus Status of original
+txn
+Alpha 3 Yes
+REǪ – Request received and
+process
+SUC – Transaction Successful
+REJ – Transaction Rejected
+ERR – Error in transaction process
+txnResponseCo
+de
+The response code
+for the original txn Alpha 4 Yes
+Original txn response code.
+000 / 0000 – Success
+Any other value indicates failure.
+
+-- 46 of 76 --
+
+47
+txnID The unique ref
+number generated
+by the gateway
+Alphanumeric 24 Yes The unique ref number generated
+by the gateway.
+settlementID Settlement ID/UTR
+No.
+Alphanumeric 24 C Settlement ID for merchant or
+service provider.
+Valid only if settled.
+settlementDate Date of settlement Numeric 8 C YYYYMMDD
+Valid only if settled.
+txnAmount The transaction
+amount
+Numeric 9,2 C
+Applicable only if the charges are
+paid by the merchant and certified
+to receive this field.
+txnCharges Total charges Numeric 9,2 C Charges including tax
+serviceTax Service tax paid Numeric 9,2 C
+Applicable only if the charges are
+paid by the merchant and certified
+to receive this field.
+settledAmount Amount settled Numeric 9,2 C The amount settled for this
+transaction
+settlementAcco
+unt
+Account No Alphanumeric 24 C Account no to which the txn been
+settled into
+settlementAcco
+untIFSC
+IFSC Code of the
+account
+Alphanumeric 11 C The IFSC Code of account No.
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 47 of 76 --
+
+48
+Chapter 14: Settlement Summary Request Parameters
+14.1 Settlement Summary Request Parameters
+Settlement status API should be used only to check the settlement status of the transaction
+and never used for checking the payment status of original transaction. The payment
+transaction gets reflected in settlement only after the settlement cycle which might take
+anywhere upto 12hrs.
+Parameter Description Type Size Mandatory Remarks
+merchantID Merchant account
+ID
+Alphanumeric 20 Yes Either of merchantID or
+aggregatorID should be present
+aggregatorID Aggregator ID Alphanumeric 20 C Echo of request field.
+settlementDate Settlement Date Alphanumeric 8 Yes YYYYMMDD
+transactionTyp
+e
+Type of
+Transaction
+SETTLEMENTSUM
+MARY
+Alphanumeric 17 Yes Type of transaction
+SETTLEMENTSUMMARY
+secureHash Hash value Alphanumeric 64 No Check Hash calculation for logic
+This is a server-to-server API Call which uses POST method with content type as
+"application/x- www- form-urlencoded”
+
+-- 48 of 76 --
+
+49
+14.2 Settlement Summary Response Parameters
+Parameter Description Type Size Mandatory Remarks
+error_code Response code Alphanumeric 4 Yes
+000 / 0000 – Success
+Any other value indicates request
+failure / transaction n found in
+settlement system.
+For settlement status of the txn
+always check settlementStatus
+merchantId Merchant account Alphanumeric 20 Yes Echo of request field
+aggregatorID Merchant
+Aggregator ID
+Alphanumeric 20 C Echo of request field
+settlementDate Settlement Date Alphanumeric 12 C Echo of request field
+Payouts All the settlement
+performed on the
+settlement Date
+Alphanumeric 12 C All the settlement performed on
+the settlement Date
+account_no Account number
+where the amount
+settled
+Alphanumeric 32 Yes Account number where the
+amount settled
+ifsc_code IFSC code of the
+account number
+Alphanumeric 32 Yes IFSC code of the account number
+pay_amount Amount settled Numeric 9,2 Yes Amount settled
+settlementID Settlement id Alphanumeric 32 Yes Settlement ID for merchant o
+service provider
+settlement_curr
+ency
+Settlement
+Currency
+Numeric 3 Yes 356
+trans_currency Settlement
+Currency
+Numeric 3 Yes 356
+
+-- 49 of 76 --
+
+50
+utr_no UTR number Alphanumeric 24 Yes UTR number of the transfer.
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 50 of 76 --
+
+51
+Chapter 15: Settlement Details Request Parameters
+15.1 Settlement Details Request Parameters
+This API needs to be called after settlement summary API for each settlementID received in
+the response. This API provides details of all the transactions that were settled under a
+particular settlementID. If there are more than 100 transactions settled under a particular
+settlementID then one API call will return only 100 transactions. Another API call with the
+same settlementID and passing the last transaction id needs to be made to get next set of
+100 transactions and so on to get all transactions under that settlementID.
+This is a server-to-server API Call which uses POST method with content type as
+"application/json”.
+Parameter Description Type Size Mandatory Remarks
+merchantID Merchant account
+ID
+Alphanumeric 20 Yes Either of merchantID OR
+aggregatorID should
+be present
+aggregatorID Aggregator ID Alphanumeric 20 C Either of merchantID OR
+aggregatorID should be present
+providerID Service provider ID Alphanumeric
+14
+C If the settlement id is for service
+provider
+settlementID SettlementID Alphanumeric 32 Yes Settlement ID
+lastTxnID Last txnid from the
+previous request.
+Alphanumeric 32 No Last transaction ID
+secureHash Hash value Alphanumeric 64 No Check Hash Calculation for logic
+Settlement Details request API:
+curl --location 'https://pgpayuat.icicibank.com/tsp/pg/api/settlementDetails' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'merchantId=T_03342' \
+
+-- 51 of 76 --
+
+52
+--data-urlencode 'settlementID=T03342000280190' \
+--data-urlencode
+'secureHash=180c2507bf70e81594075e916f874b2ba1ef1842a09612458452f3f7539e4239' \
+--data-urlencode 'lastTxnID='
+
+-- 52 of 76 --
+
+53
+15.2 Settlement Details Response Parameters
+Parameter Description Type Size Mandatory Remarks
+error_code
+Response code
+indicating
+success/failure of
+the request
+Alphanumeric 4 Yes
+000 / 0000 – Success
+Any other value indicates status
+req failure / original transaction
+not found.
+For status of the response always
+ch txnStatus and
+txnResponseCode
+merchantID Merchant account
+ID
+Alphanumeric 20 Yes Echo of request field
+lasttxnID Last txnid in the
+response
+Alphanumeric 32 No Last txnid in the response
+Payouts
+merchantID Merchant account
+ID
+Alphanumeric 20 Yes merchantID or providerID will be
+available
+providerID Service Provider Alphanumeric 32 C Either merchantID or providerID
+will be available
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 C Merchant Txn ref Number
+settlementStatu
+s
+Settlement status
+the transaction
+Alpha 3 C NSD – Not yet settled
+STD – Settled
+txnStatus Status of the
+original transact
+Alpha 3 C REǪ – Request received and in pro
+SUC – Transaction Successful
+REJ – Transaction Rejected
+ERR – Error in transaction process
+txnResponseCo
+de
+Txn response code Alphanumeric 4 C
+Original txn response code.
+000 / 0000 – Success
+Any other value indicates failure.
+
+-- 53 of 76 --
+
+54
+txnID Transaction ID
+generate
+PG
+Alphanumeric 24 C Transaction ID generate
+PG
+paymentID
+The authorization
+payment ID
+generated by the
+authorization
+system
+Alphanumeric 24 C
+The authorization payment ID
+generated by the authorization
+system
+settlementAcco
+unt
+Account number
+where the
+transaction was
+settled
+Alphanumeric 21 Yes Account number where the
+transaction was settled
+settlementAcc
+ountIFSC
+IFSC code of the
+account number
+Alphanumeric 11 Yes IFSC code of the account number
+txnAmount Transaction
+amount
+Numeric 9,2 Yes Transaction amount
+txnCharges Total charges Numeric 9,2 C Only available in case of merchant
+settlement
+serviceTax Service tax paid Numeric 9,2 C Only available in case of merchant
+settlement
+settledAmount Amount settled in
+the account
+Numeric 9,2 Yes Amount settled with
+merchant/service provider
+utr_no Utr number of the
+transfer
+Alphanumeric 24 Yes Utr number of the transfer
+settlementDate Date on which
+settlement was
+done
+Alphanumeric 12 Yes YYYYMMDD
+transmissionDa
+teTime
+Time at which
+transaction was
+executed
+Alphanumeric 12 Yes YYYYMMDD
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation for logic
+
+-- 54 of 76 --
+
+55
+Settlement Details response API:
+{"error_code":"000","merchantID":"T_03342","count":7,"Payouts":[{"merchantID":"T_03342","mercha
+ntTxnNo":"77563","settlementStatus":"SETTLED","txnStatus":"SUC","txnResponseCode":"0","txnID":"
+7700201499484","paymentID":"10520592231","settlementAccount":"629405033171","settlementAc
+countIFSC":"ICIC0000011","txnAmount":"100.00","serviceTax":"0.00","txnCharges":"0.00","settledAm
+ount":"100.00","utr_no":"T03342000280190","settlementDate":"28-07-
+2025","transmissionDateTime":"2025-07-28
+12:56:06"},{"merchantID":"T_03342","merchantTxnNo":"13689","settlementStatus":"SETTLED","txnSt
+atus":"SUC","txnResponseCode":"0","txnID":"7700201499495","paymentID":"906554130018","settle
+mentAccount":"629405033171","settlementAccountIFSC":"ICIC0000011","txnAmount":"100.00","ser
+viceTax":"0.00","txnCharges":"0.00","settledAmount":"100.00","utr_no":"T03342000280190","settle
+mentDate":"28-07-2025","transmissionDateTime":"2025-07-28
+13:02:45"},{"merchantID":"T_03342","merchantTxnNo":"5761","settlementStatus":"SETTLED","txnSta
+tus":"SUC","txnResponseCode":"0","txnID":"7700201499497","paymentID":"83946778663","settlem
+entAccount":"629405033171","settlementAccountIFSC":"ICIC0000011","txnAmount":"100.00","servic
+eTax":"0.00","txnCharges":"0.00","settledAmount":"100.00","utr_no":"T03342000280190","settlemen
+tDate":"28-07-2025","transmissionDateTime":"2025-07-28
+13:05:39"},{"merchantID":"T_03342","merchantTxnNo":"733A","settlementStatus":"SETTLED","txnSt
+atus":"SUC","txnResponseCode":"0","txnID":"7700201499508","paymentID":"90930961981","settle
+mentAccount":"629405033171","settlementAccountIFSC":"ICIC0000011","txnAmount":"100.00","ser
+viceTax":"0.00","txnCharges":"0.00","settledAmount":"100.00","utr_no":"T03342000280190","settle
+mentDate":"28-07-2025","transmissionDateTime":"2025-07-28
+13:17:39"},{"merchantID":"T_03342","merchantTxnNo":"7318A","settlementStatus":"SETTLED","txnS
+tatus":"SUC","txnResponseCode":"0","txnID":"7700201499510","paymentID":"15684915903","settle
+mentAccount":"629405033171","settlementAccountIFSC":"ICIC0000011","txnAmount":"100.00","ser
+viceTax":"0.00","txnCharges":"0.00","settledAmount":"100.00","utr_no":"T03342000280190","settle
+mentDate":"28-07-2025","transmissionDateTime":"2025-07-28
+13:27:58"},{"merchantID":"T_03342","merchantTxnNo":"1256A","settlementStatus":"SETTLED","txnS
+tatus":"SUC","txnResponseCode":"0","txnID":"7700201499517","paymentID":"186648344624","settl
+ementAccount":"629405033171","settlementAccountIFSC":"ICIC0000011","txnAmount":"100.00","se
+rviceTax":"0.00","txnCharges":"0.00","settledAmount":"100.00","utr_no":"T03342000280190","settle
+mentDate":"28-07-2025","transmissionDateTime":"2025-07-28
+13:37:07"},{"merchantID":"T_03342","merchantTxnNo":"1597169707","settlementStatus":"SETTLED"
+,"txnStatus":"SUC","txnResponseCode":"0","txnID":"7700201925306","paymentID":"54472510906","
+settlementAccount":"629405033171","settlementAccountIFSC":"ICIC0000011","txnAmount":"10000.
+00","serviceTax":"0.00","txnCharges":"0.00","settledAmount":"10000.00","utr_no":"T0334200028019
+0","settlementDate":"28-07-2025","transmissionDateTime":"2025-09-25
+18:46:20"}],"secureHash":"6971b3a706ed2dc46adecb21810ebb7df85ffabce9506e7cde13ca0b6c7b
+2efa"}
+Chapter 16: Get Card Bin
+16.1 Get Card Bin Request Parameters
+
+-- 55 of 76 --
+
+56
+To get the card Bank Identification Number (BIN) details stored in the Payment Gateway
+Parameter Description Type Size Mandatory Remarks
+merchantId Merchant id Alphanumeric 20 Yes System generated
+requestId Unique request ID Alphanumeric 12 Yes Unique request ID
+requestedAt Date time when
+the request was
+initiated
+Alphanumeric 14 Yes YYYYMMDDHHMMSS
+The requestDateTime should be in
+UTC and the value cannot be
+older than 30 mins of current time.
+cardNo Card bin or the
+card number
+Alphanumeric 20 No Card bin or the card number
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation v2 for the
+logic
+This is a server-to-server API Call which uses POST method with content type as
+"application/json”
+Sample Request body.
+{
+“merchantId”: “T_12345”, “requestId”: “00000000000003”,
+“requestedAt” : “20230426123501”
+“cardNo”: “400100007”,
+“secureHash”:
+“39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2”
+}
+
+-- 56 of 76 --
+
+57
+16.2 Get Card Bin Response Parameters
+Parameter Description Type Size Mandatory Remarks
+merchantId Merchant id Alphanumeric 20 Yes Echoed from the request
+network Card network Alphanumeric 45 Yes Whether VISA, Rupay or MC
+error_code Response code Alphanumeric 4 yes 0000 – success
+5001 – if the bin is inactive
+500 – Internal error
+errorDescription Response
+description
+Alphanumeric 48 No Only when the response is not
+successful
+cardType Type of the card Alphanumeric 45 No CC – credit card
+DC – debit card
+PP – prepaid card
+domOrIntl Whether the card
+is domestic or
+international
+Alphanumeric 45 No DOM – domestic card w.r.t. India
+INTL – international card w.r.t.
+India
+prdType Product type of the
+bin
+Alphanumeric 45 No Product type of the bin.
+Sample response
+{
+“error_code”: “000”,
+“errorDescription”: “Transaction successful”, “merchantId”: “123243”,
+“network” : “343223” “cardType”: “SUC”,
+“domOrIntl”: “000”,
+“prdType”: “”
+}
+
+-- 57 of 76 --
+
+58
+Chapter 17: UserCancel API
+17.1 User Cancel Request Parameters
+When a transaction is canceled by the end customer after a timeout, the merchant must call this API
+to mark the transaction as user canceled.
+Parameter Description Type Size Mandatory Remarks
+merchantId Merchant id Alphanumeric 20 Yes System provided.
+aggregatorID
+Merchant
+Aggregator ID
+Alphanumeric 20 C Only applicable for Aggregators
+merchantTxnNo Txn ref Number Alphanumeric 20 Yes
+Unique ref no to identify the
+request.
+Should have only alphanumeric
+characters. No other
+characters allowed.
+cancellationCode Error Code Alphanumeric 20 Yes Default = 020
+cancellationDesc Error Description Alphanumeric 48 Yes Default = Cancel By User
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation v2 for the
+logic
+This is a server-to-server API Call which uses POST method with content type as
+"application/json”
+Sample Request body.
+{
+“merchantId”: “T_12345”, “aggregatorID”: “A_00001”, “merchantTxnNo” : “20230426123501”
+“cancellationCode”: “020”, “cancellationDesc”: “Cancel By User”,
+“secureHash”:
+“39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2”
+}
+API End Point :- /pg/api/userCancel
+
+-- 58 of 76 --
+
+59
+17.2 UserCancel API Response Parameters
+Parameter Description Type Size Mandatory Remarks
+merchantId Merchant account
+ID
+Alphanumeric 20 Yes Echo of request field
+aggregatorID Merchant
+aggregator ID
+Alphanumeric 20 C Echo of request field (if available
+in request)
+merchantTxnNo Merchant Txn ref
+Number
+Alphanumeric 20 Yes Echo of request field
+respDescription Response
+description
+Alphanumeric 45 Yes Response description
+responseCode Response Code Alphanumeric 3 yes
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation V2
+Sample response.
+{
+“merchantId”: “T_12345”, “aggregatorID”: “A_00001”, “merchantTxnNo” : “20230426123501”
+“cancellationCode”: “020”, “cancellationDesc”: “Cancel By User”,
+“secureHash”: “39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2”
+}
+
+-- 59 of 76 --
+
+60
+Chapter 18: Get Service Charges API
+18.1 Get Service Charges Request Parameters
+ It is used to calculate the Transactions charges in case customer payable.
+Parameter Description Type Size Mandatory Remarks
+merchantId Merchant id Alphanumeric 20 Yes System provided.
+aggregatorID
+Merchant
+Aggregator ID Alphanumeric 20 C
+Only applicable for Aggregators
+merchantTxnNo Txn ref Number Alphanumeric 20 Yes
+Unique ref no to identify the
+request.
+Should have only alphanumeric
+characters. No other characters
+allowed.
+paymentMode Payment mode Alphanumeric 48 Yes
+ CARD
+ NB
+ WALLET
+ UPI
+ AADHAAR
+paymentOption
+Codes
+Sub Payment
+mode
+Alphanumeric 48 Yes Available options under a select
+payment mode.
+amount Transaction
+amount
+Numeric 9,2 Yes 9 significant and 2
+decimal/precision
+e.g., nnnnnnnnn.nn
+currencyCode Transaction
+Currency
+Numeric 3 Yes 356
+secureHash Hash value Alphanumeric 64 Yes Check Hash Calculation v2 for the
+logic
+This is a server-to-server API Call which uses POST method with content type as
+"application/x- www- form-urlencoded”
+
+-- 60 of 76 --
+
+61
+Sample Request body.
+{
+“respHeader” :
+{ “responseCode”: “200”, “respDescription” : “OK”
+},
+“respBody”: {
+“merchantId”: “T_12345”, “amount”: “100”,
+“serviceCharge”: “11.80”
+}
+}
+
+-- 61 of 76 --
+
+62
+18.2 Get Service Charges Response Parameters
+Parameter Description Type Size Mandatory Remarks
+respHeader
+responseCode Response code Alphanumeric Yes 200 in case of success
+respDescription Response
+description
+Alphanumeric Yes OK in case of success
+respBody
+merchantId Merchant account
+ID
+Alphanumeric 20 Yes Echo of request field
+amount Amount Numeric 9,2 Yes Echo of request field
+serviceCharge Service charges
+calculated for the
+payment mode and
+sub payment mode
+Numeric 9,2 Yes Service charges including GST
+Sample response.
+{
+“respHeader” :
+{ “responseCode”: “200”, “respDescription” : “OK”
+},
+“respBody”: {
+“merchantId”: “T_12345”, “amount”: “100”,
+“serviceCharge”: “11.80”
+}
+}
+
+-- 62 of 76 --
+
+63
+Sample HTML for Standard Mode Integration
+Request Parameters HTTP- POST: https:// .co.in/Phiwebpay/v1.0/payments
+<form id='myForm' name='myForm' action='${saleRequestURL}'
+method='post' enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="merchantID" value="M00001" />
+<input type="hidden" name="merchantTxnNo" value="M99887766" />
+<input type="hidden" name="amount" value="1000" />
+<input type="hidden" name="currencyCode" value="356" />
+<input type="hidden" name="payType" value="0" />
+<input type="hidden" name="customerEmailId" value="customer@email.com" />
+<input type="hidden" name="transactionType" value="SALE" />
+<input type="hidden" name="returnURL"
+value="https://shoppingdomain.com/paymentResponseURL" />
+<input type="hidden" name="txnDate" value="20160803101010" />
+<input type="hidden" name="customerMobileNo" value="9123456789" />
+<input type="hidden" name="secureHash"
+value="062f43817ff97eee69e89ff6d4ea283295db5d3f73a5c8addfa9012aed6aa995"/>
+</form>
+
+-- 63 of 76 --
+
+64
+Sample HTML for Direct Mode Integration
+<form id='myForm' name='myForm' action='${saleRequestURL}'
+method='post' enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="merchantID" value="M00001" />
+<input type="hidden" name="merchantTxnNo" value="M99887766" />
+<input type="hidden" name="amount" value="1000" />
+<input type="hidden" name="currencyCode" value="356" />
+<input type="hidden" name="payType" value="1" />
+<input type="hidden" name="customerEmailId" value="customer@email.com" />
+<input type="hidden" name="transactionType" value="SALE" />
+<input type="hidden" name="returnURL"
+value="https://shoppingdomain.com/paymentResponseURL" />
+<input type="hidden" name="txnDate" value="356" />
+<input type="hidden" name="customerMobileNo" value="9123456789" />
+<input type="hidden" name="cardNo" value="4111111111111111" />
+<input type="hidden" name="cardExp" value="202008" />
+<input type="hidden" name="nameOnCard" value="Customer Name" />
+<input type="hidden" name="cvv" value="123" />
+<input type="hidden" name="secureHash"
+value="062f43817ff97eee69e89ff6d4ea283295db5d3f73a5c8addfa9012aed6aa995" />
+</form>
+
+-- 64 of 76 --
+
+65
+Payment Response
+<form id='myForm' name='myForm' action='${merchantReturnURL}'
+method='post' enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="responseCode" value="000" />
+<input type="hidden" name="respDescription" value="SUCCESS" />
+<input type="hidden" name="merchantId" value="M000001" />
+<input type="hidden" name="merchantTxnNo" value="M0099999221" />
+<input type="hidden" name="txnID" value="T1472640294491" />
+<input type="hidden" name="paymentDateTime" value="20160831041454" />
+<input type="hidden" name="txnAuthID" value="006503" />
+<input type="hidden" name="secureHash"
+value="39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2" />
+</form>
+
+-- 65 of 76 --
+
+66
+Refund/Auth Response
+Sample response for refund/auth would be in json format. Sample response given below.
+{
+“responseCode”: “000”, “respDescription”: “”, “merchantId”: “123243”,
+“merchantTxnNo” : “343223” “txnID”:”T20394302393”,
+“paymentDateTime”: “20160803101010”,
+“txnAuthID” : “28288”, “addlParam1” : “”,
+“addlParam2” : “”,
+“secureHash”: “39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2”
+}
+Transaction Status Response
+Sample response for status would be in json format as given below.
+{
+“responseCode”: “000”, “respDescription”: “”, “merchantId”: “123243”,
+“merchantTxnNo” : “343223” “txnStatus”: “SUC”, “txnResponseCode”: “000”, “txnRespDescription”:
+“”, “txnID”:”T20394302393”,
+“paymentDateTime”: “20160803101010”,
+“txnAuthID” : “28288”,
+“secureHash”: “39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2”
+}
+
+-- 66 of 76 --
+
+67
+Settlement Status Response
+Sample response for settlement status would be in json format. Sample response given below.
+{
+“responseCod
+e”: “000”,
+“respDescription”:
+“”, “merchantId”:
+“123243”,
+“aggregatorID”: “123243”,
+“merchantTxnNo” : “343223”
+“settlementStatus”: “STD”,
+“txnStatus”: “SUC”,
+“txnResponseCode”: “0000”,
+“txnID”:”T20394302393”,
+“settlementID” : “28288_20191010-001”,
+“settlementDate”: “20160803”,
+“secureHash”:
+“39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2”
+}
+
+-- 67 of 76 --
+
+68
+Hash Calculation
+Step 1: Concatenate the parameter values (if not null and not an empty string) in ascending
+order of parameter names. E.g., if param1 = “abc”, param2 = “xyz” and name = ”aa” then the
+concatenated value would be “aaabcxyz” (i.e., value of name + value of param1 + value of
+param2).
+Step 2: Use HMAC function to calculate the hash. The algorithm used should be SHA256.
+The key used should be the key shared with the merchant/pg by ICICI Bank.
+Step 3: Convert the result to HEX format.
+Step 4: Convert the HEX format to lowercase and send it in secureHash parameter. E.g., if result
+of step 3 is “FEAB12CD” then convert it to “feab12cd”. This step can be skipped if the result of
+step 3 is already in lowercase.
+Hash Logic: Merchant has to generate to a secure hash at their end for the response parameter
+that is being received in the callback URL. Accordingly, match it with the securehash that is
+received in the response callback.
+Note 1: Don’t ignore any parameters which are part of a response or request for hash
+calculation, even if the parameter is not part of published spec. Parameters which are not part
+of specs can be ignored for business processing but not for hash calculation. One can ignore
+only those parameters which are null or have empty values for hash calculation.
+Note 2: The hash calculation logic is available in V1 and V2. For APIs where the version is not
+specified, it is assumed to be Hash Calc V1.
+Java example for HMAC
+public static String hmacDigest(String msg, String keyString)
+{ String digest = null;
+try {
+SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), “HmacSHA256”);
+Mac mac = Mac.getInstance(“HmacSHA256”);
+mac.init(key);
+byte[] bytes = mac.doFinal(msg.getBytes("ASCII"));
+StringBuffer hash = new StringBuffer();
+for (int i = 0; i <bytes.length; i++) {
+String hex = Integer.toHexString(0xFF & bytes[i]);
+if (hex.length() == 1) {
+hash.append('0');
+}
+97Interface Specifications Document
+hash.append(hex);
+}
+
+-- 68 of 76 --
+
+69
+digest = hash.toString();
+} catch (UnsupportedEncodingException e) {
+} catch (InvalidKeyException e) {
+} catch (NoSuchAlgorithmException e) {
+}
+return digest;
+}
+Java sample for server-to-server API call (HTTPS Post)
+// HTTP POST request
+public void sendPost()throws Exception {
+String url="https://abc.example.com/someoperation"; URL obj=newURL(url);
+HttpsURLConnection con =(HttpsURLConnection)obj.openConnection();
+//add request header con.setRequestMethod("POST"); con.setRequestProperty("Content-Type",
+"application/x-www-form-urlencoded");
+String
+urlParams="merchantId=12321&merchantTxnNo=38928332&transactionType=REFUND&secureHa
+sh
+=39867b8ef38a2853aacb84bbf5f927a72b27bdb301365245564f012d20dbc2f2";
+// Send post request con.setDoOutput(true); con.setDoInput(true);
+DataOutputStreamwr=newDataOutputStream(con.getOutputStream()); wr.writeBytes(urlParams);
+wr.flush();
+wr.close();
+System.out.println("Sending POST request to URL : "+url);
+intresponseCode=con.getResponseCode(); System.out.println("Post parameters : "+urlParameters);
+BufferedReader in
+=newBufferedReader( newInputStreamReader(con.ge tInputStream())); String inputLine;
+StringBuffer response =newStringBuffer(); while((inputLine=in.readLine())!= null){
+response.append(inputLine);
+}
+in.close();
+//print result System.out.println(response.toString());
+
+-- 69 of 76 --
+
+70
+Hash Calculation (v2)
+Applicable for json requests/responses
+Step 1: Convert the json request/response to string (e.g., JSON.stringify(jsonObject)). The json
+request has to be a minified json and not a formatted json.
+Step 2: Use the output of step 1 to calculate the hash. Use HMAC function to calculate the
+hash. The algorithm used should be SHA256. The key used should be the key shared with
+the merchant/pg by ICICI Bank.
+Step 3: Convert the result to HEX format.
+Step 4: Convert the HEX format to lowercase. E.g., if result of step 3 is “FEAB12CD” then convert
+it to “feab12cd”. This step can be skipped if the result of step 3 is already in lowercase.
+Step 5: Send the value (step 4 result) in the custom http request header parameter
+“securehash” Note: Since request header names are case insensitive the parameter name is
+“securehash” (all in lower case)
+Java example for HMAC
+Please Note: If user is using the UDF parameters, then the clear text json packet of udf parameter
+value need to append with the other parameter to generate the secure hash.
+public static String hmacDigest(String msg, String keyString)
+{ String digest = null;
+try {
+SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), “HmacSHA256”);
+Mac mac = Mac.getInstance(“HmacSHA256”);
+mac.init(key);
+byte[] bytes = mac.doFinal(msg.getBytes("ASCII"));
+StringBuffer hash = new StringBuffer();
+for (int i = 0; i <bytes.length; i++) {
+String hex = Integer.toHexString(0xFF & bytes[i]);
+if (hex.length() == 1) {
+hash.append('0');
+}
+97Interface Specifications Document
+hash.append(hex);
+}
+digest = hash.toString();
+} catch (UnsupportedEncodingException e) {
+} catch (InvalidKeyException e) {
+} catch (NoSuchAlgorithmException e) {
+}
+return digest;
+}
+
+-- 70 of 76 --
+
+71
+Sample API Request and Response
+Standard Method
+1. Initiate sale Request (Standard Method PayType = 0)
+Initiate sale Response (Standard Method PayType = 0)
+{"responseCode":"R1000","merchantId":"T_S00067","aggregatorID":null,"merchantTxnNo":"Test03
+102025111","redirectURI":"https://pgpayuat.icicibank.com/tsp/pg/api/v2/authRedirect","showOTPC
+apturePage":"N","generateOTPURI":null,"verifyOTPURI":null,"authorizeURI":null,"tranCtx":"Rb2fa69
+8c-e1bd-41fc-b4c5-
+5b5cda1a2c53","secureHash":"da3e83172b3717be0e3c294157eda2b250a419251bf11010b4966
+40b7775cd49"}
+Direct Method
+2. Initiate sale Request (Direct Method PayTyp e = 1)
+
+-- 71 of 76 --
+
+72
+
+-- 72 of 76 --
+
+73
+Initiate sale Response (Direct Method PayType = 1)
+{"responseCode":"R1000","merchantId":"T_S0001","aggregatorID":"J_D0001","merchantTxnNo":"T
+est0310202511","redirectURI":"https://pgpayuat.icicibank.com/tsp/pg/api/v2/authRedirect","showO
+TPCapturePage":"N","generateOTPURI":null,"verifyOTPURI":null,"authorizeURI":null,"tranCtx":"R5b
+fa541a-9e0e-469c-92d9-
+e12b89b717cc","secureHash":"4f4f1c96141401bb96acea6b662de5304429f11b9491f87bbfb0d24
+26f9ee3df"}
+3. Transaction Refund Request
+curl --location 'https://pgpayuat.icicibank.com/tsp/pg/api/command' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'merchantId=T_S00067' \
+--data-urlencode 'transactionType=REFUND' \
+--data-urlencode 'merchantTxnNo=Test03102025' \
+--data-urlencode 'originalTxnNo=7700206371536' \
+--data-urlencode 'amount=150.00' \
+--data-urlencode
+'secureHash=90a84da8a87c0433625016af74001e88ccf00ede8f3ded30a486c4463b774bd5' \
+--data-urlencode 'addlParam1=Additional Information'
+Transaction Refund Response
+{"secureHash":"87b6d49a2ceb1dc54352bd6d0851f07ee28213614c693274d32cc8a5f33b478d","r
+espDescription":"Request processed
+successfully","merchantId":"T_S00067","merchantTxnNo":"Test03102025","addlParam1":"Addition
+al Information","txnID":"7700206371606","responseCode":"R1000"}
+4. Transaction Status Check Request
+curl --location 'https://pgpayuat.icicibank.com/tsp/pg/api/command' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'merchantId=T_S00067' \
+--data-urlencode 'merchantTxnNo=Test03102025' \
+--data-urlencode 'originalTxnNo=7700206371536' \
+--data-urlencode 'transactionType=STATUS' \
+--data-urlencode
+'secureHash=8dead97d14d846cbb5674a46385675d242dbb35e54b37e423f241cbca85519f6' \
+--data-urlencode 'addlParam1=Additional Information'
+
+-- 73 of 76 --
+
+74
+Transaction Status Check Response
+{"txnRespDescription":"Transaction
+successful","secureHash":"2e2f67b7038a6f86d8383b59f8b7c6bf443b71d783212e9a29b6dc09abf
+bef12","amount":"550.00","txnResponseCode":"0000","txnAuthID":"811069696857","authCode":"7
+700201930022","respDescription":"Request processed
+successfully","paymentMode":"UPI","customerEmailID":"guest@icici.com","TransmissionDateTime":
+"20251003155304","oth_charge":false,"paymentInstId":"9552012231@upi","responseCode":"000",
+"customerMobileNo":"7912403781","txnStatus":"SUC","merchantId":"T_S00067","merchantTxnNo"
+:"7700206371536","addlParam1":"Additional
+Information","paymentDateTime":"20251003155335","txnID":"7700206371536"}
+
+-- 74 of 76 --
+
+75
+URLs
+Test Environment URLS
+Sale
+https://pgpayuat.icicibank.com/tsp/pg/api/v2/initiateSale
+Refund/StatusCheck
+https://pgpayuat.icicibank.com/tsp/pg/api/command
+GenerateQR UAT
+https://pgpayuat.icicibank.com/tsp/pg/api/generateQR
+Settlement Details
+https://pgpayuat.icicibank.com/tsp/pg/api/settlementDetails
+Settlement Summary
+https://pgpayuat.icicibank.com/tsp/pg/api/command
+User Cancelation API
+https://pgpayuat.icicibank.com/tsp/pg/api/userCancel
+Production URLs
+Sale
+https://pgpay.icicibank.com/pg/api/v2/initiateSale
+Refund/Void/StatusCheck
+https://pgpay.icicibank.com/pg/api/command
+GenerateQR:
+https://pgpay.icicibank.com/pg/api/generateQR
+Settlement Details:
+https://pgpay.icicibank.com/pg/api/settlementDetails
+Settlement Summary
+https://pgpay.icicibank.com/pg/api/command
+User Cancelation API
+https://pgpay.icicibank.com/pg/api/userCancel
+
+-- 75 of 76 --
+
+76
+
+-- 76 of 76 --
+

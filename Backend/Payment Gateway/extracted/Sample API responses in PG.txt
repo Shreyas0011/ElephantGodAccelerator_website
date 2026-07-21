@@ -1,0 +1,204 @@
+
+
+Request for QR
+
+curl --location 'https://qa.phicommerce.com/pg/api/v2/initiateSale' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    
+    "amount": "100.00",
+    "currencyCode": "356",
+    "customerEmailID": "asawari.athawale@phicommerce.com",
+    "customerID": "3432239",
+    "customerMobileNo": "8864634747",
+    "customerName": "BhasakarCollege",
+    "merchantId": "T_70115",
+    "merchantTxnNo": "543095363667",
+    "payType": "0",
+    "addlParam1": "tEST1234",
+    "addlParam2": "Test Version 4",
+    "returnURL": "https://qa.phicommerce.com/pg/api/merchant",
+    "secureHash": "aa99d2a106bedcd2e1788b555c05727a2e2932bea2470af71a680274ff2af5b4",
+    "transactionType": "SALE",
+    "txnDate": "20250812132505"
+    
+}'
+
+Response : 
+
+2025-08-12 17:54:21 DEBUG vert.x-eventloop-thread-0 StatusCheckRedirectHttpVerticle:86 Hgrb-DP2R7appGwkAdMBHA - Resp to merchant :{
+  "status" : "SUC",
+  "responseCode" : "0000",
+  "respDescription" : "Transaction successful",
+  "responseParams" : {
+    "secureHash" : "e74097b30a51480ce69971bb14e7b8211a4d04098a7b0f8419cc9c8712e759ec",
+    "amount" : "100.00",
+    "respDescription" : "Transaction successful",
+    "paymentMode" : "UPI",
+    "customerEmailID" : "asawari.athawale@phicommerce.com",
+    "addlParam2" : "Test Version 4",
+    "oth_charge" : false,
+    "paymentInstId" : "9552012231@upi",
+    "responseCode" : "0000",
+    "customerMobileNo" : "8864634747",
+    "merchantId" : "T_70115",
+    "paymentID" : "815122124015",
+    "merchantTxnNo" : "543095363667",
+    "addlParam1" : "tEST1234",
+    "paymentDateTime" : "20250812175422",
+    "txnID" : "7700201519046"
+  },
+  "properties" : {
+    "rejectMsg" : true,
+    "displayName" : "Nankana Sahib",
+    "oth_charge" : false,
+    "isSuccess" : false
+  },
+  "redirectType" : "MERCHANT",
+  "redirectURL" : "https://qa.phicommerce.com/pg/api/merchant",
+  "tenantId" : null,
+  "templateID" : null,
+  "txnFromIFrame" : 0,
+  "bepgenabled" : false,
+  "allowedRetry" : true
+}
+
+2025-08-12 17:54:23 ERROR pool-3-thread-2 Utility:2447  - Send Advice request : 0 : txnID = 7700201519046
+2025-08-12 17:54:23 ERROR pool-3-thread-2 Utility:2448  - Advice URL :/pg/api/merchant : txnID = 7700201519046
+2025-08-12 17:54:23 ERROR pool-3-thread-2 Utility:2449  - Advice Content-Type :application/x-www-form-urlencoded : txnID = 7700201519046
+2025-08-12 17:54:23 ERROR pool-3-thread-2 Utility:2450  - Advice encodedBody :currentRequestKey=Ea5AOPyN28eGA380mtpPGA%3D%3D&paymentInstId=9552012231%40upi&customerMobileNo=8864634747&customerEmailID=asawari.athawale%40phicommerce.com&paymentMode=UPI&amount=100.00&responseCode=0000&respDescription=Transaction%20successful&merchantId=T_70115&merchantTxnNo=543095363667&txnID=7700201519046&paymentDateTime=20250812175421&paymentID=815122124015&addlParam1=tEST1234&addlParam2=Test%20Version%204&secureHash=4c25409344a204e8d7f4c3e4e628cf3c15551ac1f6ec06b5f98f8fb866b35d0b : txnID = 7700201519046
+2025-08-12 17:54:23 DEBUG pool-3-thread-2 Utility:2486  - send Authorization in header : Authorization=Bearer REDACTED_SALESFORCE_TOKEN
+-------------------------------------------------------------------------------------------------------------------------
+Card Response : 
+2025-08-12 18:07:02 DEBUG vert.x-eventloop-thread-0 PgResponseHttpService:249 3aZ5y_E-Q72aRbAnhIfOdA - RespAction in PgResponse http service{
+  "status" : "SUC",
+  "responseCode" : "0000",
+  "respDescription" : "Transaction successful",
+  "responseParams" : {
+    "secureHash" : "b526bc01462146f70351649cf726406a2d7b97cdc8b552c52c22e301f3521edc",
+    "amount" : "100.00",
+    "respDescription" : "Transaction successful",
+    "paymentMode" : "Card",
+    "customerEmailID" : "asawari.athawale@phicommerce.com",
+    "addlParam2" : "Test Version 4",
+    "paymentInstId" : "6XXX XXXX XXXX 3677",
+    "responseCode" : "0000",
+    "customerMobileNo" : "8864634747",
+    "paymentSubInstType" : "DC",
+    "merchantId" : "T_70115",
+    "paymentID" : "91186569678",
+    "merchantTxnNo" : "543097766657",
+    "addlParam1" : "tEST1234",
+    "paymentDateTime" : "20250812180654",
+    "txnID" : "7700201519065"
+  },
+  "properties" : {
+    "amount" : 100.0000,
+    "displayName" : "Nankana Sahib",
+    "oth_charge" : false,
+    "isSuccess" : true
+  },
+  "redirectType" : "MERCHANT",
+  "redirectURL" : "https://qa.phicommerce.com/pg/api/merchant",
+  "tenantId" : null,
+  "templateID" : null,
+  "txnFromIFrame" : 0,
+  "bepgenabled" : false,
+  "allowedRetry" : true
+  }
+  
+  2025-08-12 18:07:02 ERROR saleServiceGroup-8 Utility:2447 XImz8f5uS5Guors9R70qVg - Send Advice request : 0 : txnID = 7700201519065
+2025-08-12 18:07:02 ERROR saleServiceGroup-8 Utility:2448 XImz8f5uS5Guors9R70qVg - Advice URL :/pg/api/merchant : txnID = 7700201519065
+2025-08-12 18:07:02 ERROR saleServiceGroup-8 Utility:2449 XImz8f5uS5Guors9R70qVg - Advice Content-Type :application/x-www-form-urlencoded : txnID = 7700201519065
+2025-08-12 18:07:02 ERROR saleServiceGroup-8 Utility:2450 XImz8f5uS5Guors9R70qVg - Advice encodedBody :paymentInstId=6XXX%20XXXX%20XXXX%203677&customerMobileNo=8864634747&customerEmailID=asawari.athawale%40phicommerce.com&paymentSubInstType=DC&paymentMode=Card&amount=100.00&responseCode=0000&respDescription=Transaction%20successful&merchantId=T_70115&merchantTxnNo=543097766657&txnID=7700201519065&paymentDateTime=20250812180654&paymentID=91186569678&addlParam1=tEST1234&addlParam2=Test%20Version%204&secureHash=b526bc01462146f70351649cf726406a2d7b97cdc8b552c52c22e301f3521edc : txnID = 7700201519065
+
+
+-----------------------------------------------------------------------------------------------------------------------
+UPI QR Response : 
+
+2025-08-12 18:21:24 DEBUG vert.x-eventloop-thread-0 StatusCheckRedirectHttpVerticle:86 dFZcIUu1TAGQ46XYu618qA - Resp to merchant :{
+  "status" : "SUC",
+  "responseCode" : "0000",
+  "respDescription" : "Transaction successful",
+  "responseParams" : {
+    "secureHash" : "4d4eeca6d04ac8d66040690424587587efe2d7f58c1a06664595a77b6ab68296",
+    "amount" : "100.00",
+    "respDescription" : "Transaction successful",
+    "paymentMode" : "UPI",
+    "customerEmailID" : "asawari.athawale@phicommerce.com",
+    "addlParam2" : "Test Version 4",
+    "oth_charge" : false,
+    "paymentInstId" : "9552012231@upi",
+    "responseCode" : "0000",
+    "customerMobileNo" : "8864634747",
+    "merchantId" : "T_70115",
+    "paymentID" : "523412257863",
+    "merchantTxnNo" : "54309556757",
+    "addlParam1" : "tEST1234",
+    "paymentDateTime" : "20250812182124",
+    "txnID" : "7700201519083"
+  },
+  "properties" : {
+    "rejectMsg" : true,
+    "displayName" : "Nankana Sahib",
+    "oth_charge" : false,
+    "isSuccess" : false
+  },
+  "redirectType" : "MERCHANT",
+  "redirectURL" : "https://qa.phicommerce.com/pg/api/merchant",
+  "tenantId" : null,
+  "templateID" : null,
+  "txnFromIFrame" : 0,
+  "bepgenabled" : false,
+  "allowedRetry" : true
+}
+
+
+2025-08-12 18:21:25 ERROR pool-3-thread-4 Utility:2447  - Send Advice request : 0 : txnID = 7700201519083
+2025-08-12 18:21:25 ERROR pool-3-thread-4 Utility:2448  - Advice URL :/pg/api/merchant : txnID = 7700201519083
+2025-08-12 18:21:25 ERROR pool-3-thread-4 Utility:2449  - Advice Content-Type :application/x-www-form-urlencoded : txnID = 7700201519083
+2025-08-12 18:21:25 ERROR pool-3-thread-4 Utility:2450  - Advice encodedBody :currentRequestKey=Ea5AOPyN28eGA380mtpPGA%3D%3D&paymentInstId=9552012231%40upi&customerMobileNo=8864634747&customerEmailID=asawari.athawale%40phicommerce.com&paymentMode=UPI&amount=100.00&unSolRespType=UPIQR&responseCode=0000&respDescription=Transaction%20successful&merchantId=T_70115&merchantTxnNo=54309556757&txnID=7700201519083&paymentDateTime=20250812182123&paymentID=523412257863&addlParam1=tEST1234&addlParam2=Test%20Version%204&secureHash=453303e2a274b0d1beab291c474b8e7ae94852b379d0a8ffa6c8da7a927b66bd : txnID = 7700201519083
+--------------------------------------------------------------------------------------------------------------------------------
+Response for Net Banking
+
+2025-08-12 18:29:01 DEBUG vert.x-eventloop-thread-0 PgResponseHttpService:249 o5K9KRlrR0G0HeHTfrzC2A - RespAction in PgResponse http service{
+  "status" : "SUC",
+  "responseCode" : "0000",
+  "respDescription" : "Transaction successful",
+  "responseParams" : {
+    "secureHash" : "4f52e2a46cd9e3ec22153c2a849ece1fb6303c8cf8360c9e11f19c6978b39c7d",
+    "amount" : "100.00",
+    "respDescription" : "Transaction successful",
+    "paymentMode" : "NB",
+    "customerEmailID" : "asawari.athawale@phicommerce.com",
+    "addlParam2" : "Test Version 4",
+    "responseCode" : "0000",
+    "customerMobileNo" : "8864634747",
+    "paymentSubInstType" : "Phicom Test bank",
+    "merchantId" : "T_70115",
+    "paymentID" : "61792736640",
+    "merchantTxnNo" : "543096766757",
+    "addlParam1" : "tEST1234",
+    "paymentDateTime" : "20250812182853",
+    "txnID" : "7700201519089"
+  },
+  "properties" : {
+    "amount" : 100.0000,
+    "displayName" : "Nankana Sahib",
+    "oth_charge" : false,
+    "isSuccess" : true
+  },
+  "redirectType" : "MERCHANT",
+  "redirectURL" : "https://qa.phicommerce.com/pg/api/merchant",
+  "tenantId" : null,
+  "templateID" : null,
+  "txnFromIFrame" : 0,
+  "bepgenabled" : false,
+  "allowedRetry" : true
+}
+
+
+2025-08-12 18:29:01 ERROR saleServiceGroup-0 Utility:2447 o5K9KRlrR0G0HeHTfrzC2A - Send Advice request : 0 : txnID = 7700201519089
+2025-08-12 18:29:01 ERROR saleServiceGroup-0 Utility:2448 o5K9KRlrR0G0HeHTfrzC2A - Advice URL :/pg/api/merchant : txnID = 7700201519089
+2025-08-12 18:29:01 ERROR saleServiceGroup-0 Utility:2449 o5K9KRlrR0G0HeHTfrzC2A - Advice Content-Type :application/x-www-form-urlencoded : txnID = 7700201519089
+2025-08-12 18:29:01 ERROR saleServiceGroup-0 Utility:2450 o5K9KRlrR0G0HeHTfrzC2A - Advice encodedBody :bankCode=224&customerMobileNo=8864634747&customerEmailID=asawari.athawale%40phicommerce.com&paymentSubInstType=Phicom%20Test%20bank&paymentMode=NB&amount=100.00&responseCode=0000&respDescription=Transaction%20successful&merchantId=T_70115&merchantTxnNo=543096766757&txnID=7700201519089&paymentDateTime=20250812182853&paymentID=61792736640&addlParam1=tEST1234&addlParam2=Test%20Version%204&secureHash=cf1eeffe77507ad6f2f89866adb2812e136f6c017cc4e10bd15c62cb511e6755 : txnID = 7700201519089

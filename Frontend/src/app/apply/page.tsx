@@ -156,21 +156,25 @@ export default function ApplyPage() {
     setAccUploading(true);
     setAccUploadError(null);
 
-    let pitchDeckUrl = "";
+    let pitchDeckMeta = null;
     if (accFileObj) {
       try {
         const formData = new FormData();
         formData.append("pitchDeck", accFileObj);
+        formData.append("founderEmail", accFormData.founderEmail || "");
+        formData.append("founderName", accFormData.founderName || "");
+        formData.append("uploadPurpose", "application");
+
         const uploadRes = await fetch(`${API_URL}/upload/pitch-deck`, {
           method: "POST",
           body: formData,
         });
         if (!uploadRes.ok) {
           const err = await uploadRes.json();
-          throw new Error(err.error || "File upload failed.");
+          throw new Error(err.message || err.error || "File upload failed.");
         }
         const uploadData = await uploadRes.json();
-        pitchDeckUrl = uploadData.fileUrl;
+        pitchDeckMeta = uploadData.pitchDeck;
       } catch (err: any) {
         setAccUploading(false);
         setAccUploadError(err.message || "Failed to upload pitch deck.");
@@ -181,7 +185,7 @@ export default function ApplyPage() {
     const payload = {
       type: "acceleration",
       ...accFormData,
-      pitchDeck: pitchDeckUrl,
+      pitchDeck: pitchDeckMeta,
     };
 
     try {

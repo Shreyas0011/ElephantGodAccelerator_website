@@ -37,6 +37,14 @@ const EventSchema = new mongoose.Schema(
       ],
     },
     externalLink: String,
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
+    price: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
